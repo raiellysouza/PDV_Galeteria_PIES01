@@ -2,7 +2,8 @@ package com.example.pdv_galeteria.Frontend.Controllers;
 
 import java.io.File;
 import java.io.IOException;
-
+import com.example.pdv_galeteria.Frontend.Models.Usuario;
+import com.example.pdv_galeteria.Frontend.Models.UsuarioManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,14 +22,18 @@ public class LoginController {
     private PasswordField campoSenha;
 
     @FXML
-    @SuppressWarnings("unused")
     private void mudarPagina(ActionEvent event) throws IOException {
         String usuario = campoUsuario.getText();
         String senha = campoSenha.getText();
 
-        // Validação simples - usuário e senha temporários
-        if ("admin".equals(usuario) && "1234".equals(senha)) {
-            // Login bem-sucedido - vai para tela inicial
+        // Tenta fazer login
+        Usuario usuarioLogado = UsuarioManager.fazerLogin(usuario, senha);
+
+        if (usuarioLogado != null) {
+            // Login bem-sucedido
+            mostrarSucesso("Login realizado com sucesso!\n\nBem-vindo, " + usuarioLogado.getNome() + "!");
+
+            // Vai para tela inicial
             Parent root = FXMLLoader.load(
                     new File("src/main/java/com/example/pdv_galeteria/Frontend/views/TelaInicial.fxml").toURI()
                             .toURL());
@@ -36,17 +41,35 @@ public class LoginController {
             stage.setScene(new Scene(root));
             stage.show();
         } else {
-            // Login falhou - mostra mensagem de erro
+            // Login falhou
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erro de Login");
             alert.setHeaderText(null);
-            alert.setContentText("Usuário ou senha incorretos!\nUse: admin / 1234");
+            alert.setContentText(
+                    "Email ou senha incorretos!\n\nCadastre-se ou tente novamente.");
             alert.showAndWait();
 
             // Limpa os campos
             campoUsuario.setText("");
             campoSenha.setText("");
-            campoUsuario.requestFocus(); // Volta o foco para o campo de usuário
+            campoUsuario.requestFocus();
         }
+    }
+
+    @FXML
+    private void abrirCadastro(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(
+                new File("src/main/java/com/example/pdv_galeteria/Frontend/views/Cadastro.fxml").toURI().toURL());
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
+    }
+
+    private void mostrarSucesso(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Login Bem-sucedido");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
     }
 }

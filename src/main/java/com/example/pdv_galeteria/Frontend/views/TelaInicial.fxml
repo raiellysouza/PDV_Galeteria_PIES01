@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.Glow?>
@@ -31,6 +32,9 @@
                <HBox.margin>
                   <Insets left="1100.0" top="27.0" />
                </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </Button>
             <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#voltarLogin" prefHeight="32.0" prefWidth="90.0" style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-background-color: white; -fx-pref-height: 30;" text="Sair" textFill="#ee0000">
                <font>
@@ -39,6 +43,9 @@
                <HBox.margin>
                   <Insets left="9.0" right="20.0" top="27.0" />
                </HBox.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </Button>
          </children>
       </HBox>
@@ -62,7 +69,7 @@
             </ImageView>
          </children>
       </Pane>
-      <Pane layoutX="39.0" layoutY="160.0" prefHeight="502.0" prefWidth="916.0" style="-fx-background-color: #87CEFF; -fx-background-radius: 10;">
+      <Pane layoutX="38.0" layoutY="160.0" prefHeight="502.0" prefWidth="916.0" style="-fx-background-color: #87CEFF; -fx-background-radius: 10;">
          <children>
             <Label layoutX="53.0" layoutY="14.0" text="Produtos">
                <font>
@@ -74,6 +81,179 @@
                   <Image url="@../../../../../../../../../../Users/pinho/Downloads/curry.png" />
                </image>
             </ImageView>
+            <Pane layoutX="129.0" layoutY="57.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Label layoutX="68.0" layoutY="26.0" text="Coxa de Frango">
+                     <font>
+                        <Font name="Georgia Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/coxa-de-frango.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="129.0" layoutY="196.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Label layoutX="68.0" layoutY="26.0" text="Coca-Cola 2L">
+                     <font>
+                        <Font name="Georgia Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/garrafa-de-refrigerante.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="129.0" layoutY="334.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Label layoutX="68.0" layoutY="26.0" text="Espetinho">
+                     <font>
+                        <Font name="Georgia Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/shishkebab.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="360.0" layoutY="57.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/salsicha.png" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="68.0" layoutY="26.0" text="Linguiça">
+                     <font>
+                        <Font name="Georgia Bold" size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+            <Pane layoutX="360.0" layoutY="196.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="172.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/carne.png" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="68.0" layoutY="26.0" text="Frango inteiro">
+                     <font>
+                        <Font name="Georgia Bold" size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+            <Pane layoutX="360.0" layoutY="334.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Label layoutX="68.0" layoutY="26.0" text="Porção de Arroz">
+                     <font>
+                        <Font name="Georgia Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/tigela-de-arroz.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="592.0" layoutY="57.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="592.0" layoutY="196.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+               </children>
+            </Pane>
+            <Pane layoutX="592.0" layoutY="334.0" prefHeight="120.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+               <children>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="152.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../../Users/pinho/Downloads/mais.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+               </children>
+            </Pane>
          </children>
       </Pane>
    </children>
