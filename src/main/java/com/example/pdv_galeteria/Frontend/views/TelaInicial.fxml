@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-pref-height: 700; -fx-pref-width: 1350; -fx-background-color: #104E8B;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.InicialController">
+   <children>
+      <HBox layoutX="-5.0" layoutY="-7.0" prefHeight="80.0" prefWidth="1372.0" style="-fx-background-color: #87CEFF; -fx-border-color: white;">
+         <children>
+            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../../../../Users/pinho/Downloads/Gemini_Generated_Image_79qc4y79qc4y79qc-removebg-preview%20(1)b.png" />
+               </image>
+               <HBox.margin>
+                  <Insets left="12.0" top="12.0" />
+               </HBox.margin>
+            </ImageView>
+            <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#voltarLogin" prefHeight="32.0" prefWidth="90.0" style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-background-color: white; -fx-pref-height: 30;" text="Histórico" textFill="#4876ff">
+               <font>
+                  <Font name="Georgia Bold" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="1100.0" top="27.0" />
+               </HBox.margin>
+            </Button>
+            <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#voltarLogin" prefHeight="32.0" prefWidth="90.0" style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-background-color: white; -fx-pref-height: 30;" text="Sair" textFill="#ee0000">
+               <font>
+                  <Font name="Georgia Bold" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="9.0" right="20.0" top="27.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+      <Pane layoutX="1011.0" layoutY="160.0" prefHeight="502.0" prefWidth="314.0" style="-fx-background-color: #87CEFF; -fx-background-radius: 10;">
+         <children>
+            <Label layoutX="55.0" layoutY="14.0" text="Carrinho">
+               <font>
+                  <Font name="Georgia" size="17.0" />
+               </font>
+            </Label>
+            <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="14.0" layoutY="9.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" style="-fx-fit-width: 30; -fx-fit-height: 30;">
+               <image>
+                  <Image url="@../../../../../../../../../../Users/pinho/Downloads/carrinho-de-compras%20(4).png" />
+               </image>
+               <viewport>
+                  <Rectangle2D />
+               </viewport>
+               <effect>
+                  <Glow />
+               </effect>
+            </ImageView>
+         </children>
+      </Pane>
+      <Pane layoutX="39.0" layoutY="160.0" prefHeight="502.0" prefWidth="916.0" style="-fx-background-color: #87CEFF; -fx-background-radius: 10;">
+         <children>
+            <Label layoutX="53.0" layoutY="14.0" text="Produtos">
+               <font>
+                  <Font name="Georgia" size="17.0" />
+               </font>
+            </Label>
+            <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="14.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../../../../Users/pinho/Downloads/curry.png" />
+               </image>
+            </ImageView>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>
