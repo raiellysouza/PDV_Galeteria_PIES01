@@ -2,8 +2,10 @@ package com.example.pdv_galeteria.Frontend.Controllers;
 
 import java.io.File;
 import java.io.IOException;
+
 import com.example.pdv_galeteria.Frontend.Models.Usuario;
 import com.example.pdv_galeteria.Frontend.Models.UsuarioManager;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -60,6 +62,16 @@ public class LoginController {
     private void abrirCadastro(ActionEvent event) throws IOException {
         Parent root = FXMLLoader.load(
                 new File("src/main/java/com/example/pdv_galeteria/Frontend/views/Cadastro.fxml").toURI().toURL());
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.show();
+    }
+
+    // NOVO MÉTODO: Abrir tela de recuperação de senha
+    @FXML
+    private void abrirRecuperarSenha(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(
+                new File("src/main/java/com/example/pdv_galeteria/Frontend/views/RecuperarSenha.fxml").toURI().toURL());
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.show();

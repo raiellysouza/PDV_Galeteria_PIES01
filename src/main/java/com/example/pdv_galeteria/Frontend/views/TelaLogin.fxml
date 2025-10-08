@@ -12,9 +12,9 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #104E8B; -fx-pref-width: 1350; -fx-pref-height: 700;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
    <children>
-      <Pane layoutX="503.0" layoutY="296.0" prefHeight="357.0" prefWidth="361.0" style="-fx-background-color: #63B8FF; -fx-background-radius: 20;">
+      <Pane layoutX="503.0" layoutY="296.0" prefHeight="362.0" prefWidth="362.0" style="-fx-background-color: #63B8FF; -fx-background-radius: 20;">
          <children>
-            <Button alignment="CENTER" layoutX="68.0" layoutY="257.0" mnemonicParsing="false" onAction="#mudarPagina" prefHeight="43.0" prefWidth="227.0" style="-fx-alignment: center; -fx-background-color: #838B8B; -fx-background-radius: 20;" text="Entrar" textFill="WHITE">
+            <Button alignment="CENTER" layoutX="68.0" layoutY="280.0" mnemonicParsing="false" onAction="#mudarPagina" prefHeight="43.0" prefWidth="227.0" style="-fx-alignment: center; -fx-background-color: #838B8B; -fx-background-radius: 20;" text="Entrar" textFill="WHITE">
                <font>
                   <Font name="Georgia Bold" size="21.0" />
                </font>
@@ -40,7 +40,7 @@
             <TextField fx:id="campoUsuario" layoutX="68.0" layoutY="120.0" prefHeight="35.0" prefWidth="227.0" promptText="Digite seu usuário" style="-fx-background-radius: 6;" />
 
             <PasswordField fx:id="campoSenha" layoutX="68.0" layoutY="204.0" prefHeight="35.0" prefWidth="227.0" promptText="Digite sua senha" style="-fx-background-radius: 6;" />
-            <Button layoutX="141.0" layoutY="309.0" mnemonicParsing="false" onAction="#abrirCadastro" style="-fx-background-color: transparent; -fx-text-fill: #0066CC;" text="Cadastre-se">
+            <Button layoutX="142.0" layoutY="323.0" mnemonicParsing="false" onAction="#abrirCadastro" style="-fx-background-color: transparent; -fx-text-fill: #0066CC;" text="Cadastre-se">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
@@ -48,6 +48,10 @@
                   <Font size="12.0" />
                </font>
             </Button>
+            <Button layoutX="68.0" layoutY="239.0" mnemonicParsing="false" onAction="#abrirRecuperarSenha" style="-fx-background-color: transparent;                -fx-text-fill: #0066CC;" text="Recuperar Senha">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Button>
          </children>
       </Pane>
       <Label alignment="CENTER" layoutX="541.0" layoutY="199.0" prefHeight="25.0" prefWidth="286.0" text="GALETERIA DO IRMÃO" textFill="#fffafa">

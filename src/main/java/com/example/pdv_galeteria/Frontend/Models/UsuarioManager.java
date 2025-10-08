@@ -14,7 +14,7 @@ public class UsuarioManager {
     public static boolean cadastrarUsuario(String nome, String email, String senha) {
         // Verifica se o email já existe
         for (Usuario usuario : usuarios) {
-            if (usuario.getEmail().equals(email)) {
+            if (usuario.getEmail().equalsIgnoreCase(email)) {
                 return false; // Email já cadastrado
             }
         }
@@ -35,5 +35,42 @@ public class UsuarioManager {
 
     public static List<Usuario> getUsuarios() {
         return new ArrayList<>(usuarios);
+    }
+
+    // NOVO MÉTODO: Verificar se email existe na lista de usuários cadastrados
+    public static boolean verificarEmailExistente(String email) {
+        for (Usuario usuario : usuarios) {
+            if (usuario.getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // NOVO MÉTODO: Atualizar senha do usuário
+    public static boolean atualizarSenha(String email, String novaSenha) {
+        for (Usuario usuario : usuarios) {
+            if (usuario.getEmail().equalsIgnoreCase(email)) {
+                usuario.setSenha(novaSenha);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // MÉTODO AUXILIAR: Buscar usuário por email (pode ser útil para outras
+    // funcionalidades)
+    public static Usuario buscarUsuarioPorEmail(String email) {
+        for (Usuario usuario : usuarios) {
+            if (usuario.getEmail().equalsIgnoreCase(email)) {
+                return usuario;
+            }
+        }
+        return null;
+    }
+
+    // MÉTODO AUXILIAR: Ver quantidade de usuários cadastrados (para debug)
+    public static int getQuantidadeUsuarios() {
+        return usuarios.size();
     }
 }
