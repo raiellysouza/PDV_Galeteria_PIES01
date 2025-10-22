@@ -41,7 +41,7 @@ public class LoginController {
                 Parent root = FXMLLoader.load(fxmlFile.toURI().toURL());
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root, 1350, 700));
-                stage.setMaximized(true); // Abre maximizada
+                stage.setMaximized(true);
                 stage.setTitle("Galeteria do Irmão - Produtos");
                 stage.show();
 

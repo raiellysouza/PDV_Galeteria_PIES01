@@ -1,0 +1,42 @@
+.button-lateral {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-font-size: 28;
+    -fx-text-fill: white;
+    -fx-padding: 2px;
+}
+
+.button-lateral:hover {
+    -fx-background-color: F68411;
+}
+
+.text-field {
+    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.card-produtos {
+    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.categorias {
+    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.editar {
+    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.apagar {
+    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+

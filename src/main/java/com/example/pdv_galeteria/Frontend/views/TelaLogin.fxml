@@ -11,18 +11,27 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+    prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;"
+    xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
 
     <children>
-        <ImageView fitHeight="226.0" fitWidth="198.0" layoutX="576.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
+        <ImageView fitHeight="226.0" fitWidth="198.0" layoutX="576.0" layoutY="23.0"
+            pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../Users/pinho/Downloads/Imagem%20do%20WhatsApp%20de%202025-10-08%20à(s)%2017.39.16_0e69f781.jpg" />
+                <Image
+                    url="@../../../../../../../../../../Users/pinho/Downloads/Imagem%20do%20WhatsApp%20de%202025-10-08%20à(s)%2017.39.16_0e69f781.jpg" />
             </image>
         </ImageView>
 
-        <Pane layoutX="425.0" layoutY="237.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+        <Pane layoutX="425.0" layoutY="237.0" maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0"
+            style="-fx-background-color: white; -fx-background-radius: 10;">
             <children>
-                <Button layoutX="63.0" layoutY="320.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="39.0" prefWidth="374.0" style="-fx-background-color: #F68411;" text="Entrar" textFill="WHITE">
+                <Button layoutX="63.0" layoutY="320.0" mnemonicParsing="false"
+                    onAction="#entrarNoSistema" prefHeight="39.0" prefWidth="374.0"
+                    style="-fx-background-color: #F68411;" text="Entrar" textFill="WHITE">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -49,13 +58,15 @@
                     </font>
                 </Label>
 
-                <PasswordField fx:id="campoSenha" layoutX="63.0" layoutY="223.0" prefHeight="37.0" prefWidth="374.0" promptText="Digite sua senha">
+                <PasswordField fx:id="campoSenha" layoutX="63.0" layoutY="223.0" prefHeight="37.0"
+                    prefWidth="374.0" promptText="Digite sua senha">
                     <font>
                         <Font size="18.0" />
                     </font>
                 </PasswordField>
 
-                <TextField fx:id="campoUsuario" layoutX="63.0" layoutY="115.0" prefHeight="39.0" prefWidth="374.0" promptText="Digite seu usuário">
+                <TextField fx:id="campoUsuario" layoutX="63.0" layoutY="115.0" prefHeight="39.0"
+                    prefWidth="374.0" promptText="Digite seu usuário">
                     <font>
                         <Font size="18.0" />
                     </font>
