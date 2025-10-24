@@ -1,27 +1,31 @@
 package com.example.pdv_galeteria.Frontend.Models;
 
-import java.io.File;
-
+import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.application.Platform;
 import javafx.stage.Stage;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContext;
 
 public class Main extends Application {
+
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void init() throws Exception {
+        applicationContext = new SpringApplicationBuilder(PdvGaleteriaApplication.class)
+                .run(getParameters().getRaw().toArray(new String[0]));
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        File fxmlFile = new File("src/main/java/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml");
-        System.out.println("Carregando: " + fxmlFile.getAbsolutePath());
-        System.out.println("Arquivo existe: " + fxmlFile.exists());
+         applicationContext.publishEvent(new StageReadyEvent(primaryStage));
+    }
 
-        Parent root = FXMLLoader.load(fxmlFile.toURI().toURL());
-        primaryStage.setTitle("Galeteria do Irmão - Login");
-        primaryStage.setScene(new Scene(root, 1350, 700));
-        primaryStage.setResizable(true);
-        primaryStage.setMaximized(true);
-
-        primaryStage.show();
+    @Override
+    public void stop() throws Exception {
+        ((Stage) applicationContext).close();
+        Platform.exit();
     }
 
     public static void main(String[] args) {
