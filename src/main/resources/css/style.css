@@ -40,3 +40,6 @@
     -fx-border-radius: 5px;
 }
 
+.telaEditarProduto {
+    -fx-background-radius: 8px;
+}
