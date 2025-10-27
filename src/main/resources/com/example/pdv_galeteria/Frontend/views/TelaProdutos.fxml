@@ -16,7 +16,7 @@
    prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;"
    stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25"
    xmlns:fx="http://javafx.com/fxml/1"
-   fx:controller="com.example.pdv_galeteria.controller.TelaProdutosController">
+   fx:controller="com.example.pdv_galeteria.controllers.TelaProdutosController">
 
    <children>
       <Pane fx:id="contentPane" layoutX="283.0" layoutY="-26.0" prefHeight="730.0"
