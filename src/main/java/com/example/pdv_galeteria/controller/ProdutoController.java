@@ -4,52 +4,40 @@ import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ProdutoService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Component;
 import java.util.List;
+import java.util.Optional;
 
 @Data
-@RestController
-@RequestMapping("/api/produtos")
+@Component
 public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
 
-    @GetMapping
-    public ResponseEntity<List<Produto>> listarTodos() {
-        return ResponseEntity.ok(produtoService.listarTodos());
+    public List<Produto> listarTodos() {
+        return produtoService.listarTodos();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Produto> buscarPorId(@PathVariable Long id) {
-        return produtoService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Optional<Produto> buscarPorId(Long id) {
+        return produtoService.buscarPorId(id);
     }
 
-    @PostMapping
-    public ResponseEntity<Produto> salvar(@RequestBody Produto produto) {
-        Produto novoProduto = produtoService.salvar(produto);
-        return ResponseEntity.ok(novoProduto);
+    public Produto salvar(Produto produto) {
+        return produtoService.salvar(produto);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Produto> atualizar(@PathVariable Long id, @RequestBody Produto produto) {
+    public Optional<Produto> atualizar(Long id, Produto produto) {
         return produtoService.buscarPorId(id)
                 .map(existing -> {
                     existing.setNome(produto.getNome());
                     existing.setPreco(produto.getPreco());
                     existing.setQuantidade(produto.getQuantidade());
-                    Produto atualizado = produtoService.salvar(existing);
-                    return ResponseEntity.ok(atualizado);
-                })
-                .orElse(ResponseEntity.notFound().build());
+                    return produtoService.salvar(existing);
+                });
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public void deletar(Long id) {
         produtoService.deletar(id);
-        return ResponseEntity.noContent().build();
     }
 }

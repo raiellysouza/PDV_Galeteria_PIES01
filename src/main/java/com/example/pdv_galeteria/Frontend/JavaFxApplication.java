@@ -12,11 +12,11 @@ import java.io.File;
 import java.io.IOException;
 
 @Component
-public class JavaFXApplication implements ApplicationListener<StageReadyEvent> {
+public class JavaFxApplication implements ApplicationListener<StageReadyEvent> {
 
     private final ApplicationContext applicationContext;
 
-    public JavaFXApplication(ApplicationContext applicationContext) {
+    public JavaFxApplication(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
@@ -37,6 +37,7 @@ public class JavaFXApplication implements ApplicationListener<StageReadyEvent> {
             stage.setResizable(true);
             stage.setMaximized(true);
             stage.show();
+            
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Falha ao carregar a tela de login (FXML).", e);
