@@ -1,12 +1,15 @@
 package com.example.pdv_galeteria.controller;
 
-import com.example.pdv_galeteria.model.Produto;
-import com.example.pdv_galeteria.service.ProdutoService;
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.service.ProdutoService;
+
+import lombok.Data;
 
 @Data
 @Component
