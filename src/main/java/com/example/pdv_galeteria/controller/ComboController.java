@@ -4,13 +4,14 @@ import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.service.ComboService;
 import lombok.Data; 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity; //remove
+import org.springframework.web.bind.annotation.*; //remove
 import java.util.List;
 
 @Data 
-@RestController
-@RequestMapping("/api/combos")
+@RestController //remove
+@RequestMapping("/api/combos") //remove
+
 public class ComboController {
 
     @Autowired
