@@ -20,7 +20,7 @@
             <Insets bottom="2.0" top="2.0" />
          </padding>
       </Button>
-      <Button alignment="CENTER" layoutX="98.0" layoutY="102.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="36.0" prefWidth="77.0" style="-fx-background-color: #ff0000; -fx-border-color: black; -fx-border-radius: 8; -fx-background-radius: 8;" text="Sim" textFill="WHITE">
+      <Button alignment="CENTER" layoutX="98.0" layoutY="102.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="36.0" prefWidth="77.0" style="-fx-background-color: #f68411; -fx-border-color: black; -fx-border-radius: 8; -fx-background-radius: 8;" text="Sim" textFill="WHITE">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>

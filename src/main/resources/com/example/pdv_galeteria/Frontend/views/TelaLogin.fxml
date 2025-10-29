@@ -20,8 +20,7 @@
         <ImageView fitHeight="226.0" fitWidth="198.0" layoutX="576.0" layoutY="23.0"
             pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image
-                    url="@../../../../../../../../../../Users/pinho/Downloads/Imagem%20do%20WhatsApp%20de%202025-10-08%20à(s)%2017.39.16_0e69f781.jpg" />
+                <Image url="@../../../../../../resources/assets/imgs/logo-pdv.jpg" />
             </image>
         </ImageView>
 
@@ -40,7 +39,7 @@
                     </font>
                 </Button>
 
-                <Label layoutX="207.0" layoutY="14.0" text="Entrar">
+                <Label layoutX="211.0" layoutY="14.0" text="Login">
                     <font>
                         <Font name="System Bold" size="30.0" />
                     </font>
