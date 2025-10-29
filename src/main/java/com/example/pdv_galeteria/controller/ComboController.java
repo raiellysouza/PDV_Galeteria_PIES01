@@ -2,15 +2,15 @@ package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.service.ComboService;
-import lombok.Data; 
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity; //remove
 import org.springframework.web.bind.annotation.*; //remove
 import java.util.List;
 
-@Data 
-@RestController //remove
-@RequestMapping("/api/combos") //remove
+@Data
+@RestController // remove
+@RequestMapping("/api/combos") // remove
 
 public class ComboController {
 
@@ -39,11 +39,10 @@ public class ComboController {
     public ResponseEntity<Combo> atualizar(@PathVariable Long id, @RequestBody Combo combo) {
         return comboService.buscarPorId(id)
                 .map(existing -> {
-                    
+
                     existing.setNome(combo.getNome());
                     existing.setPreco(combo.getPreco());
-                  
-                    
+
                     Combo atualizado = comboService.salvar(existing);
                     return ResponseEntity.ok(atualizado);
                 })
