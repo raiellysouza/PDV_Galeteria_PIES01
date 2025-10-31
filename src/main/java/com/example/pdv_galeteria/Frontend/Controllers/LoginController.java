@@ -1,8 +1,5 @@
 package com.example.pdv_galeteria.Frontend.Controllers;
 
-import java.io.File;
-import java.io.IOException;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +10,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
+import java.io.IOException;
 
+@Controller
 public class LoginController {
 
     @FXML
@@ -21,6 +23,9 @@ public class LoginController {
 
     @FXML
     private PasswordField campoSenha;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     private static final String USUARIO_PADRAO = "admin";
     private static final String SENHA_PADRAO = "admin";
@@ -37,17 +42,22 @@ public class LoginController {
 
         if (USUARIO_PADRAO.equals(usuario) && SENHA_PADRAO.equals(senha)) {
             try {
-                File fxmlFile = new File("src/main/java/com/example/pdv_galeteria/Frontend/views/TelaProdutos.fxml");
-                Parent root = FXMLLoader.load(fxmlFile.toURI().toURL());
+                // AQUI É ONDE VOCÊ COLOCA O setControllerFactory
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaProdutos.fxml"));
+                loader.setControllerFactory(applicationContext::getBean); // ← AQUI
+
+                Parent root = loader.load();
+
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.setScene(new Scene(root, 1350, 700));
+                stage.setScene(new Scene(root));
                 stage.setMaximized(true);
                 stage.setTitle("Galeteria do Irmão - Produtos");
                 stage.show();
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-                mostrarAlerta("Erro", "Erro ao carregar a tela de produtos: " + e.getMessage());
+                mostrarAlerta("Erro", "Erro ao carregar a tela de produtos:\n" + e.getMessage());
             }
         } else {
             mostrarAlerta("Erro de Login",

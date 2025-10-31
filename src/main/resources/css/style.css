@@ -30,13 +30,11 @@
 
 .editar {
     -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
-    -fx-border-width: 2px;
     -fx-border-radius: 5px;
 }
 
 .apagar {
     -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
-    -fx-border-width: 2px;
     -fx-border-radius: 5px;
 }
 
