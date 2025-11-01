@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
 
     <children>
         <!-- Container Principal Centralizado -->
@@ -47,7 +47,7 @@
                                                 <Font name="System Bold" size="18.0" />
                                             </font>
                                         </Label>
-                                        <TextField fx:id="campoUsuario" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Digite seu usuário">
+                                        <TextField fx:id="campoUsuario" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Digite seu usuário" styleClass="text-field">
                                             <font>
                                                 <Font size="16.0" />
                                             </font>
@@ -63,7 +63,7 @@
                                                 <Font name="System Bold" size="18.0" />
                                             </font>
                                         </Label>
-                                        <PasswordField fx:id="campoSenha" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Digite sua senha">
+                                        <PasswordField fx:id="campoSenha" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Digite sua senha" styleClass="text-field">
                                             <font>
                                                 <Font size="16.0" />
                                             </font>
@@ -73,8 +73,8 @@
                             </children>
                         </VBox>
 
-                        <!-- Botão Entrar -->
-                        <Button maxWidth="400.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="50.0" prefWidth="400.0" style="-fx-background-color: #F68411; -fx-background-radius: 8;" text="Entrar" textFill="WHITE">
+                        <!-- Botão Entrar COM HOVER FUNCIONANDO -->
+                        <Button maxWidth="400.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="50.0" prefWidth="400.0" style="-fx-background-color: #f68411; -fx-background-radius: 8px;" styleClass="hover" text="Entrar" textFill="WHITE">
                             <cursor>
                                 <Cursor fx:constant="HAND" />
                             </cursor>
@@ -128,7 +128,7 @@
                                 <Label style="-fx-text-fill: black;" text="Usuário">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
-                                <TextField fx:id="campoUsuarioMobile" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Usuário">
+                                <TextField fx:id="campoUsuarioMobile" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Usuário" styleClass="text-field">
                                     <font><Font size="14.0" /></font>
                                 </TextField>
                             </VBox>
@@ -137,13 +137,14 @@
                                 <Label style="-fx-text-fill: black;" text="Senha">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
-                                <PasswordField fx:id="campoSenhaMobile" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Senha">
+                                <PasswordField fx:id="campoSenhaMobile" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Senha" styleClass="text-field">
                                     <font><Font size="14.0" /></font>
                                 </PasswordField>
                             </VBox>
                         </VBox>
 
-                        <Button maxWidth="300.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="45.0" style="-fx-background-color: #F68411; -fx-background-radius: 8;" text="Entrar" textFill="WHITE">
+                        <!-- Botão Entrar Mobile COM HOVER FUNCIONANDO -->
+                        <Button maxWidth="300.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="45.0" styleClass="hover" text="Entrar">
                             <cursor><Cursor fx:constant="HAND" /></cursor>
                             <font><Font name="System Bold" size="16.0" /></font>
                         </Button>
