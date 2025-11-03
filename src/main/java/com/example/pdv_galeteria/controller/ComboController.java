@@ -1,58 +1,85 @@
 package com.example.pdv_galeteria.controller;
 
-import com.example.pdv_galeteria.model.Combo;
-import com.example.pdv_galeteria.service.ComboService;
-import lombok.Data; 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity; //remove
-import org.springframework.web.bind.annotation.*; //remove
 import java.util.List;
+import java.util.Optional;
 
-@Data 
-@RestController //remove
-@RequestMapping("/api/combos") //remove
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.example.pdv_galeteria.model.Combo;
+import com.example.pdv_galeteria.service.ComboService; 
+
+import lombok.Data;
+
+
+@Data
+@Component
 
 public class ComboController {
 
     @Autowired
     private ComboService comboService;
 
-    @GetMapping
-    public ResponseEntity<List<Combo>> listarTodos() {
-        return ResponseEntity.ok(comboService.listarTodos());
+    /**
+     * Busca e retorna todos os Combos.
+     * @return 
+     */
+    public List<Combo> listarTodos() {
+        return comboService.buscarTodosCombos();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Combo> buscarPorId(@PathVariable Long id) {
-        return comboService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    /**
+     * Busca um Combo por ID.
+     * @param id 
+     * @return 
+     */
+    public Optional<Combo> buscarPorId(Long id) {
+  
+
+        try {
+            return Optional.of(comboService.buscarComboPorId(id));
+        } catch (RuntimeException e) {
+            return Optional.empty();
+        }
     }
 
-    @PostMapping
-    public ResponseEntity<Combo> salvar(@RequestBody Combo combo) {
-        Combo novoCombo = comboService.salvar(combo);
-        return ResponseEntity.ok(novoCombo);
+    /**
+     * Salva ou atualiza um novo Combo.
+     * @param combo 
+     * @return 
+     */
+    public Combo salvar(Combo combo) {
+        return comboService.salvarCombo(combo);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Combo> atualizar(@PathVariable Long id, @RequestBody Combo combo) {
-        return comboService.buscarPorId(id)
-                .map(existing -> {
-                    
-                    existing.setNome(combo.getNome());
-                    existing.setPreco(combo.getPreco());
-                  
-                    
-                    Combo atualizado = comboService.salvar(existing);
-                    return ResponseEntity.ok(atualizado);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    /**
+     * Atualiza um Combo existente.
+     * @param id 
+     * @param comboDetalhes 
+     * @return 
+     */
+    public Optional<Combo> atualizar(Long id, Combo comboDetalhes) {
+        try {
+            Combo existing = comboService.buscarComboPorId(id);
+
+            existing.setNome(comboDetalhes.getNome());
+            existing.setPrecoTotal(comboDetalhes.getPrecoTotal());
+            
+            existing.setItensDoCombo(comboDetalhes.getItensDoCombo());
+
+
+            return Optional.of(comboService.salvarCombo(existing));
+            
+        } catch (RuntimeException e) {
+            return Optional.empty();
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        comboService.deletar(id);
-        return ResponseEntity.noContent().build();
+    /**
+     * Deleta um Combo por ID.
+     * @param id 
+     */
+    public void deletar(Long id) {
+        comboService.deletarCombo(id);
     }
 }
