@@ -1,43 +1,164 @@
+/* ===== ESTILOS GERAIS ===== */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ===== BOTÕES LATERAIS ===== */
 .button-lateral {
     -fx-background-color: transparent;
     -fx-background-radius: 8;
     -fx-font-size: 28;
     -fx-text-fill: white;
     -fx-padding: 2px;
+    -fx-cursor: hand;
 }
 
 .button-lateral:hover {
-    -fx-background-color: F68411;
+    -fx-background-color: #F68411;
 }
 
+/* ===== BOTÕES PRINCIPAIS (NOVO PRODUTO/NOVO COMBO/ADICIONAR PRODUTO/ENTRAR) ===== */
+.hover {
+    -fx-background-color: #F68411;
+    -fx-background-radius: 8;
+    -fx-text-fill: WHITE;
+    -fx-font-weight: bold;
+    -fx-font-size: 19px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+    -fx-content-display: CENTER;
+}
+
+.hover:hover {
+    -fx-background-color: #e0700f;
+}
+
+/* ===== CAMPOS DE TEXTO ===== */
 .text-field {
-    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-color: rgba(0, 0, 0, 0.3);
     -fx-border-width: 2px;
     -fx-border-radius: 5px;
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
 }
 
+.text-field:hover {
+    -fx-border-color: #F68411;
+}
+
+.text-field:focused {
+    -fx-border-color: #F68411;
+    -fx-background-color: #FFF8F0;
+}
+
+/* ===== CARDS DE PRODUTOS ===== */
 .card-produtos {
-    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
-    -fx-border-width: 2px;
-    -fx-border-radius: 5px;
+    -fx-border-color: rgba(0, 0, 0, 0.2);
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 2);
 }
 
-.categorias {
-    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
-    -fx-border-width: 2px;
-    -fx-border-radius: 5px;
+.card-produtos:hover {
+    -fx-border-color: #F68411;
+    -fx-effect: dropshadow(gaussian, rgba(246, 132, 17, 0.15), 8, 0, 0, 3);
+    -fx-translate-y: -2px;
 }
 
+/* ===== BOTÕES DE EDIÇÃO ===== */
 .editar {
-    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-color: rgba(0, 0, 0, 0.3);
     -fx-border-radius: 5px;
+    -fx-background-color: white;
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+    -fx-padding: 5px 10px;
 }
 
+.editar:hover {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #F68411;
+    -fx-text-fill: #F68411;
+}
+
+/* ===== BOTÕES DE ENTRADA ===== */
+.entrada {
+    -fx-border-color: rgba(0, 0, 0, 0.3);
+    -fx-border-radius: 5px;
+    -fx-background-color: white;
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 5px 10px;
+}
+
+.entrada:hover {
+    -fx-background-color: #f0f8f0;
+    -fx-border-color: #4CAF50;
+    -fx-text-fill: #4CAF50;
+}
+
+/* ===== BOTÕES DE EXCLUSÃO ===== */
 .apagar {
-    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-color: rgba(0, 0, 0, 0.3);
+    -fx-border-radius: 5px;
+    -fx-background-color: white;
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 5px 10px;
+}
+
+.apagar:hover {
+    -fx-background-color: #fff0f0;
+    -fx-border-color: #ff4444;
+    -fx-text-fill: #ff4444;
+}
+
+/* ===== LABELS ===== */
+.label {
+    -fx-text-fill: black;
+}
+
+/* ===== CONTAINERS ===== */
+.vbox {
+    -fx-spacing: 10px;
+}
+
+.hbox {
+    -fx-spacing: 10px;
+}
+
+/* ===== PASSWORD FIELD ===== */
+.password-field {
+    -fx-border-color: rgba(0, 0, 0, 0.3);
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 8px;
+    -fx-font-size: 14px;
+}
+
+.password-field:hover {
+    -fx-border-color: #F68411;
+}
+
+.password-field:focused {
+    -fx-border-color: #F68411;
+    -fx-background-color: #FFF8F0;
+}
+
+/* ===== CATEGORIAS ===== */
+.categorias {
+    -fx-border-color: rgba(0, 0, 0, 0.3);
+    -fx-border-width: 2px;
     -fx-border-radius: 5px;
 }
 
+/* ===== TELA EDIÇÃO ===== */
 .telaEditarProduto {
     -fx-background-radius: 8px;
 }
@@ -64,4 +185,30 @@
 }
 .cardPedido:hover {
     -fx-border-color: #f68411 2px solid;
+/* ===== CHECKBOXES ESTILIZADOS ===== */
+.check-box {
+    -fx-text-fill: black;
+    -fx-font-size: 10px;
+    -fx-cursor: hand;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #F68411;
+    -fx-border-color: #F68411;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.check-box:hover .box {
+    -fx-border-color: #F68411;
 }
