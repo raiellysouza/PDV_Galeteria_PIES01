@@ -8,15 +8,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="334.0" prefWidth="471.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="334.0" prefWidth="471.0" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.ProdutoController">
     <children>
-
-        <!-- Botão de fechar -->
-        <Button layoutX="441.0" layoutY="14.0" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent; -fx-text-fill: black; -fx-font-size: 16;" text="x">
-            <cursor>
-                <Cursor fx:constant="HAND" />
-            </cursor>
-        </Button>
 
         <!-- Título -->
         <Label layoutX="26.0" layoutY="14.0" text="Cadastrar Produto" textFill="black">
@@ -64,7 +57,7 @@
         </Label>
 
         <!-- Botão Adicionar Produto -->
-        <Button layoutX="25.0" layoutY="290.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="422.0" style="-fx-background-color: #FF8800; -fx-text-fill: white; -fx-background-radius: 8px; -fx-pref-height: 35px;" text="Adicionar Produto">
+        <Button layoutX="25.0" layoutY="290.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="422.0" style="-fx-background-color: #f68411; -fx-background-radius: 8px;" styleClass="hover" text="Adicionar Produto" textFill="WHITE">
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
@@ -96,14 +89,7 @@
                 <Font size="10.0" />
             </font>
         </CheckBox>
-        <CheckBox alignment="CENTER" layoutX="352.0" layoutY="250.0" prefHeight="29.0" prefWidth="95.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 12; -fx-padding: 5;" styleClass="text-field" stylesheets="@../../../../../resources/css/style.css" text="Outro" textFill="black" underline="true">
-            <cursor>
-                <Cursor fx:constant="HAND" />
-            </cursor>
-            <font>
-                <Font size="10.0" />
-            </font>
-        </CheckBox>
+      <TextField layoutX="357.0" layoutY="252.0" prefHeight="25.0" prefWidth="90.0" promptText="Outro" style="-fx-background-color: transparent;" />
 
     </children>
 </AnchorPane>

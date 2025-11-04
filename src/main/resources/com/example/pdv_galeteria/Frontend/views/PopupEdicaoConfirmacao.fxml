@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="152.0" prefWidth="356.0" style="-fx-border-radius: 5; -fx-background-radius: 5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button alignment="CENTER" layoutX="184.0" layoutY="102.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="36.0" prefWidth="77.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 8;" text="Não" textFill="#030303">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <padding>
+            <Insets bottom="2.0" top="2.0" />
+         </padding>
+      </Button>
+      <Button alignment="CENTER" layoutX="98.0" layoutY="102.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="36.0" prefWidth="77.0" style="-fx-background-color: #f68411; -fx-border-color: black; -fx-border-radius: 8; -fx-background-radius: 8;" text="Sim" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <padding>
+            <Insets bottom="2.0" top="2.0" />
+         </padding>
+      </Button>
+      <Label contentDisplay="CENTER" layoutX="14.0" layoutY="29.0" prefHeight="14.0" prefWidth="396.0" text="Tem certeza que deseja editar esse" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label contentDisplay="CENTER" layoutX="133.0" layoutY="59.0" prefHeight="30.0" prefWidth="91.0" text="produto?" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+   </children>
+</Pane>
