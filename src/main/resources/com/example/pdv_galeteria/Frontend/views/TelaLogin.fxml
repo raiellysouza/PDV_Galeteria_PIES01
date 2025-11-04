@@ -21,7 +21,7 @@
                 <!-- Logo -->
                 <ImageView fitHeight="180.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
+                        <Image url="@/assets/imgs/logo-pdv.jpg" />
                     </image>
                 </ImageView>
 
@@ -109,7 +109,7 @@
                 <!-- Logo Mobile -->
                 <ImageView fitHeight="120.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../assets/imgs/logo-pdv.jpg" />
+                        <Image url="@assets/imgs/logo-pdv.jpg" />
                     </image>
                 </ImageView>
 
