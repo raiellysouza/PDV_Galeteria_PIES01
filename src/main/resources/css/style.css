@@ -163,6 +163,28 @@
     -fx-background-radius: 8px;
 }
 
+.metodoPagamento {
+    -fx-text-fill: black;
+    -fx-background-color: white;
+    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-font-size: 15px;
+}
+.metodoPagamento:hover {
+    -fx-background-color: #f68411;
+    -fx-text-fill: white;
+}
+
+.cardPedido {
+    -fx-background-color: #F3F4F6;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: rgba(0, 0, 0, 0.3); /* preto com 30% de opacidade */
+}
+.cardPedido:hover {
+    -fx-border-color: #f68411 2px solid;
 /* ===== CHECKBOXES ESTILIZADOS ===== */
 .check-box {
     -fx-text-fill: black;

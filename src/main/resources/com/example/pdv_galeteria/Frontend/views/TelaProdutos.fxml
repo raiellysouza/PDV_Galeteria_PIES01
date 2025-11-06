@@ -90,7 +90,7 @@
         <!-- Resto do menu lateral permanece igual -->
         <ImageView fitHeight="93.0" fitWidth="113.0" layoutX="99.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
+                <Image url="@../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
             </image>
         </ImageView>
 
