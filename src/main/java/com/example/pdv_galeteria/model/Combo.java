@@ -17,7 +17,7 @@ public class Combo {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
+    @Column(name = "preco_total", nullable = false)
     private Double precoTotal; 
 
 
