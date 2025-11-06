@@ -1,0 +1,28 @@
+/* Este é o estilo padrão do botão (quando não está selecionado) */
+#meuBotao {
+    -fx-background-color: orange;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+
+#meuBotao:hover {
+     -fx-background-color: #FFB84D; /* Laranja um pouco mais claro */
+}
+
+
+#meuBotao:selected {
+    -fx-background-color: #CC6600; /* Laranja bem mais escuro */
+}
+#Cancel{
+    -fx-background-color: rgb(214, 214, 214);
+    -fx-text-fill: rgb(38, 38, 38);
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+#Cancel:hover {
+    -fx-background-color: rgb(158, 158, 158);
+}
