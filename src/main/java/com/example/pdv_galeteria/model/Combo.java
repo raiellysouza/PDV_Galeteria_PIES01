@@ -11,20 +11,16 @@ public class Combo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_combo")
     private Long id;
 
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
-    private Double preco;
-    
+    @Column(name = "preco_total", nullable = false)
+    private Double precoTotal; 
 
-    @ManyToMany 
-    @JoinTable(
-        name = "combos_produtos",
-        joinColumns = @JoinColumn(name = "combo_id"), 
-        inverseJoinColumns = @JoinColumn(name = "produto_id") 
-    )
-    private List<Produto> produtos;
+
+    @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ComboItem> itensDoCombo;
 }
