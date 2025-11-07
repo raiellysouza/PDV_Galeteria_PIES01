@@ -15,7 +15,7 @@
 
     <children>
         <!-- Container Principal Centralizado -->
-        <VBox alignment="CENTER" spacing="40" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
+        <VBox alignment="CENTER" prefHeight="700.0" prefWidth="1350.0" spacing="40" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
 
             <children>
                 <!-- Logo -->
@@ -109,7 +109,7 @@
                 <!-- Logo Mobile -->
                 <ImageView fitHeight="120.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../assets/imgs/logo-pdv.jpg" />
+                        <Image url="@assets/imgs/logo-pdv.jpg" />
                     </image>
                 </ImageView>
 

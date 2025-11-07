@@ -9,11 +9,6 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="297.0" prefWidth="433.0" style="-fx-border-radius: 8; -fx-background-radius: 8;" styleClass="telaEditarProduto" stylesheets="@../../../../../resources/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button layoutX="386.0" layoutY="26.0" mnemonicParsing="false" style="-fx-background-color: transparent;" text="X">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
       <Label layoutX="27.0" layoutY="26.0" text="Editar Produtos">
          <font>
             <Font name="System Bold" size="27.0" />
