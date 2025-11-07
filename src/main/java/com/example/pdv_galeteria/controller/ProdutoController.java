@@ -39,8 +39,8 @@ public class ProdutoController {
 
     @FXML
     private void initialize() {
-        System.out.println("✅ ProdutoController inicializado!");
-        System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
+        System.out.println("ProdutoController inicializado!");
+        System.out.println("ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
         configurarCheckboxes();
     }
