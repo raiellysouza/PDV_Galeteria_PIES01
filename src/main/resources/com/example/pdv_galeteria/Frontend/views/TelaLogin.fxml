@@ -15,13 +15,13 @@
 
     <children>
         <!-- Container Principal Centralizado -->
-        <VBox alignment="CENTER" spacing="40" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
+        <VBox alignment="CENTER" prefHeight="700.0" prefWidth="1350.0" spacing="40" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
 
             <children>
                 <!-- Logo -->
                 <ImageView fitHeight="180.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@/assets/imgs/logo-pdv.jpg" />
+                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
                     </image>
                 </ImageView>
 

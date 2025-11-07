@@ -1,24 +1,33 @@
 package com.example.pdv_galeteria.controller;
 
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
+import javafx.scene.control.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ProdutoService;
+import com.example.pdv_galeteria.PdvGaleteriaApplication;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+import javafx.stage.Modality;
+
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+
+import javafx.scene.control.ContentDisplay;
+
+import java.util.*;
 
 @Component
 public class TelaProdutosController implements Initializable {
@@ -26,160 +35,411 @@ public class TelaProdutosController implements Initializable {
     @Autowired
     private ProdutoService produtoService;
 
+    // Lista para armazenar os produtos
+    private List<Produto> produtosList = new ArrayList<>();
+
     @FXML
     private Pane contentPane;
-
-    private double initialX = 13.0;
-    private double initialY = 293.0;
+    @FXML
+    private Pane mainContentPane;
+    // Ajuste as coordenadas para serem relativas ao mainContentPane
+    private double initialX = 20.0;
+    private double initialY = 300.0;
     private double cardWidth = 240.0;
     private double cardHeight = 178.0;
     private double horizontalGap = 20.0;
     private double verticalGap = 20.0;
-    private int cardsPerRow = 3;
+    private int cardsPerRow = 3; // Mais cards por linha já que a área é maior
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("Inicializando TelaProdutosController...");
+        System.out.println("MainContentPane: " + (mainContentPane != null ? "ENCONTRADO" : "NULO"));
+
+        // DEBUG: Verificar caminho e testar popup
+        verificarCaminhoFXML();
+        testePopupBasico();
+
+        // Debug do Spring Context
+        PdvGaleteriaApplication.debugSpringContext();
+        System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
+
+        // Carregar produtos
         carregarProdutos();
     }
 
+    // Método para carregar produtos (se você ainda não tiver)
     private void carregarProdutos() {
         try {
-            System.out.println("Carregando produtos do banco...");
+            System.out.println("🔄 Carregando produtos do banco de dados...");
+
+            // Buscar produtos do service
             List<Produto> produtos = produtoService.listarTodos();
-            System.out.println("Produtos encontrados: " + produtos.size());
-            renderizarProdutos(produtos);
+
+            // Atualizar a lista local
+            produtosList.clear();
+            produtosList.addAll(produtos);
+
+            System.out.println("✅ " + produtos.size() + " produtos carregados");
+
+            // Renderizar os produtos na interface
+            renderizarProdutos(produtosList);
+
         } catch (Exception e) {
+            System.err.println("❌ Erro ao carregar produtos: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("Erro ao carregar produtos: " + e.getMessage());
             mostrarMensagemErro("Erro ao carregar produtos: " + e.getMessage());
         }
     }
 
+
     private void renderizarProdutos(List<Produto> produtos) {
-        contentPane.getChildren()
-                .removeIf(node -> node instanceof Pane && node.getStyleClass().contains("card-produtos"));
+        // Limpar todos os elementos do mainContentPane
+        if (mainContentPane != null) {
+            mainContentPane.getChildren().clear();
+        } else {
+            System.err.println("❌ mainContentPane é nulo! Usando contentPane como fallback.");
+            contentPane.getChildren().removeIf(node -> node instanceof Pane && node.getStyleClass().contains("card-produtos"));
+        }
 
         if (produtos.isEmpty()) {
             mostrarMensagemSemProdutos();
             return;
         }
 
-        double currentX = initialX;
-        double currentY = initialY;
-        int cardCount = 0;
+        // Separar produtos e combos
+        List<Produto> produtosNormais = new ArrayList<>();
+        List<Produto> combos = new ArrayList<>();
 
         for (Produto produto : produtos) {
-            Pane cardProduto = criarCardProduto(produto);
-            cardProduto.setLayoutX(currentX);
-            cardProduto.setLayoutY(currentY);
-
-            contentPane.getChildren().add(cardProduto);
-
-            cardCount++;
-            currentX += cardWidth + horizontalGap;
-
-            if (cardCount % cardsPerRow == 0) {
-                currentX = initialX;
-                currentY += cardHeight + verticalGap;
+            if (produto.getNome() != null && produto.getNome().toLowerCase().contains("combo")) {
+                combos.add(produto);
+            } else {
+                produtosNormais.add(produto);
             }
         }
 
-        System.out.println("Renderizados " + cardCount + " cards de produtos");
+        // POSIÇÕES FIXAS - layout manual como no FXML original
+        double startX = 315.0;
+        double startY = 240.0;
+        double cardWidth = 400.0;
+        double cardHeight = 178.0;
+        double horizontalGap = 59.0;
+        double verticalGap = 26.0;
+
+        // Renderizar PRODUTOS NORMAIS
+        if (!produtosNormais.isEmpty()) {
+
+
+            int count = 0;
+            for (Produto produto : produtosNormais) {
+                double currentX = (count % 2 == 0) ? startX : startX + cardWidth + horizontalGap;
+                double currentY = startY + ((count / 2) * (cardHeight + verticalGap));
+
+                Pane cardProduto = criarCardProduto(produto, false);
+                cardProduto.setLayoutX(currentX);
+                cardProduto.setLayoutY(currentY);
+
+                if (mainContentPane != null) {
+                    mainContentPane.getChildren().add(cardProduto);
+                } else {
+                    contentPane.getChildren().add(cardProduto);
+                }
+                count++;
+            }
+        }
+
+        // Renderizar COMBOS
+        if (!combos.isEmpty()) {
+            // Calcular posição Y para combos
+            double combosStartY = startY + (Math.ceil(produtosNormais.size() / 2.0) * (cardHeight + verticalGap)) + 50;
+
+
+            int comboCount = 0;
+            for (Produto combo : combos) {
+                double currentX = (comboCount % 2 == 0) ? startX : startX + cardWidth + horizontalGap;
+                double currentY = combosStartY + ((comboCount / 2) * (cardHeight + verticalGap));
+
+                Pane cardCombo = criarCardProduto(combo, true);
+                cardCombo.setLayoutX(currentX);
+                cardCombo.setLayoutY(currentY);
+
+                if (mainContentPane != null) {
+                    mainContentPane.getChildren().add(cardCombo);
+                } else {
+                    contentPane.getChildren().add(cardCombo);
+                }
+                comboCount++;
+            }
+        }
     }
 
-    private Pane criarCardProduto(Produto produto) {
+    private Pane criarCardProduto(Produto produto, boolean isCombo) {
         Pane card = new Pane();
         card.getStyleClass().add("card-produtos");
-        card.setPrefSize(cardWidth, cardHeight);
-        card.setStyle(
-                "-fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: white;");
+        card.setPrefSize(400, 178); // TAMANHO FIXO
+        card.setMinSize(400, 178);
+        card.setMaxSize(400, 178);
+        card.setStyle("-fx-background-color: white; " +
+                "-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: rgba(0,0,0,0.2); " +
+                "-fx-border-width: 1;");
 
-        Label labelNome = new Label(truncarNome(produto.getNome(), 15));
-        labelNome.setLayoutX(14.0);
-        labelNome.setLayoutY(14.0);
-        labelNome.setStyle("-fx-font-weight: bold; -fx-font-size: 21px;");
-        labelNome.setPrefWidth(200.0);
+        // Nome do produto
+        Label labelNome = new Label(produto.getNome());
+        labelNome.setLayoutX(14);
+        labelNome.setLayoutY(14);
+        labelNome.setStyle("-fx-font-weight: bold; -fx-font-size: 21px; -fx-text-fill: black;");
 
+        // Categoria
+        String categoria = isCombo ? "Combo" : "Produto";
         Pane categoriaPane = new Pane();
-        categoriaPane.setLayoutX(14.0);
-        categoriaPane.setLayoutY(45.0);
-        categoriaPane.setPrefSize(68.0, 23.0);
-        categoriaPane.setStyle("-fx-background-color: #F3F4F6; -fx-border-color: black; -fx-border-radius: 20;");
+        categoriaPane.setLayoutX(299);
+        categoriaPane.setLayoutY(18);
+        categoriaPane.setPrefSize(68, 23);
+        categoriaPane.setStyle("-fx-background-color: #F3F4F6; " +
+                "-fx-background-radius: 20; " +
+                "-fx-border-radius: 20;");
 
-        Label labelCategoria = new Label("Produto");
-        labelCategoria.setLayoutX(9.0);
-        labelCategoria.setLayoutY(3.0);
-        labelCategoria.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+        Label labelCategoria = new Label(categoria);
+        labelCategoria.setLayoutX(9);
+        labelCategoria.setLayoutY(3);
+        labelCategoria.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #374151;");
         categoriaPane.getChildren().add(labelCategoria);
 
+        // Descrição
+        String descricao = isCombo ?
+                "1 frango inteiro + 2 balões + 2 linguiças + 1 refrigerante de 1 litro + Farofa" :
+                "Delicioso frango assado na brasa. Acompanha farofa.";
+
+        Label labelDescricao = new Label(descricao);
+        labelDescricao.setLayoutX(14);
+        labelDescricao.setLayoutY(45);
+        labelDescricao.setPrefSize(372, 35);
+        labelDescricao.setWrapText(true);
+        labelDescricao.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
+
+        // Preço
         Label labelPreco = new Label(String.format("R$ %.2f", produto.getPreco()));
-        labelPreco.setLayoutX(14.0);
-        labelPreco.setLayoutY(89.0);
+        labelPreco.setLayoutX(14);
+        labelPreco.setLayoutY(82);
         labelPreco.setStyle("-fx-font-weight: bold; -fx-font-size: 28px; -fx-text-fill: #2a6df4;");
 
-        Label labelEstoque = new Label("Estoque: ");
-        labelEstoque.setLayoutX(14.0);
-        labelEstoque.setLayoutY(121.0);
-        labelEstoque.setStyle("-fx-font-size: 12px;");
+        // BOTÕES
+        Button btnEditar = criarBotaoComIcone("Editar", 65, 144, 90, 29, "/assets/imgs/editar.png");
+        Button btnSegundo = isCombo
+                ? criarBotaoComIcone("Excluir", 160, 144, 95, 29, "/assets/imgs/delete.png")
+                : criarBotaoComIcone("Entrada", 160, 144, 95, 29, "/assets/imgs/plus-square-svgrepo-com.png");
+        Button btnApagar = criarBotaoIcone(269, 144, 30, 29, "/assets/imgs/delete.png");
 
-        Label labelQuantidade = new Label(produto.getQuantidade() + " Unidades");
-        labelQuantidade.setLayoutX(65.0);
-        labelQuantidade.setLayoutY(121.0);
-        labelQuantidade.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+        // Ações dos botões
+        btnEditar.setOnAction(e -> {
+            if (isCombo) {
+                System.out.println("✏️ Clicou para editar combo: " + produto.getNome());
+            } else {
+                System.out.println("✏️ Clicou para editar produto: " + produto.getNome());
+            }
+        });
 
-        Button btnEditar = new Button("    Editar");
-        btnEditar.setLayoutX(14.0);
-        btnEditar.setLayoutY(138.0);
-        btnEditar.setPrefSize(82.0, 29.0);
-        btnEditar.setStyle(
-                "-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 3; -fx-font-weight: bold;");
-        btnEditar.setCursor(javafx.scene.Cursor.HAND);
+        btnSegundo.setOnAction(e -> {
+            if (isCombo) {
+                System.out.println("🗑️ Clicou para excluir combo: " + produto.getNome());
+            } else {
+                System.out.println("📥 Clicou para entrada de estoque: " + produto.getNome());
+            }
+        });
 
-        Button btnEntrada = new Button("    Entrada");
-        btnEntrada.setLayoutX(102.0);
-        btnEntrada.setLayoutY(138.0);
-        btnEntrada.setPrefSize(85.0, 29.0);
-        btnEntrada.setStyle(
-                "-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 3; -fx-font-weight: bold;");
-        btnEntrada.setCursor(javafx.scene.Cursor.HAND);
-
-        Button btnApagar = new Button("X");
-        btnApagar.setLayoutX(190.0);
-        btnApagar.setLayoutY(138.0);
-        btnApagar.setPrefSize(30.0, 29.0);
-        btnApagar.setStyle(
-                "-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 3;");
-        btnApagar.setCursor(javafx.scene.Cursor.HAND);
+        // Adicionar ação ao botão de apagar
+        btnApagar.setOnAction(e -> {
+            System.out.println("🗑️ Clicou para apagar produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
+            abrirConfirmacaoExclusao(produto); // ← Isso deve chamar o popup
+        });
 
         card.getChildren().addAll(
-                labelNome, categoriaPane, labelPreco, labelEstoque, labelQuantidade,
-                btnEditar, btnEntrada, btnApagar);
+                labelNome, categoriaPane, labelDescricao, labelPreco,
+                btnEditar, btnSegundo, btnApagar
+        );
 
         return card;
     }
+    private Button criarBotaoComIcone(String texto, double x, double y, double width, double height, String iconePath) {
+        Button button = new Button(texto);
+        button.setLayoutX(x);
+        button.setLayoutY(y);
+        button.setPrefSize(width, height);
+        button.setStyle("-fx-background-color: transparent; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 5; " +
+                "-fx-text-fill: #6B7280; " +
+                "-fx-font-size: 14px; " +
+                "-fx-cursor: hand;");
 
-    private String truncarNome(String nome, int maxLength) {
-        if (nome != null && nome.length() > maxLength) {
-            return nome.substring(0, maxLength) + "...";
+        // ADICIONAR ÍCONE AO LADO DO TEXTO
+        try {
+            ImageView icon = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
+            icon.setFitWidth(16);
+            icon.setFitHeight(16);
+            icon.setPreserveRatio(true);
+            button.setGraphic(icon);
+            button.setContentDisplay(ContentDisplay.LEFT);
+            button.setGraphicTextGap(5); // Espaço entre ícone e texto
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao carregar ícone: " + iconePath);
         }
-        return nome != null ? nome : "Sem Nome";
+
+        // Adicionar efeito hover
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #F9FAFB; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 5; " +
+                "-fx-text-fill: #374151; " +
+                "-fx-font-size: 14px; " +
+                "-fx-cursor: hand;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 5; " +
+                "-fx-text-fill: #6B7280; " +
+                "-fx-font-size: 14px; " +
+                "-fx-cursor: hand;"));
+
+        return button;
     }
+
+    private Button criarBotaoIcone(double x, double y, double width, double height, String iconePath) {
+        Button button = new Button();
+        button.setLayoutX(x);
+        button.setLayoutY(y);
+        button.setPrefSize(width, height);
+        button.setStyle("-fx-background-color: transparent; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 5; " +
+                "-fx-cursor: hand;");
+
+        // ADICIONAR ÍCONE DENTRO DO BOTÃO
+        try {
+            ImageView icon = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
+            icon.setFitWidth(16);
+            icon.setFitHeight(16);
+            icon.setPreserveRatio(true);
+            button.setGraphic(icon);
+            button.setContentDisplay(ContentDisplay.CENTER);
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao carregar ícone: " + iconePath);
+        }
+
+        // Adicionar efeito hover
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #F9FAFB; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 5; " +
+                "-fx-cursor: hand;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 5; " +
+                "-fx-cursor: hand;"));
+
+        return button;
+    }
+
+    // Método para adicionar efeitos hover no card
+    private void adicionarEfeitosHover(Pane card) {
+        card.setOnMouseEntered(e -> {
+            card.setStyle("-fx-background-color: #f8fafc; " +
+                    "-fx-background-radius: 12; " +
+                    "-fx-border-radius: 12; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 3); " +
+                    "-fx-border-color: #e2e8f0; " +
+                    "-fx-border-width: 1;");
+        });
+
+        card.setOnMouseExited(e -> {
+            card.setStyle("-fx-background-color: white; " +
+                    "-fx-background-radius: 12; " +
+                    "-fx-border-radius: 12; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2); " +
+                    "-fx-border-color: #e8e8e8; " +
+                    "-fx-border-width: 1;");
+        });
+    }
+
+    private String truncarNome(String texto, int maxLength) {
+        if (texto == null) return "Sem Nome";
+        if (texto.length() <= maxLength) return texto;
+        return texto.substring(0, maxLength - 3) + "...";
+    }
+    // Método auxiliar para criar botões estilizados
+    private Button criarBotaoAcao(String texto, double x, double y, double width, double height, String cor) {
+        Button botao = new Button(texto);
+        botao.setLayoutX(x);
+        botao.setLayoutY(y);
+        botao.setPrefSize(width, height);
+
+        String estiloBase = "-fx-background-color: " + cor + "; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-weight: bold; " +
+                "-fx-background-radius: 6; " +
+                "-fx-border-radius: 6; " +
+                "-fx-cursor: hand; " +
+                "-fx-font-size: " + (texto.length() > 2 ? "11px" : "12px") + ";";
+
+        botao.setStyle(estiloBase);
+
+        // Efeito de hover
+        botao.setOnMouseEntered(e -> {
+            botao.setStyle(estiloBase + "-fx-effect: dropshadow(gaussian, " + cor + "50, 5, 0, 0, 0);");
+        });
+
+        botao.setOnMouseExited(e -> {
+            botao.setStyle(estiloBase);
+        });
+
+        return botao;
+    }
+
+    // Método auxiliar para criar ícones
+    private ImageView criarIcone(String caminho, double x, double y, double width, double height) {
+        try {
+            ImageView icon = new ImageView(new Image(getClass().getResourceAsStream(caminho)));
+            icon.setFitWidth(width);
+            icon.setFitHeight(height);
+            icon.setLayoutX(x);
+            icon.setLayoutY(y);
+            icon.setPreserveRatio(true);
+            return icon;
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar ícone: " + caminho);
+            return new ImageView(); // Retorna ImageView vazio se não encontrar o ícone
+        }
+    }
+
 
     private void mostrarMensagemSemProdutos() {
         Label mensagem = new Label("Nenhum produto cadastrado");
         mensagem.setLayoutX(400.0);
         mensagem.setLayoutY(350.0);
         mensagem.setStyle("-fx-font-size: 18px; -fx-text-fill: #666;");
-        contentPane.getChildren().add(mensagem);
+
+        if (mainContentPane != null) {
+            mainContentPane.getChildren().add(mensagem);
+        } else {
+            contentPane.getChildren().add(mensagem);
+        }
     }
 
+
     private void mostrarMensagemErro(String mensagem) {
-        Label erro = new Label(mensagem);
-        erro.setLayoutX(14.0);
-        erro.setLayoutY(250.0);
-        erro.setStyle("-fx-font-size: 14px; -fx-text-fill: red;");
-        contentPane.getChildren().add(erro);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText(null);
+            alert.setContentText(mensagem);
+            alert.showAndWait();
+        });
     }
 
     @FXML
@@ -189,6 +449,10 @@ public class TelaProdutosController implements Initializable {
 
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/CadastrarProduto.fxml"));
+
+            // Usar o ControllerFactory do Spring (agora estático)
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
             Parent root = loader.load();
 
             Stage stage = new Stage();
@@ -196,14 +460,361 @@ public class TelaProdutosController implements Initializable {
             stage.setTitle("Cadastrar Produto");
             stage.setResizable(false);
 
-            stage.show();
+            stage.setOnHidden(e -> {
+                System.out.println("Janela de cadastro fechada, recarregando produtos...");
+                carregarProdutos();
+            });
 
-            System.out.println("Tela de cadastro aberta com sucesso!");
+            stage.show();
+            System.out.println("✅ Tela de cadastro aberta com sucesso!");
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao abrir tela de cadastro: " + e.getMessage());
+            System.err.println("❌ Erro ao abrir tela de cadastro: " + e.getMessage());
             mostrarMensagemErro("Erro ao abrir cadastro: " + e.getMessage());
         }
     }
-}
+
+    @FXML
+    private void abrirTelaVendas() {
+        try {
+            System.out.println("Abrindo tela de vendas...");
+
+            // PRIMEIRO: Verificar se o arquivo FXML existe
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRegistroPedido.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("❌ Arquivo FXML não encontrado: TelaRegistroPedido.fxml");
+                mostrarMensagemErro("Arquivo da tela de vendas não encontrado!");
+                return;
+            }
+            System.out.println("✅ Arquivo FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            // Verificar se o contexto do Spring está disponível
+            if (PdvGaleteriaApplication.getSpringContext() == null) {
+                System.err.println("❌ Contexto do Spring não disponível");
+                // Tentar carregar sem o Spring como fallback
+                try {
+                    Parent root = loader.load();
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(root));
+                    stage.setTitle("Registro de Pedidos");
+                    stage.show();
+                    System.out.println("✅ Tela de vendas aberta sem Spring");
+                    return;
+                } catch (Exception fallbackException) {
+                    fallbackException.printStackTrace();
+                    mostrarMensagemErro("Erro ao abrir tela: " + fallbackException.getMessage());
+                    return;
+                }
+            }
+
+            // Usar o ControllerFactory do Spring
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
+            Parent root = loader.load();
+
+            // Criar nova stage em vez de reutilizar a atual
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Registro de Pedidos");
+            stage.setMaximized(true); // Ou ajustar tamanho conforme necessário
+
+            // Fechar a tela atual se desejar
+            // Stage currentStage = (Stage) contentPane.getScene().getWindow();
+            // currentStage.close();
+
+            stage.show();
+            System.out.println("✅ Tela de vendas aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("❌ Erro ao abrir tela de vendas: " + e.getMessage());
+
+            // Mostrar detalhes mais específicos do erro
+            String errorDetails = "Erro ao abrir tela de vendas:\n";
+            if (e.getCause() != null) {
+                errorDetails += "Causa: " + e.getCause().getMessage();
+            } else {
+                errorDetails += e.getMessage();
+            }
+
+            mostrarMensagemErro(errorDetails);
+        }
+    }
+
+    @FXML
+    private void sairParaLogin() {
+        try {
+            System.out.println("Abrindo pop-up de confirmação de saída...");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            Parent root = loader.load();
+            ConfirmacaoSaidaController controller = loader.getController();
+
+            Stage popupStage = new Stage();
+            controller.setPopupStage(popupStage);
+
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Confirmação de Saída");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(contentPane.getScene().getWindow());
+            popupStage.setResizable(false);
+            popupStage.centerOnScreen();
+
+            popupStage.showAndWait();
+
+            if (controller.isConfirmado()) {
+                System.out.println("Usuário confirmou saída, voltando para login...");
+                voltarParaTelaLogin();
+            } else {
+                System.out.println("Usuário cancelou a saída.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
+
+            // Fallback com alerta
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmação de Saída");
+            alert.setHeaderText("Deseja realmente sair?");
+            alert.setContentText("Você será redirecionado para a tela de login.");
+
+            Optional<ButtonType> resultado = alert.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                voltarParaTelaLogin();
+            }
+        }
+    }
+
+    private void voltarParaTelaLogin() {
+        try {
+            System.out.println("Iniciando processo de volta para login...");
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
+
+            // Usar o ControllerFactory do Spring para garantir injeção de dependências
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setTitle("Login");
+            stage.centerOnScreen();
+
+            System.out.println("✅ Tela de login carregada com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("❌ Erro ao voltar para login: " + e.getMessage());
+
+            // Tentar reiniciar a aplicação completamente
+            reiniciarAplicacaoCompleta();
+        }
+    }
+
+
+    private void reiniciarAplicacaoCompleta() {
+        try {
+            System.out.println("Tentando reiniciar aplicação completamente...");
+
+            // Fechar a janela atual
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.close();
+
+            // Usar o método de reinício da aplicação principal
+            PdvGaleteriaApplication.relaunchApplication();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao reiniciar aplicação: " + e.getMessage());
+
+            // Último recurso
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Erro ao reiniciar aplicação");
+            alert.setContentText("Por favor, feche e abra o programa manualmente.");
+            alert.showAndWait();
+
+            Platform.exit();
+        }
+    }
+
+    private void testePopupBasico() {
+        System.out.println("🎯 TESTE BÁSICO DO POPUP...");
+
+        try {
+            // Método mais simples possível
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pdv_galeteria/view/popupExclusaoConfirmacao.fxml"));
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("TESTE - Popup Básico");
+            stage.show();
+
+            System.out.println("✅ POPUP BÁSICO ABERTO COM SUCESSO!");
+
+        } catch (Exception e) {
+            System.err.println("❌ FALHA NO POPUP BÁSICO: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void verificarCaminhoFXML() {
+        System.out.println("📍 VERIFICANDO CAMINHO DO FXML...");
+
+        String[] caminhos = {
+                "/com/example/pdv_galeteria/view/popupExclusaoConfirmacao.fxml",
+                "/view/popupExclusaoConfirmacao.fxml",
+                "popupExclusaoConfirmacao.fxml"
+        };
+
+        for (String caminho : caminhos) {
+            try {
+                URL url = getClass().getResource(caminho);
+                System.out.println("🔍 " + caminho + " → " + (url != null ? "✅ ENCONTRADO" : "❌ NÃO ENCONTRADO"));
+                if (url != null) {
+                    System.out.println("   📂 " + url);
+                }
+            } catch (Exception e) {
+                System.out.println("🔍 " + caminho + " → ❌ ERRO: " + e.getMessage());
+            }
+        }
+    }
+
+    private void abrirConfirmacaoExclusao(Produto produto) {
+        System.out.println("🎯 ABRINDO POPUP...");
+
+        try {
+            // Método correto - usando URL em vez de InputStream
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupExclusaoConfirmacao.fxml");
+
+            if (fxmlUrl == null) {
+                System.err.println("❌ FXML não encontrado!");
+                return;
+            }
+
+            System.out.println("✅ FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            System.out.println("✅ FXML carregado com sucesso");
+
+            ConfirmacaoExclusaoController controller = loader.getController();
+            System.out.println("✅ Controller: " + (controller != null ? "OK" : "NULO"));
+
+            if (controller != null) {
+                controller.setProdutoId(produto.getId());
+                controller.setOnConfirmCallback(() -> {
+                    System.out.println("✅ Exclusão confirmada!");
+                    executarExclusaoProduto(produto);
+                });
+            }
+
+            Stage stage = new Stage();
+            if (controller != null) {
+                controller.setPopupStage(stage);
+            }
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("Confirmar Exclusão");
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            if (contentPane.getScene() != null) {
+                stage.initOwner(contentPane.getScene().getWindow());
+            }
+
+            stage.setResizable(false);
+            stage.showAndWait();
+
+            System.out.println("🔒 Popup fechado");
+
+        } catch (Exception e) {
+            System.err.println("💥 ERRO: " + e.getMessage());
+            e.printStackTrace();
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro FXML");
+            alert.setHeaderText("Erro ao carregar o popup");
+            alert.setContentText("Erro: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+
+
+    private void mostrarMensagemSucesso(String mensagem) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle("Sucesso");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private void abrirConfirmacaoExclusaoFallback(Produto produto) {
+        System.out.println("🔄 Usando fallback para exclusão de: " + produto.getNome());
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar Exclusão");
+        alert.setHeaderText("Deseja realmente excluir este produto?");
+        alert.setContentText("Produto: " + produto.getNome() +
+                "\nPreço: R$ " + String.format("%.2f", produto.getPreco()) +
+                "\n\nEsta ação não pode ser desfeita.");
+
+        // Botões customizados
+        ButtonType btnSim = new ButtonType("Sim, Excluir", ButtonBar.ButtonData.YES);
+        ButtonType btnNao = new ButtonType("Cancelar", ButtonBar.ButtonData.NO);
+        alert.getButtonTypes().setAll(btnSim, btnNao);
+
+        // Estilizar botão de confirmar
+        Button simButton = (Button) alert.getDialogPane().lookupButton(btnSim);
+        simButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+        if (resultado.isPresent() && resultado.get() == btnSim) {
+            System.out.println("✅ Usuário confirmou exclusão no fallback");
+            executarExclusaoProduto(produto);
+        } else {
+            System.out.println("❌ Usuário cancelou exclusão");
+        }
+    }
+
+    private void executarExclusaoProduto(Produto produto) {
+        try {
+            System.out.println("🗑️ EXECUTANDO EXCLUSÃO: " + produto.getNome() + " (ID: " + produto.getId() + ")");
+
+            if (produtoService == null) {
+                System.err.println("❌ produtoService é nulo!");
+                mostrarMensagemErro("Erro: Serviço não disponível");
+                return;
+            }
+
+            // Executar a exclusão
+            produtoService.deletar(produto.getId());
+            System.out.println("✅ Produto excluído do banco com sucesso");
+
+            // Recarregar a lista de produtos
+            carregarProdutos();
+
+            // Mostrar mensagem de sucesso
+            mostrarMensagemSucesso("Produto '" + produto.getNome() + "' excluído com sucesso!");
+
+        } catch (Exception e) {
+            System.err.println("❌ ERRO na exclusão: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensagemErro("Erro ao excluir produto: " + e.getMessage());
+        }
+    }
+
+
+    }
+
+

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -26,7 +25,7 @@
                         <Font size="25.0" />
                     </font>
                 </Label>
-                <TextField fx:id="txtBuscar" layoutX="19.0" layoutY="144.0" prefHeight="36.0" prefWidth="526.0" promptText="Buscar produto, combo,..." style="-fx-background-color: white;" styleClass="text-field">
+                <TextField fx:id="txtBuscar" layoutX="19.0" layoutY="144.0" prefHeight="36.0" prefWidth="526.0" promptText="Buscar produto, combo..." styleClass="text-field">
                     <font>
                         <Font size="15.0" />
                     </font>
@@ -35,62 +34,58 @@
                     </cursor>
                 </TextField>
 
-                <!-- Botão Novo Combo com Hover  -->
-                <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="225.0" styleClass="hover" text="       Novo Combo" textFill="WHITE">
+                <!-- Botão Novo Produto -->
+                <Button layoutX="576.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirCadastroProduto" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Produto" textFill="WHITE">
                     <font>
-                        <Font name="System Bold" size="19.0" />
+                        <Font name="System Bold" size="16.0" />
                     </font>
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
                 </Button>
 
-                <!-- Botão Novo Produto com Hover  -->
-                <Button layoutX="576.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirCadastroProduto" prefHeight="36.0" prefWidth="225.0" styleClass="hover" text="     Novo Produto" textFill="WHITE">
+                <!-- Botão Novo Combo -->
+                <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Combo" textFill="WHITE">
                     <font>
-                        <Font name="System Bold" size="19.0" />
+                        <Font name="System Bold" size="16.0" />
                     </font>
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
                 </Button>
-                <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="866.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@/assets/imgs/mais.png" />
-                    </image>
-                </ImageView>
+
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="520.0" layoutY="155.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@/assets/imgs/search-svgrepo-com.png" />
+                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/search-svgrepo-com.png" />
                     </image>
                 </ImageView>
-                <Label layoutX="13.0" layoutY="247.0" text="Produtos">
-                    <font>
-                        <Font name="System Bold" size="31.0" />
-                    </font>
-                </Label>
-                <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="609.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@/assets/imgs/mais.png" />
-                    </image>
-                </ImageView>
-
-                <!-- Área onde os cards dinâmicos serão renderizados pelo controller -->
-                <!-- Os cards serão adicionados programaticamente começando em X=13, Y=293 -->
-
-                <Label layoutX="13.0" layoutY="477.0" text="Combos">
-                    <font>
-                        <Font name="System Bold" size="31.0" />
-                    </font>
-                </Label>
-                <!-- Área para combos (se necessário separar) -->
+            <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="606.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="858.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+               </image>
+            </ImageView>
+            <Label layoutX="19.0" layoutY="180.0" text="Produtos">
+               <font>
+                  <Font name="System Bold" size="35.0" />
+               </font>
+            </Label>
+            <Label layoutX="24.0" layoutY="429.0" text="Combos">
+               <font>
+                  <Font name="System Bold" size="35.0" />
+               </font>
+            </Label>
             </children>
         </Pane>
 
-        <!-- Resto do menu lateral permanece igual -->
+        <!-- Menu Lateral -->
         <ImageView fitHeight="93.0" fitWidth="113.0" layoutX="99.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@/assets/imgs/logo-pdv.jpg" />
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
             </image>
         </ImageView>
 
@@ -98,9 +93,6 @@
             <font>
                 <Font name="System Bold" size="22.0" />
             </font>
-            <opaqueInsets>
-                <Insets />
-            </opaqueInsets>
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
@@ -108,6 +100,7 @@
 
         <Separator layoutX="-12.0" layoutY="115.0" opacity="0.19" prefWidth="295.0" />
 
+        <!-- Dashboard -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="121.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Dashboard" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -119,10 +112,12 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="132.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@/assets/imgs/casa.png" />
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/casa.png" />
             </image>
         </ImageView>
-        <Button alignment="CENTER" layoutX="12.0" layoutY="181.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Vendas     " textFill="WHITE">
+
+        <!-- Vendas -->
+        <Button alignment="CENTER" layoutX="12.0" layoutY="181.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaVendas" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Vendas     " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -130,11 +125,14 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
+
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@/assets/imgs/carrinho.png" />
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/carrinho.png" />
             </image>
         </ImageView>
+
+        <!-- Estoque -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="241.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Estoque    " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -143,6 +141,14 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
+
+        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/estoque.png" />
+            </image>
+        </ImageView>
+
+        <!-- Caixa -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -151,6 +157,14 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
+
+        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/money.png" />
+            </image>
+        </ImageView>
+
+        <!-- Entregadores -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -159,6 +173,14 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
+
+        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="375.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/entregadores.png" />
+            </image>
+        </ImageView>
+
+        <!-- Relatórios -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="421.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Relatórios  " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -167,6 +189,14 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
+
+        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="437.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/relat.png" />
+            </image>
+        </ImageView>
+
+        <!-- Configurações -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="481.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="     Configurações" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -175,32 +205,17 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
-        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@/assets/imgs/estoque.png" />
-            </image>
-        </ImageView>
-        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@/assets/imgs/money.png" />
-            </image>
-        </ImageView>
-        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="375.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@/assets/imgs/entregadores.png" />
-            </image>
-        </ImageView>
-        <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="437.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@/assets/imgs/relat.png" />
-            </image>
-        </ImageView>
+
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="497.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@/assets/imgs/configs.png" />
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/configs.png" />
             </image>
         </ImageView>
-        <Button alignment="CENTER" layoutX="12.0" layoutY="553.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Sair            " textFill="WHITE">
+
+        <Separator layoutX="-1.0" layoutY="540.0" opacity="0.19" prefWidth="295.0" />
+
+        <!-- Sair -->
+        <Button alignment="CENTER" layoutX="12.0" layoutY="553.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#sairParaLogin" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Sair            " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -208,11 +223,11 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
+
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="567.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@/assets/imgs/sair_.png" />
+                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/sair_.png" />
             </image>
         </ImageView>
-        <Separator layoutX="-1.0" layoutY="540.0" opacity="0.19" prefWidth="295.0" />
     </children>
 </AnchorPane>

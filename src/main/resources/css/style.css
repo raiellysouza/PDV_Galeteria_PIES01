@@ -49,7 +49,6 @@
 
 .text-field:focused {
     -fx-border-color: #F68411;
-    -fx-background-color: #FFF8F0;
 }
 
 /* ===== CARDS DE PRODUTOS ===== */
