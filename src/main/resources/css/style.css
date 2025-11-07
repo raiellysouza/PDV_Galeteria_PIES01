@@ -49,6 +49,7 @@
 
 .text-field:focused {
     -fx-border-color: #F68411;
+    -fx-background-color: #FFF8F0;
 }
 
 /* ===== CARDS DE PRODUTOS ===== */
@@ -185,7 +186,6 @@
 }
 .cardPedido:hover {
     -fx-border-color: #f68411 2px solid;
-=======
 /* ===== CHECKBOXES ESTILIZADOS ===== */
 .check-box {
     -fx-text-fill: black;
@@ -212,5 +212,4 @@
 
 .check-box:hover .box {
     -fx-border-color: #F68411;
->>>>>>> 92780f750297a3f8ca759313e103e57f0eae677f
 }
