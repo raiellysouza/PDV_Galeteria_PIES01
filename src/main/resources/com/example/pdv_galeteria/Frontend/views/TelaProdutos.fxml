@@ -25,7 +25,7 @@
                         <Font size="25.0" />
                     </font>
                 </Label>
-                <TextField fx:id="txtBuscar" layoutX="19.0" layoutY="144.0" prefHeight="36.0" prefWidth="526.0" promptText="Buscar produto, combo..." styleClass="text-field">
+                <TextField fx:id="txtBuscar" layoutX="19.0" layoutY="144.0" prefHeight="36.0" prefWidth="526.0" promptText="Buscar produto, combo..." style="-fx-background-color: white;" styleClass="text-field">
                     <font>
                         <Font size="15.0" />
                     </font>

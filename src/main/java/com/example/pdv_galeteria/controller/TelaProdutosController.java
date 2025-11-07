@@ -38,6 +38,8 @@ public class TelaProdutosController implements Initializable {
     // Lista para armazenar os produtos
     private List<Produto> produtosList = new ArrayList<>();
 
+    private Produto produtoSelecionado;
+
     @FXML
     private Pane contentPane;
     @FXML
@@ -218,7 +220,7 @@ public class TelaProdutosController implements Initializable {
         labelDescricao.setLayoutY(45);
         labelDescricao.setPrefSize(372, 35);
         labelDescricao.setWrapText(true);
-        labelDescricao.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
+        labelDescricao.setStyle("-fx-font-size: 14px; -fx-text-fill: #666; -fx-font-weight: bold;");
 
         // Preço
         Label labelPreco = new Label(String.format("R$ %.2f", produto.getPreco()));
@@ -230,16 +232,13 @@ public class TelaProdutosController implements Initializable {
         Button btnEditar = criarBotaoComIcone("Editar", 65, 144, 90, 29, "/assets/imgs/editar.png");
         Button btnSegundo = isCombo
                 ? criarBotaoComIcone("Excluir", 160, 144, 95, 29, "/assets/imgs/delete.png")
-                : criarBotaoComIcone("Entrada", 160, 144, 95, 29, "/assets/imgs/plus-square-svgrepo-com.png");
+                : criarBotaoComIcone("Entrada", 160, 144, 95, 29, "/assets/imgs/plus-square.png");
         Button btnApagar = criarBotaoIcone(269, 144, 30, 29, "/assets/imgs/delete.png");
 
-        // Ações dos botões
+        // Ações dos botões - ATUALIZADAS
         btnEditar.setOnAction(e -> {
-            if (isCombo) {
-                System.out.println("✏️ Clicou para editar combo: " + produto.getNome());
-            } else {
-                System.out.println("✏️ Clicou para editar produto: " + produto.getNome());
-            }
+            produtoSelecionado = produto;
+            editarProduto();
         });
 
         btnSegundo.setOnAction(e -> {
@@ -249,6 +248,7 @@ public class TelaProdutosController implements Initializable {
                 System.out.println("📥 Clicou para entrada de estoque: " + produto.getNome());
             }
         });
+
 
         // Adicionar ação ao botão de apagar
         btnApagar.setOnAction(e -> {
@@ -759,34 +759,6 @@ public class TelaProdutosController implements Initializable {
         alert.showAndWait();
     }
 
-    private void abrirConfirmacaoExclusaoFallback(Produto produto) {
-        System.out.println("🔄 Usando fallback para exclusão de: " + produto.getNome());
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar Exclusão");
-        alert.setHeaderText("Deseja realmente excluir este produto?");
-        alert.setContentText("Produto: " + produto.getNome() +
-                "\nPreço: R$ " + String.format("%.2f", produto.getPreco()) +
-                "\n\nEsta ação não pode ser desfeita.");
-
-        // Botões customizados
-        ButtonType btnSim = new ButtonType("Sim, Excluir", ButtonBar.ButtonData.YES);
-        ButtonType btnNao = new ButtonType("Cancelar", ButtonBar.ButtonData.NO);
-        alert.getButtonTypes().setAll(btnSim, btnNao);
-
-        // Estilizar botão de confirmar
-        Button simButton = (Button) alert.getDialogPane().lookupButton(btnSim);
-        simButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
-
-        Optional<ButtonType> resultado = alert.showAndWait();
-        if (resultado.isPresent() && resultado.get() == btnSim) {
-            System.out.println("✅ Usuário confirmou exclusão no fallback");
-            executarExclusaoProduto(produto);
-        } else {
-            System.out.println("❌ Usuário cancelou exclusão");
-        }
-    }
-
     private void executarExclusaoProduto(Produto produto) {
         try {
             System.out.println("🗑️ EXECUTANDO EXCLUSÃO: " + produto.getNome() + " (ID: " + produto.getId() + ")");
@@ -811,6 +783,62 @@ public class TelaProdutosController implements Initializable {
             System.err.println("❌ ERRO na exclusão: " + e.getMessage());
             e.printStackTrace();
             mostrarMensagemErro("Erro ao excluir produto: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void editarProduto() {
+        try {
+            System.out.println("✏️ Abrindo tela de edição para: " + produtoSelecionado.getNome());
+
+            if (produtoSelecionado == null) {
+                mostrarMensagemErro("Nenhum produto selecionado para edição.");
+                return;
+            }
+
+            // Carregar o FXML específico de edição
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEditarProdutos.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("❌ Arquivo FXML não encontrado: TelaEditarProdutos.fxml");
+                mostrarMensagemErro("Arquivo de edição não encontrado!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
+            Parent root = loader.load();
+
+            // Obter o controller
+            ProdutoController produtoController = loader.getController();
+
+            // Configurar para modo edição
+            produtoController.setProdutoParaEdicao(produtoSelecionado);
+            produtoController.setOnEdicaoConcluidaCallback(() -> {
+                // Callback quando a edição for concluída
+                System.out.println("✅ Edição concluída, atualizando lista...");
+                carregarProdutos(); // Recarrega a lista
+            });
+
+            // Criar e mostrar o popup
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Editar Produto");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setScene(new Scene(root));
+            popupStage.setResizable(false);
+
+            if (contentPane.getScene() != null) {
+                popupStage.initOwner(contentPane.getScene().getWindow());
+            }
+
+            popupStage.showAndWait();
+
+            System.out.println("✅ Popup de edição fechado");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("❌ Erro ao abrir tela de edição: " + e.getMessage());
+            mostrarMensagemErro("Erro ao abrir tela de edição: " + e.getMessage());
         }
     }
 
