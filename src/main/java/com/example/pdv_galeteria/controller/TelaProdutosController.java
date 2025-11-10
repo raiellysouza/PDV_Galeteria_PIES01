@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.example.pdv_galeteria.model.Produto;
@@ -17,6 +18,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -26,8 +28,17 @@ public class TelaProdutosController implements Initializable {
     @Autowired
     private ProdutoService produtoService;
 
+    @Autowired
+    private ApplicationContext context; 
+
+    @Autowired
+    private TelaCombosController telaCombosController;
+
     @FXML
     private Pane contentPane;
+
+    @FXML
+    private AnchorPane comboContainerPane;
 
     private double initialX = 13.0;
     private double initialY = 293.0;
@@ -41,6 +52,7 @@ public class TelaProdutosController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("Inicializando TelaProdutosController...");
         carregarProdutos();
+        carregarTelaCombos();
     }
 
     private void carregarProdutos() {
@@ -55,6 +67,30 @@ public class TelaProdutosController implements Initializable {
             mostrarMensagemErro("Erro ao carregar produtos: " + e.getMessage());
         }
     }
+
+     private void carregarTelaCombos() {
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/Teladisplaycombo.fxml"));
+            loader.setControllerFactory(context::getBean);
+            Pane combosPane = loader.load();
+
+
+            comboContainerPane.getChildren().setAll(combosPane);
+
+
+            AnchorPane.setTopAnchor(combosPane, 0.0);
+            AnchorPane.setLeftAnchor(combosPane, 0.0);
+            AnchorPane.setRightAnchor(combosPane, 0.0);
+            AnchorPane.setBottomAnchor(combosPane, 0.0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao carregar a sub-tela de combos: " + e.getMessage());
+          
+        }
+    }
+
 
     private void renderizarProdutos(List<Produto> produtos) {
         contentPane.getChildren()
@@ -180,6 +216,11 @@ public class TelaProdutosController implements Initializable {
         erro.setLayoutY(250.0);
         erro.setStyle("-fx-font-size: 14px; -fx-text-fill: red;");
         contentPane.getChildren().add(erro);
+    }
+    
+    @FXML
+    private void abrirTelaCombo() {
+    telaCombosController.abrirTelaCombo();
     }
 
     @FXML

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.pdv_galeteria.controller.TelaCombosController"
+      spacing="10" style="-fx-padding: 8;">
+    <children>
+        <FlowPane fx:id="comboContainer" hgap="12" vgap="12" prefWrapLength="1200" />
+        <!-- botão opcional para atualizar manualmente -->
+        <Button text="Atualizar Combos" onAction="#carregarCombos" />
+    </children>
+</VBox>

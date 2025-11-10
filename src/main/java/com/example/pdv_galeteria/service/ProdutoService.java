@@ -24,6 +24,11 @@ public class ProdutoService {
     public List<Produto> listarTodos() {
         return produtoRepository.findAll();
     }
+    
+    public Produto buscarPorNome(String nome) {
+        return produtoRepository.findByNomeIgnoreCase(nome)
+            .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + nome));
+    }
 
     public Optional<Produto> buscarPorId(Long id) {
         return produtoRepository.findById(id);

@@ -19,6 +19,8 @@ public class Combo {
 
     @Column(name = "preco_total", nullable = false)
     private Double precoTotal; 
+    public void setPrecoTotal(Double precoTotal) { this.precoTotal = precoTotal; }
+    public Double getPrecoTotal() { return precoTotal; }
 
 
     @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL, orphanRemoval = true)
