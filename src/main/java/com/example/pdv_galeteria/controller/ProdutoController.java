@@ -1,46 +1,247 @@
 package com.example.pdv_galeteria.controller;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.service.ProdutoService;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.example.pdv_galeteria.model.Produto;
-import com.example.pdv_galeteria.service.ProdutoService;
-
-import lombok.Data;
-
-@Data
 @Component
 public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
 
-    public List<Produto> listarTodos() {
-        return produtoService.listarTodos();
+    @FXML
+    private TextField txtNome;
+
+    @FXML
+    private TextField txtPreco;
+
+    @FXML
+    private TextField txtEstoque;
+
+    @FXML
+    private CheckBox checkPrincipal;
+
+    @FXML
+    private CheckBox checkBebida;
+
+    @FXML
+    private CheckBox checkAcompanhamento;
+
+    @FXML
+    private TextField txtOutraCategoria;
+
+    @FXML
+    private TextField txtNomeEditar;
+
+    @FXML
+    private TextField txtPrecoEditar;
+
+    private Produto produtoParaEdicao;
+    private Runnable onEdicaoConcluidaCallback;
+
+
+    @FXML
+    private void initialize() {
+        System.out.println("✅ ProdutoController inicializado!");
+        System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
+
+        configurarCheckboxes();
     }
 
-    public Optional<Produto> buscarPorId(Long id) {
-        return produtoService.buscarPorId(id);
+    private void configurarCheckboxes() {
+        if (checkPrincipal != null) {
+            checkPrincipal.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal) desmarcarOutrosCheckboxes();
+            });
+        }
+
+        if (checkBebida != null) {
+            checkBebida.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal) desmarcarOutrosCheckboxes();
+            });
+        }
+
+        if (checkAcompanhamento != null) {
+            checkAcompanhamento.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal) desmarcarOutrosCheckboxes();
+            });
+        }
+
+        if (txtOutraCategoria != null) {
+            txtOutraCategoria.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null && !newVal.trim().isEmpty()) {
+                    desmarcarTodosCheckboxes();
+                }
+            });
+        }
     }
 
-    public Produto salvar(Produto produto) {
-        return produtoService.salvar(produto);
+    private void desmarcarOutrosCheckboxes() {
+        if (checkPrincipal != null && !checkPrincipal.isSelected()) {
+            if (checkBebida != null) checkBebida.setSelected(false);
+            if (checkAcompanhamento != null) checkAcompanhamento.setSelected(false);
+            if (txtOutraCategoria != null) txtOutraCategoria.setText("");
+        }
     }
 
-    public Optional<Produto> atualizar(Long id, Produto produto) {
-        return produtoService.buscarPorId(id)
-                .map(existing -> {
-                    existing.setNome(produto.getNome());
-                    existing.setPreco(produto.getPreco());
-                    existing.setQuantidade(produto.getQuantidade());
-                    return produtoService.salvar(existing);
-                });
+    private void desmarcarTodosCheckboxes() {
+        if (checkPrincipal != null) checkPrincipal.setSelected(false);
+        if (checkBebida != null) checkBebida.setSelected(false);
+        if (checkAcompanhamento != null) checkAcompanhamento.setSelected(false);
     }
 
-    public void deletar(Long id) {
-        produtoService.deletar(id);
+    @FXML
+    private void adicionarProduto() {
+        try {
+            System.out.println("🎯 Tentando adicionar produto...");
+            System.out.println("🎯 ProdutoService: " + produtoService);
+
+            if (produtoService == null) {
+                mostrarAlerta("Erro", "Sistema não inicializado. Reinicie a aplicação.");
+                return;
+            }
+
+            // Validar campos obrigatórios
+            if (txtNome.getText().isEmpty() || txtPreco.getText().isEmpty() || txtEstoque.getText().isEmpty()) {
+                mostrarAlerta("Erro", "Preencha todos os campos obrigatórios!");
+                return;
+            }
+
+            // Criar e salvar produto
+            Produto produto = new Produto();
+            produto.setNome(txtNome.getText().trim());
+
+            String precoText = txtPreco.getText().replace(",", ".");
+            produto.setPreco(Double.parseDouble(precoText));
+
+            produto.setQuantidade(Integer.parseInt(txtEstoque.getText().trim()));
+
+            // Salvar no banco
+            Produto produtoSalvo = produtoService.salvar(produto);
+            System.out.println("✅ Produto salvo com ID: " + produtoSalvo.getId());
+
+            mostrarAlerta("Sucesso", "Produto cadastrado com sucesso!");
+            limparCampos();
+            fecharJanela();
+
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "Preço e estoque devem ser números válidos!\nEx: 25.50 ou 25,50");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Erro ao cadastrar produto: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void editarProduto() {
+        try {
+            System.out.println("✏️ Iniciando edição de produto...");
+
+            if (produtoService == null) {
+                mostrarAlerta("Erro", "Sistema não inicializado. Reinicie a aplicação.");
+                return;
+            }
+
+            // Validar campos obrigatórios (usando os campos da tela de edição)
+            if (txtNomeEditar.getText().isEmpty() || txtPrecoEditar.getText().isEmpty()) {
+                mostrarAlerta("Erro", "Preencha todos os campos obrigatórios!");
+                return;
+            }
+
+            // Verificar se há um produto para editar
+            if (produtoParaEdicao == null || produtoParaEdicao.getId() == null) {
+                mostrarAlerta("Erro", "Nenhum produto selecionado para edição.");
+                return;
+            }
+
+            // Atualizar os dados do produto
+            produtoParaEdicao.setNome(txtNomeEditar.getText().trim());
+
+            String precoText = txtPrecoEditar.getText().replace(",", ".");
+            produtoParaEdicao.setPreco(Double.parseDouble(precoText));
+
+            // Atualizar no banco
+            Produto produtoAtualizado = produtoService.salvar(produtoParaEdicao);
+            System.out.println("✅ Produto atualizado com ID: " + produtoAtualizado.getId());
+
+            mostrarAlerta("Sucesso", "Produto atualizado com sucesso!");
+
+            // Fechar janela após sucesso
+            fecharJanelaEdicao();
+
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "Preço deve ser um número válido!\nEx: 25.50 ou 25,50");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Erro ao atualizar produto: " + e.getMessage());
+        }
+    }
+
+    // Método para configurar o produto para edição
+    public void setProdutoParaEdicao(Produto produto) {
+        this.produtoParaEdicao = produto;
+        carregarDadosProdutoEdicao();
+    }
+
+    // Método para carregar os dados do produto nos campos de edição
+    private void carregarDadosProdutoEdicao() {
+        if (produtoParaEdicao != null && txtNomeEditar != null && txtPrecoEditar != null) {
+            txtNomeEditar.setText(produtoParaEdicao.getNome());
+            txtPrecoEditar.setText(String.format("%.2f", produtoParaEdicao.getPreco()));
+            System.out.println("📝 Carregando dados para edição: " + produtoParaEdicao.getNome());
+        }
+    }
+
+    // Método para configurar callback quando a edição for concluída
+    public void setOnEdicaoConcluidaCallback(Runnable callback) {
+        this.onEdicaoConcluidaCallback = callback;
+    }
+
+    // Método específico para fechar a janela de edição
+    private void fecharJanelaEdicao() {
+        // Notificar que a edição foi concluída
+        if (onEdicaoConcluidaCallback != null) {
+            onEdicaoConcluidaCallback.run();
+        }
+
+        // Fechar a janela de edição
+        if (txtNomeEditar != null && txtNomeEditar.getScene() != null) {
+            Stage stage = (Stage) txtNomeEditar.getScene().getWindow();
+            stage.close();
+        }
+    }
+
+
+
+    private void mostrarAlerta(String titulo, String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private void limparCampos() {
+        if (txtNome != null) txtNome.clear();
+        if (txtPreco != null) txtPreco.clear();
+        if (txtEstoque != null) txtEstoque.clear();
+        if (checkPrincipal != null) checkPrincipal.setSelected(false);
+        if (checkBebida != null) checkBebida.setSelected(false);
+        if (checkAcompanhamento != null) checkAcompanhamento.setSelected(false);
+        if (txtOutraCategoria != null) txtOutraCategoria.clear();
+    }
+
+    private void fecharJanela() {
+        if (txtNome != null && txtNome.getScene() != null) {
+            Stage stage = (Stage) txtNome.getScene().getWindow();
+            stage.close();
+        }
     }
 }

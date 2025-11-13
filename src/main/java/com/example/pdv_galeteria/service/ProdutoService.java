@@ -37,4 +37,9 @@ public class ProdutoService {
     public void deletar(Long id) {
         produtoRepository.deleteById(id);
     }
+
+    public List<Produto> buscarPorNome(String nome) {
+        return produtoRepository.findByNomeContainingIgnoreCase(nome);
+    }
+
 }
