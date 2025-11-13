@@ -33,7 +33,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </Label>
-        <TextField fx:id="txtNomeEditar" layoutX="20.0" layoutY="138.0" prefHeight="25.0" prefWidth="393.0" promptText="Ex.: Galeto Inteiro" style="-fx-background-radius: 8;" />
-        <TextField fx:id="txtPrecoEditar" layoutX="20.0" layoutY="205.0" prefHeight="25.0" prefWidth="393.0" promptText="0,00" style="-fx-background-radius: 8;" />
+        <TextField fx:id="txtNomeEditar" layoutX="20.0" layoutY="138.0" prefHeight="25.0" prefWidth="393.0" promptText="Ex.: Galeto Inteiro" style="-fx-background-radius: 8; -fx-background-color: white;" />
+        <TextField fx:id="txtPrecoEditar" layoutX="20.0" layoutY="205.0" prefHeight="25.0" prefWidth="393.0" promptText="0,00" style="-fx-background-radius: 8; -fx-background-color: white;" />
     </children>
 </Pane>

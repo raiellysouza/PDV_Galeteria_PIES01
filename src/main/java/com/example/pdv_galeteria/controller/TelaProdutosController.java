@@ -41,17 +41,22 @@ public class TelaProdutosController implements Initializable {
     private Produto produtoSelecionado;
 
     @FXML
+    private TextField campoBusca;
+
+    private List<Produto> todosProdutos = new ArrayList<>(); // Lista com todos os produtos
+    private Timer timerBusca; // Para busca com delay
+
+    @FXML
     private Pane contentPane;
     @FXML
     private Pane mainContentPane;
-    // Ajuste as coordenadas para serem relativas ao mainContentPane
     private double initialX = 20.0;
     private double initialY = 300.0;
     private double cardWidth = 240.0;
     private double cardHeight = 178.0;
     private double horizontalGap = 20.0;
     private double verticalGap = 20.0;
-    private int cardsPerRow = 3; // Mais cards por linha já que a área é maior
+    private int cardsPerRow = 2;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -66,32 +71,11 @@ public class TelaProdutosController implements Initializable {
         PdvGaleteriaApplication.debugSpringContext();
         System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
+        // Inicializar timer
+        timerBusca = new Timer();
+
         // Carregar produtos
         carregarProdutos();
-    }
-
-    // Método para carregar produtos (se você ainda não tiver)
-    private void carregarProdutos() {
-        try {
-            System.out.println("🔄 Carregando produtos do banco de dados...");
-
-            // Buscar produtos do service
-            List<Produto> produtos = produtoService.listarTodos();
-
-            // Atualizar a lista local
-            produtosList.clear();
-            produtosList.addAll(produtos);
-
-            System.out.println("✅ " + produtos.size() + " produtos carregados");
-
-            // Renderizar os produtos na interface
-            renderizarProdutos(produtosList);
-
-        } catch (Exception e) {
-            System.err.println("❌ Erro ao carregar produtos: " + e.getMessage());
-            e.printStackTrace();
-            mostrarMensagemErro("Erro ao carregar produtos: " + e.getMessage());
-        }
     }
 
 
@@ -839,6 +823,85 @@ public class TelaProdutosController implements Initializable {
             e.printStackTrace();
             System.err.println("❌ Erro ao abrir tela de edição: " + e.getMessage());
             mostrarMensagemErro("Erro ao abrir tela de edição: " + e.getMessage());
+        }
+    }
+
+    // Método chamado quando digitar no campo de busca
+    @FXML
+    private void onBuscaKeyReleased() {
+        String termoBusca = campoBusca.getText().trim();
+
+        // Cancelar timer anterior se existir
+        if (timerBusca != null) {
+            timerBusca.cancel();
+        }
+
+        // Se campo estiver vazio, mostrar todos os produtos imediatamente
+        if (termoBusca.isEmpty()) {
+            renderizarProdutos(todosProdutos);
+            System.out.println("Campo vazio - mostrando todos os produtos");
+            return;
+        }
+
+        // Busca com delay para não sobrecarregar
+        timerBusca = new Timer();
+        timerBusca.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    executarBusca(termoBusca);
+                });
+            }
+        }, 200); // 300ms de delay
+    }
+
+    // Método que executa a busca
+    private void executarBusca(String termoBusca) {
+        try {
+            System.out.println("🔍 Buscando produtos por: '" + termoBusca + "'");
+
+            // Buscar produtos pelo service
+            List<Produto> produtosEncontrados = produtoService.buscarPorNome(termoBusca);
+
+            System.out.println("✅ " + produtosEncontrados.size() + " produtos encontrados");
+
+            // Renderizar os produtos encontrados
+            renderizarProdutos(produtosEncontrados);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erro na busca: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensagemErro("Erro ao buscar produtos: " + e.getMessage());
+
+            // Em caso de erro, mostra todos os produtos
+            renderizarProdutos(todosProdutos);
+        }
+    }
+
+    // Atualize o método carregarProdutos para salvar todos os produtos
+    private void carregarProdutos() {
+        try {
+            System.out.println("🔄 Carregando produtos do banco de dados...");
+
+            // Buscar produtos do service
+            List<Produto> produtos = produtoService.listarTodos();
+
+            // Atualizar as listas locais
+            produtosList.clear();
+            produtosList.addAll(produtos);
+
+            todosProdutos.clear();
+            todosProdutos.addAll(produtos); // Salva cópia de todos os produtos
+
+            System.out.println("✅ " + produtos.size() + " produtos carregados");
+
+            // Renderizar os produtos na interface
+            renderizarProdutos(produtosList);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao carregar produtos: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensagemErro("Erro ao carregar produtos: " + e.getMessage());
         }
     }
 
