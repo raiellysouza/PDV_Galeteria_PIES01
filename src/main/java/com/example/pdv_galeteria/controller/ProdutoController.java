@@ -38,6 +38,16 @@ public class ProdutoController {
     private TextField txtOutraCategoria;
 
     @FXML
+    private TextField txtNomeEditar;
+
+    @FXML
+    private TextField txtPrecoEditar;
+
+    private Produto produtoParaEdicao;
+    private Runnable onEdicaoConcluidaCallback;
+
+
+    @FXML
     private void initialize() {
         System.out.println("✅ ProdutoController inicializado!");
         System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
@@ -128,6 +138,87 @@ public class ProdutoController {
             mostrarAlerta("Erro", "Erro ao cadastrar produto: " + e.getMessage());
         }
     }
+
+    @FXML
+    private void editarProduto() {
+        try {
+            System.out.println("✏️ Iniciando edição de produto...");
+
+            if (produtoService == null) {
+                mostrarAlerta("Erro", "Sistema não inicializado. Reinicie a aplicação.");
+                return;
+            }
+
+            // Validar campos obrigatórios (usando os campos da tela de edição)
+            if (txtNomeEditar.getText().isEmpty() || txtPrecoEditar.getText().isEmpty()) {
+                mostrarAlerta("Erro", "Preencha todos os campos obrigatórios!");
+                return;
+            }
+
+            // Verificar se há um produto para editar
+            if (produtoParaEdicao == null || produtoParaEdicao.getId() == null) {
+                mostrarAlerta("Erro", "Nenhum produto selecionado para edição.");
+                return;
+            }
+
+            // Atualizar os dados do produto
+            produtoParaEdicao.setNome(txtNomeEditar.getText().trim());
+
+            String precoText = txtPrecoEditar.getText().replace(",", ".");
+            produtoParaEdicao.setPreco(Double.parseDouble(precoText));
+
+            // Atualizar no banco
+            Produto produtoAtualizado = produtoService.salvar(produtoParaEdicao);
+            System.out.println("✅ Produto atualizado com ID: " + produtoAtualizado.getId());
+
+            mostrarAlerta("Sucesso", "Produto atualizado com sucesso!");
+
+            // Fechar janela após sucesso
+            fecharJanelaEdicao();
+
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "Preço deve ser um número válido!\nEx: 25.50 ou 25,50");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Erro ao atualizar produto: " + e.getMessage());
+        }
+    }
+
+    // Método para configurar o produto para edição
+    public void setProdutoParaEdicao(Produto produto) {
+        this.produtoParaEdicao = produto;
+        carregarDadosProdutoEdicao();
+    }
+
+    // Método para carregar os dados do produto nos campos de edição
+    private void carregarDadosProdutoEdicao() {
+        if (produtoParaEdicao != null && txtNomeEditar != null && txtPrecoEditar != null) {
+            txtNomeEditar.setText(produtoParaEdicao.getNome());
+            txtPrecoEditar.setText(String.format("%.2f", produtoParaEdicao.getPreco()));
+            System.out.println("📝 Carregando dados para edição: " + produtoParaEdicao.getNome());
+        }
+    }
+
+    // Método para configurar callback quando a edição for concluída
+    public void setOnEdicaoConcluidaCallback(Runnable callback) {
+        this.onEdicaoConcluidaCallback = callback;
+    }
+
+    // Método específico para fechar a janela de edição
+    private void fecharJanelaEdicao() {
+        // Notificar que a edição foi concluída
+        if (onEdicaoConcluidaCallback != null) {
+            onEdicaoConcluidaCallback.run();
+        }
+
+        // Fechar a janela de edição
+        if (txtNomeEditar != null && txtNomeEditar.getScene() != null) {
+            Stage stage = (Stage) txtNomeEditar.getScene().getWindow();
+            stage.close();
+        }
+    }
+
+
 
     private void mostrarAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

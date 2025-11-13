@@ -213,3 +213,8 @@
 .check-box:hover .box {
     -fx-border-color: #F68411;
 }
+
+.semBorda {
+    -fx-border:none;
+}
+

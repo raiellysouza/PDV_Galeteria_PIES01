@@ -8,9 +8,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="334.0" prefWidth="471.0" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.ProdutoController">
+<AnchorPane prefHeight="334.0" prefWidth="471.0" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.ProdutoController">
     <children>
-
         <!-- Título -->
         <Label layoutX="26.0" layoutY="14.0" text="Cadastrar Produto" textFill="black">
             <font>
@@ -57,7 +56,7 @@
         </Label>
 
         <!-- Botão Adicionar Produto -->
-        <Button layoutX="25.0" layoutY="290.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#adicionarProduto" prefHeight="35.0" prefWidth="422.0" style="-fx-background-color: #f68411; -fx-background-radius: 8px;" styleClass="hover" text="Adicionar Produto" textFill="WHITE">
+        <Button layoutX="25.0" layoutY="290.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#adicionarProduto" prefHeight="35.0" prefWidth="422.0" styleClass="hover" text="Adicionar Produto" textFill="WHITE">
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
@@ -66,7 +65,7 @@
             </font>
         </Button>
 
-        <CheckBox fx:id="checkPrincipal" alignment="CENTER" layoutX="26.0" layoutY="250.0" prefHeight="29.0" prefWidth="98.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 12; -fx-padding: 5;" styleClass="text-field" stylesheets="@../../../../../resources/css/style.css" text="Principal" textFill="black">
+        <CheckBox fx:id="checkPrincipal" alignment="CENTER" layoutX="26.0" layoutY="250.0" prefHeight="29.0" prefWidth="98.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 12; -fx-padding: 5;" stylesheets="/css/style.css" text="Principal" textFill="black">
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
@@ -75,7 +74,7 @@
             </font>
         </CheckBox>
 
-        <CheckBox fx:id="checkBebida" alignment="CENTER" layoutX="128.0" layoutY="250.0" prefHeight="29.0" prefWidth="98.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 12; -fx-padding: 5;" styleClass="text-field" stylesheets="@../../../../../resources/css/style.css" text="Bebida" textFill="black">
+        <CheckBox fx:id="checkBebida" alignment="CENTER" layoutX="128.0" layoutY="250.0" prefHeight="29.0" prefWidth="98.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 12; -fx-padding: 5;" stylesheets="/css/style.css" text="Bebida" textFill="black">
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
@@ -84,7 +83,7 @@
             </font>
         </CheckBox>
 
-        <CheckBox fx:id="checkAcompanhamento" alignment="CENTER" layoutX="231.0" layoutY="250.0" prefHeight="29.0" prefWidth="116.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 12; -fx-padding: 5;" styleClass="text-field" stylesheets="@../../../../../resources/css/style.css" text="Acompanhamento" textFill="black">
+        <CheckBox fx:id="checkAcompanhamento" alignment="CENTER" layoutX="231.0" layoutY="250.0" prefHeight="29.0" prefWidth="116.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 12; -fx-padding: 5;" stylesheets="/css/style.css" text="Acompanhamento" textFill="black">
             <cursor>
                 <Cursor fx:constant="HAND" />
             </cursor>
@@ -93,7 +92,10 @@
             </font>
         </CheckBox>
 
-        <TextField fx:id="txtOutraCategoria" layoutX="357.0" layoutY="252.0" prefHeight="25.0" prefWidth="90.0" promptText="Outro" style="-fx-background-color: transparent;" />
+        <TextField fx:id="txtOutraCategoria" layoutX="357.0" layoutY="248.0" prefHeight="25.0" prefWidth="90.0" promptText="Outro" style="-fx-background-color: transparent; -fx-border-color: none;" styleClass="semBorda">
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor></TextField>
 
     </children>
 </AnchorPane>
