@@ -5,6 +5,7 @@ import java.util.*;
 
 import javafx.scene.control.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.example.pdv_galeteria.model.Produto;
@@ -16,6 +17,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -35,18 +39,20 @@ public class TelaProdutosController implements Initializable {
     @Autowired
     private ProdutoService produtoService;
 
-    // Lista para armazenar os produtos
-    private List<Produto> produtosList = new ArrayList<>();
+    @Autowired
+    private ApplicationContext context; 
 
-    private Produto produtoSelecionado;
+    @Autowired
+    private TelaCombosController telaCombosController;
 
     @FXML
     private Pane contentPane;
+
     @FXML
-    private Pane mainContentPane;
-    // Ajuste as coordenadas para serem relativas ao mainContentPane
-    private double initialX = 20.0;
-    private double initialY = 300.0;
+    private AnchorPane comboContainerPane;
+
+    private double initialX = 13.0;
+    private double initialY = 293.0;
     private double cardWidth = 240.0;
     private double cardHeight = 178.0;
     private double horizontalGap = 20.0;
@@ -68,6 +74,7 @@ public class TelaProdutosController implements Initializable {
 
         // Carregar produtos
         carregarProdutos();
+        carregarTelaCombos();
     }
 
     // Método para carregar produtos (se você ainda não tiver)
@@ -91,6 +98,29 @@ public class TelaProdutosController implements Initializable {
             System.err.println("❌ Erro ao carregar produtos: " + e.getMessage());
             e.printStackTrace();
             mostrarMensagemErro("Erro ao carregar produtos: " + e.getMessage());
+        }
+    }
+
+     private void carregarTelaCombos() {
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/Teladisplaycombo.fxml"));
+            loader.setControllerFactory(context::getBean);
+            Pane combosPane = loader.load();
+
+
+            comboContainerPane.getChildren().setAll(combosPane);
+
+
+            AnchorPane.setTopAnchor(combosPane, 0.0);
+            AnchorPane.setLeftAnchor(combosPane, 0.0);
+            AnchorPane.setRightAnchor(combosPane, 0.0);
+            AnchorPane.setBottomAnchor(combosPane, 0.0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao carregar a sub-tela de combos: " + e.getMessage());
+          
         }
     }
 
@@ -440,6 +470,11 @@ public class TelaProdutosController implements Initializable {
             alert.setContentText(mensagem);
             alert.showAndWait();
         });
+    }
+    
+    @FXML
+    private void abrirTelaCombo() {
+    telaCombosController.abrirTelaCombo();
     }
 
     @FXML
