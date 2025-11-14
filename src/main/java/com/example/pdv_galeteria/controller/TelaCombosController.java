@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -24,7 +25,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +40,7 @@ public class TelaCombosController {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
-    private ComboRepository comboRepository;
-    
+    private HBox combosContainer; // Não é @FXML
 
     // Campos da tela (vinculados pelo fx:id)
     @FXML private TextArea nomeComboField;
@@ -62,12 +60,21 @@ public class TelaCombosController {
         carregarCombos();
     }
 
+    // Método para receber o container da TelaProdutos
+    public void setCombosContainer(HBox combosContainer) {
+        this.combosContainer = combosContainer;
+    }
+
     @FXML
     public void carregarCombos() {
         try {
-            System.out.println("🔄 Carregando combos...");
+            if (combosContainer == null) {
+                System.out.println("❌ combosContainer não configurado!");
+                return;
+            }
 
-            comboContainer.getChildren().clear();
+            System.out.println("🔄 Carregando combos no HBox...");
+            combosContainer.getChildren().clear();
             List<Combo> combos = comboService.buscarTodosCombos();
 
             System.out.println("📊 Combos encontrados: " + (combos != null ? combos.size() : 0));
@@ -75,26 +82,28 @@ public class TelaCombosController {
             if (combos == null || combos.isEmpty()) {
                 Label vazio = new Label("Nenhum combo cadastrado");
                 vazio.setStyle("-fx-font-size: 14px; -fx-text-fill: #666; -fx-padding: 20;");
-                comboContainer.getChildren().add(vazio);
+                combosContainer.getChildren().add(vazio);
                 return;
             }
 
             for (Combo combo : combos) {
-                System.out.println("🎴 Criando card para: " + combo.getNome());
                 VBox card = criarCardCombo(combo);
-                comboContainer.getChildren().add(card);
+                combosContainer.getChildren().add(card);
             }
 
-            System.out.println("✅ Cards criados: " + comboContainer.getChildren().size());
+            System.out.println("✅ Cards criados: " + combosContainer.getChildren().size());
 
         } catch (Exception e) {
             e.printStackTrace();
-            comboContainer.getChildren().clear();
-            Label erro = new Label("Erro ao carregar combos: " + e.getMessage());
-            erro.setStyle("-fx-text-fill: red; -fx-padding: 10;");
-            comboContainer.getChildren().add(erro);
+            if (combosContainer != null) {
+                combosContainer.getChildren().clear();
+                Label erro = new Label("Erro ao carregar combos: " + e.getMessage());
+                erro.setStyle("-fx-text-fill: red; -fx-padding: 10;");
+                combosContainer.getChildren().add(erro);
+            }
         }
     }
+
 
     private VBox criarCardCombo(Combo combo) {
         VBox card = new VBox();
@@ -120,7 +129,7 @@ public class TelaCombosController {
         return card;
     }
 
-    
+
     private void abrirTelaEditarCombo(Combo combo) {
     try {
         Combo comboCompleto = comboService.buscarPorIdComItens(combo.getId());
@@ -174,68 +183,25 @@ public class TelaCombosController {
     @FXML
     public void abrirTelaCombo() {
         try {
-            System.out.println("🎯 Tentando abrir TelaCombo.fxml...");
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getClassLoader().getResource("com/example/pdv_galeteria/Frontend/views/telaCombo.fxml")
+            );
 
-            // Tentar diferentes caminhos possíveis
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/telaCombo.fxml");
-
-            if (fxmlUrl == null) {
-                // Tentar caminho alternativo
-                fxmlUrl = getClass().getResource("/Frontend/views/telaCombo.fxml");
-            }
-
-            if (fxmlUrl == null) {
-                // Tentar caminho relativo
-                fxmlUrl = getClass().getResource("telaCombo.fxml");
-            }
-
-            if (fxmlUrl == null) {
-                System.err.println("❌ Arquivo FXML não encontrado em nenhum dos caminhos");
-
-                // Listar recursos disponíveis para debug
-                System.out.println("📁 Recursos disponíveis:");
-                try {
-                    java.nio.file.Path resourcesPath = java.nio.file.Paths.get("src/main/resources");
-                    if (java.nio.file.Files.exists(resourcesPath)) {
-                        java.nio.file.Files.walk(resourcesPath)
-                                .filter(path -> path.toString().contains(".fxml"))
-                                .forEach(path -> System.out.println("   - " + resourcesPath.relativize(path)));
-                    }
-                } catch (Exception ex) {
-                    System.err.println("Erro ao listar recursos: " + ex.getMessage());
-                }
-
-                mostrarAlerta("Erro", "Arquivo da tela de combo não encontrado!", Alert.AlertType.ERROR);
-                return;
-            }
-
-            System.out.println("✅ Arquivo FXML encontrado: " + fxmlUrl);
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-            // Se estiver usando Spring, descomente a linha abaixo
             loader.setControllerFactory(applicationContext::getBean);
-
             Parent root = loader.load();
+
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Cadastro de Combo");
             stage.setResizable(false);
-
-            stage.showAndWait(); // ou stage.show() se não quiser modal
-
-            System.out.println("✅ Tela de combo aberta com sucesso!");
+            stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("❌ Erro ao abrir tela de combo: " + e.getMessage());
             mostrarAlerta("Erro", "Erro ao abrir tela de combo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-    /**
-     * Adiciona um produto à lista temporária do combo
-     */
     @FXML
     private void adicionarProduto() {
         try {
@@ -279,109 +245,38 @@ public class TelaCombosController {
     @FXML
     private void salvarCombo() {
         try {
-            System.out.println("🎯 INICIANDO SALVAMENTO DO COMBO...");
-
             String nomeCombo = nomeComboField.getText().trim();
             String precoStr = precoComboField.getText().trim();
 
-            // VALIDAÇÕES BÁSICAS
-            if (nomeCombo.isEmpty()) {
-                mostrarAlerta("Aviso", "Nome do combo é obrigatório!", Alert.AlertType.WARNING);
-                nomeComboField.requestFocus();
+            if (nomeCombo.isEmpty() || precoStr.isEmpty() || itensDoCombo.isEmpty()) {
+                mostrarAlerta("Aviso", "Preencha o nome, preço e adicione ao menos um produto.", Alert.AlertType.WARNING);
                 return;
             }
 
-            if (precoStr.isEmpty()) {
-                mostrarAlerta("Aviso", "Preço do combo é obrigatório!", Alert.AlertType.WARNING);
-                precoComboField.requestFocus();
-                return;
-            }
+            BigDecimal preco = new BigDecimal(precoStr.replace(",", "."));
 
-            if (itensDoCombo.isEmpty()) {
-                mostrarAlerta("Aviso", "Adicione ao menos um produto ao combo!", Alert.AlertType.WARNING);
-                return;
-            }
-
-            // CONVERTER PREÇO
-            Double precoTotal;
-            try {
-                precoStr = precoStr.replace(",", ".");
-                precoTotal = Double.parseDouble(precoStr);
-
-                if (precoTotal <= 0) {
-                    mostrarAlerta("Erro", "Preço deve ser maior que zero!", Alert.AlertType.ERROR);
-                    precoComboField.requestFocus();
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                mostrarAlerta("Erro", "Preço inválido! Use números (ex: 25.90)", Alert.AlertType.ERROR);
-                precoComboField.requestFocus();
-                return;
-            }
-
-            // CRIAR COMBO
             Combo combo = new Combo();
             combo.setNome(nomeCombo);
-            combo.setPrecoTotal(precoTotal);
-            combo.setItensDoCombo(new ArrayList<>(itensDoCombo)); // Cria nova lista
+            combo.setPrecoTotal(preco.doubleValue()); // ou use BigDecimal se seu modelo aceitar
+            combo.setItensDoCombo(itensDoCombo);
 
-            System.out.println("📦 Combo criado - chamando service...");
+            comboService.salvarCombo(combo);
 
-            // SALVAR (AGORA COM TRY-CATCH ESPECÍFICO)
-            Combo comboSalvo;
-            try {
-                comboSalvo = comboService.salvarCombo(combo);
-            } catch (Exception e) {
-                System.err.println("❌ Erro no service: " + e.getMessage());
-                throw e; // Propaga para o catch externo
-            }
+            mostrarAlerta("Sucesso", "Combo salvo com sucesso!", Alert.AlertType.INFORMATION);
 
-            // VERIFICAR SE FOI SALVO
-            if (comboSalvo == null) {
-                throw new RuntimeException("Service retornou combo nulo!");
-            }
+            // Limpa todos os campos e a lista
+            nomeComboField.clear();
+            precoComboField.clear();
+            produtosTextArea.clear();
+            itensDoCombo.clear();
 
-            if (comboSalvo.getId() == null) {
-                throw new RuntimeException("Combo salvo mas ID é nulo!");
-            }
-
-            System.out.println("🎉 Combo salvo com ID: " + comboSalvo.getId());
-
-            // LIMPAR E ATUALIZAR
-            limparCamposEAtualizar();
-            carregarCombos(); // Atualiza a lista
-
-            mostrarAlerta("Sucesso",
-                    "Combo salvo com sucesso!\n" +
-                            "ID: " + comboSalvo.getId() + "\n" +
-                            "Nome: " + comboSalvo.getNome() + "\n" +
-                            "Preço: R$ " + comboSalvo.getPrecoTotal(),
-                    Alert.AlertType.INFORMATION);
-
-        } catch (IllegalArgumentException e) {
-            // Erros de validação
-            System.err.println("❌ Erro de validação: " + e.getMessage());
-            mostrarAlerta("Erro de Validação", e.getMessage(), Alert.AlertType.ERROR);
         } catch (Exception e) {
-            // Erros gerais
-            System.err.println("❌ Erro geral: " + e.getMessage());
             e.printStackTrace();
             mostrarAlerta("Erro", "Erro ao salvar combo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+        carregarCombos();
     }
 
-    /**
-     * Limpa todos os campos e a lista de itens
-     */
-    private void limparCamposEAtualizar() {
-        nomeComboField.clear();
-        precoComboField.clear();
-        produtosTextArea.clear();
-        itensDoCombo.clear();
-
-        // Focar no primeiro campo
-        nomeComboField.requestFocus();
-    }
     /**
      * Atualiza o campo de texto com a lista de produtos adicionados
      */
