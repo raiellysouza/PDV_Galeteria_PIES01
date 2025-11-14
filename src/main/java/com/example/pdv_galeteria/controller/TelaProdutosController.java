@@ -1,18 +1,14 @@
 package com.example.pdv_galeteria.controller;
-
 import java.net.URL;
 import java.util.*;
-
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ProdutoService;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,13 +19,9 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.stage.Modality;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-
 import javafx.scene.control.ContentDisplay;
-
 import java.util.*;
 
 @Component
@@ -50,7 +42,11 @@ public class TelaProdutosController implements Initializable {
     private List<Produto> produtosList = new ArrayList<>();
     private Produto produtoSelecionado;
 
-    @FXML private HBox produtosContainer;
+    @FXML
+    private FlowPane produtosContainer;
+
+    @FXML
+    private FlowPane combosContainer;
 
     @FXML
     private TextField campoBusca;
@@ -67,16 +63,13 @@ public class TelaProdutosController implements Initializable {
     @Autowired
     private TelaCombosController combosController; // Injeta o controller de combos
 
-    @FXML
-    private HBox combosContainer;
-
     private double initialX = 13.0;
     private double initialY = 293.0;
     private double cardWidth = 240.0;
     private double cardHeight = 178.0;
     private double horizontalGap = 20.0;
     private double verticalGap = 20.0;
-    private int cardsPerRow = 3; // Mais cards por linha já que a área é maior
+    private int cardsPerRow = 2;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -104,7 +97,6 @@ public class TelaProdutosController implements Initializable {
         combosController.carregarCombos();
     }
 
-    // ATUALIZE O MÉTODO carregarProdutos PARA SALVAR TODOS OS PRODUTOS
     public void carregarProdutos() {
         try {
             System.out.println("🔄 Carregando produtos em scroll horizontal...");
@@ -141,28 +133,19 @@ public class TelaProdutosController implements Initializable {
 
     private void carregarTelaCombos() {
         try {
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/Teladisplaycombo.fxml"));
             loader.setControllerFactory(context::getBean);
             Pane combosPane = loader.load();
-
-
             comboContainerPane.getChildren().setAll(combosPane);
-
-
             AnchorPane.setTopAnchor(combosPane, 0.0);
             AnchorPane.setLeftAnchor(combosPane, 0.0);
             AnchorPane.setRightAnchor(combosPane, 0.0);
             AnchorPane.setBottomAnchor(combosPane, 0.0);
-
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Erro ao carregar a sub-tela de combos: " + e.getMessage());
-
         }
     }
-
-
 
     private void renderizarProdutos(List<Produto> produtos) {
         // Limpar todos os elementos do mainContentPane
@@ -190,7 +173,6 @@ public class TelaProdutosController implements Initializable {
             }
         }
 
-        // POSIÇÕES FIXAS - layout manual como no FXML original
         double startX = 315.0;
         double startY = 240.0;
         double cardWidth = 400.0;
@@ -292,7 +274,7 @@ public class TelaProdutosController implements Initializable {
                 : criarBotaoComIcone("Entrada", 160, 144, 95, 29, "/assets/imgs/plus-square.png");
         Button btnApagar = criarBotaoIcone(269, 144, 30, 29, "/assets/imgs/delete.png");
 
-        // Ações dos botões - ATUALIZADAS
+        // Ações dos botões
         btnEditar.setOnAction(e -> {
             produtoSelecionado = produto;
             editarProduto();
@@ -333,7 +315,6 @@ public class TelaProdutosController implements Initializable {
                 "-fx-text-fill: #374151; " +
                 "-fx-font-weight: bold; " +
                 "-fx-font-size: 12px;");
-
         try {
             ImageView icone = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
             icone.setFitWidth(16);
@@ -358,7 +339,6 @@ public class TelaProdutosController implements Initializable {
                 "-fx-border-width: 1; " +
                 "-fx-border-radius: 6; " +
                 "-fx-background-radius: 6;");
-
         try {
             ImageView icone = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
             icone.setFitWidth(16);
@@ -383,7 +363,6 @@ public class TelaProdutosController implements Initializable {
             contentPane.getChildren().add(mensagem);
         }
     }
-
 
     private void mostrarMensagemErro(String mensagem) {
         Platform.runLater(() -> {
@@ -477,15 +456,10 @@ public class TelaProdutosController implements Initializable {
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Registro de Pedidos");
-            stage.setMaximized(true); // Ou ajustar tamanho conforme necessário
-
-            // Fechar a tela atual se desejar
-            // Stage currentStage = (Stage) contentPane.getScene().getWindow();
-            // currentStage.close();
+            stage.setMaximized(true);
 
             stage.show();
             System.out.println("✅ Tela de vendas aberta com sucesso!");
-
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("❌ Erro ao abrir tela de vendas: " + e.getMessage());
@@ -497,7 +471,6 @@ public class TelaProdutosController implements Initializable {
             } else {
                 errorDetails += e.getMessage();
             }
-
             mostrarMensagemErro(errorDetails);
         }
     }
@@ -531,7 +504,6 @@ public class TelaProdutosController implements Initializable {
             } else {
                 System.out.println("Usuário cancelou a saída.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
@@ -569,7 +541,6 @@ public class TelaProdutosController implements Initializable {
             stage.centerOnScreen();
 
             System.out.println("✅ Tela de login carregada com sucesso!");
-
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("❌ Erro ao voltar para login: " + e.getMessage());
@@ -578,7 +549,6 @@ public class TelaProdutosController implements Initializable {
             reiniciarAplicacaoCompleta();
         }
     }
-
 
     private void reiniciarAplicacaoCompleta() {
         try {
@@ -594,7 +564,6 @@ public class TelaProdutosController implements Initializable {
         } catch (Exception e) {
             System.err.println("Erro ao reiniciar aplicação: " + e.getMessage());
 
-            // Último recurso
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erro");
             alert.setHeaderText("Erro ao reiniciar aplicação");
@@ -607,7 +576,6 @@ public class TelaProdutosController implements Initializable {
 
     private void testePopupBasico() {
         System.out.println("🎯 TESTE BÁSICO DO POPUP...");
-
         try {
             // Método mais simples possível
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pdv_galeteria/view/popupExclusaoConfirmacao.fxml"));
@@ -618,7 +586,6 @@ public class TelaProdutosController implements Initializable {
             stage.show();
 
             System.out.println("✅ POPUP BÁSICO ABERTO COM SUCESSO!");
-
         } catch (Exception e) {
             System.err.println("❌ FALHA NO POPUP BÁSICO: " + e.getMessage());
             e.printStackTrace();
@@ -627,7 +594,6 @@ public class TelaProdutosController implements Initializable {
 
     private void verificarCaminhoFXML() {
         System.out.println("📍 VERIFICANDO CAMINHO DO FXML...");
-
         String[] caminhos = {
                 "/com/example/pdv_galeteria/view/popupExclusaoConfirmacao.fxml",
                 "/view/popupExclusaoConfirmacao.fxml",
@@ -658,7 +624,6 @@ public class TelaProdutosController implements Initializable {
     private void executarExclusaoProduto(Produto produto) {
         try {
             System.out.println("🗑️ EXECUTANDO EXCLUSÃO: " + produto.getNome() + " (ID: " + produto.getId() + ")");
-
             if (produtoService == null) {
                 System.err.println("❌ produtoService é nulo!");
                 mostrarMensagemErro("Erro: Serviço não disponível");
@@ -674,7 +639,6 @@ public class TelaProdutosController implements Initializable {
 
             // Mostrar mensagem de sucesso
             mostrarMensagemSucesso("Produto '" + produto.getNome() + "' excluído com sucesso!");
-
         } catch (Exception e) {
             System.err.println("❌ ERRO na exclusão: " + e.getMessage());
             e.printStackTrace();
@@ -730,7 +694,6 @@ public class TelaProdutosController implements Initializable {
             popupStage.showAndWait();
 
             System.out.println("✅ Popup de edição fechado");
-
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("❌ Erro ao abrir tela de edição: " + e.getMessage());
