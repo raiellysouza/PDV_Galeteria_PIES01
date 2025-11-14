@@ -272,17 +272,6 @@ public class TelaProdutosController implements Initializable {
         labelCategoria.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #374151;");
         categoriaPane.getChildren().add(labelCategoria);
 
-        // Descrição
-        String descricao = isCombo ?
-                "1 frango inteiro + 2 balões + 2 linguiças + 1 refrigerante de 1 litro + Farofa" :
-                "Delicioso frango assado na brasa. Acompanha farofa.";
-
-        Label labelDescricao = new Label(descricao);
-        labelDescricao.setLayoutX(14);
-        labelDescricao.setLayoutY(45);
-        labelDescricao.setPrefSize(372, 35);
-        labelDescricao.setWrapText(true);
-        labelDescricao.setStyle("-fx-font-size: 14px; -fx-text-fill: #666; -fx-font-weight: bold;");
 
         // Preço
         Label labelPreco = new Label(String.format("R$ %.2f", produto.getPreco()));
@@ -319,7 +308,7 @@ public class TelaProdutosController implements Initializable {
         });
 
         card.getChildren().addAll(
-                labelNome, categoriaPane, labelDescricao, labelPreco,
+                labelNome, categoriaPane, labelPreco,
                 btnEditar, btnSegundo, btnApagar
         );
 
@@ -406,77 +395,6 @@ public class TelaProdutosController implements Initializable {
                 "-fx-cursor: hand;"));
 
         return button;
-    }
-
-    // Método para adicionar efeitos hover no card
-    private void adicionarEfeitosHover(Pane card) {
-        card.setOnMouseEntered(e -> {
-            card.setStyle("-fx-background-color: #f8fafc; " +
-                    "-fx-background-radius: 12; " +
-                    "-fx-border-radius: 12; " +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 3); " +
-                    "-fx-border-color: #e2e8f0; " +
-                    "-fx-border-width: 1;");
-        });
-
-        card.setOnMouseExited(e -> {
-            card.setStyle("-fx-background-color: white; " +
-                    "-fx-background-radius: 12; " +
-                    "-fx-border-radius: 12; " +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2); " +
-                    "-fx-border-color: #e8e8e8; " +
-                    "-fx-border-width: 1;");
-        });
-    }
-
-    private String truncarNome(String texto, int maxLength) {
-        if (texto == null) return "Sem Nome";
-        if (texto.length() <= maxLength) return texto;
-        return texto.substring(0, maxLength - 3) + "...";
-    }
-    // Método auxiliar para criar botões estilizados
-    private Button criarBotaoAcao(String texto, double x, double y, double width, double height, String cor) {
-        Button botao = new Button(texto);
-        botao.setLayoutX(x);
-        botao.setLayoutY(y);
-        botao.setPrefSize(width, height);
-
-        String estiloBase = "-fx-background-color: " + cor + "; " +
-                "-fx-text-fill: white; " +
-                "-fx-font-weight: bold; " +
-                "-fx-background-radius: 6; " +
-                "-fx-border-radius: 6; " +
-                "-fx-cursor: hand; " +
-                "-fx-font-size: " + (texto.length() > 2 ? "11px" : "12px") + ";";
-
-        botao.setStyle(estiloBase);
-
-        // Efeito de hover
-        botao.setOnMouseEntered(e -> {
-            botao.setStyle(estiloBase + "-fx-effect: dropshadow(gaussian, " + cor + "50, 5, 0, 0, 0);");
-        });
-
-        botao.setOnMouseExited(e -> {
-            botao.setStyle(estiloBase);
-        });
-
-        return botao;
-    }
-
-    // Método auxiliar para criar ícones
-    private ImageView criarIcone(String caminho, double x, double y, double width, double height) {
-        try {
-            ImageView icon = new ImageView(new Image(getClass().getResourceAsStream(caminho)));
-            icon.setFitWidth(width);
-            icon.setFitHeight(height);
-            icon.setLayoutX(x);
-            icon.setLayoutY(y);
-            icon.setPreserveRatio(true);
-            return icon;
-        } catch (Exception e) {
-            System.err.println("Erro ao carregar ícone: " + caminho);
-            return new ImageView(); // Retorna ImageView vazio se não encontrar o ícone
-        }
     }
 
 
