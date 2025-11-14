@@ -4,25 +4,46 @@ import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Camada de serviço que contém as regras de negócio
- * relacionadas ao cadastro e gerenciamento de produtos.
- */
 @Service
 public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
 
-    public Produto salvar(Produto produto) {
-        return produtoRepository.save(produto);
+    // MÉTODO PARA EditarCombosController e TelaCombosController - retorna UM Produto
+    public Produto buscarPrimeiroPorNome(String nome) {
+        List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCase(nome);
+        if (produtos != null && !produtos.isEmpty()) {
+            return produtos.get(0); // Retorna o primeiro produto encontrado
+        }
+        return null;
+    }
+
+    // MÉTODO PARA TelaProdutosController - retorna LISTA de Produtos
+    public List<Produto> buscarListaPorNome(String nome) {
+        return produtoRepository.findByNomeContainingIgnoreCase(nome);
+    }
+
+    // MÉTODO ORIGINAL (para compatibilidade) - retorna UM Produto
+    public Produto buscarPorNome(String nome) {
+        return buscarPrimeiroPorNome(nome);
+    }
+
+    // Método para buscar por nome exato
+    public Optional<Produto> buscarPorNomeExato(String nome) {
+        return produtoRepository.findByNomeIgnoreCase(nome);
     }
 
     public List<Produto> listarTodos() {
         return produtoRepository.findAll();
+    }
+
+    public Produto salvar(Produto produto) {
+        return produtoRepository.save(produto);
     }
 
     public Optional<Produto> buscarPorId(Long id) {
@@ -32,9 +53,4 @@ public class ProdutoService {
     public void deletar(Long id) {
         produtoRepository.deleteById(id);
     }
-
-    public Produto buscarPorNome(String nome) {
-        return produtoRepository.findByNomeContainingIgnoreCase(nome);
-    }
-
 }

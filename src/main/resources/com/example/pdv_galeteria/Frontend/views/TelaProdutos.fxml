@@ -25,7 +25,7 @@
                         <Font size="25.0" />
                     </font>
                 </Label>
-                <TextField fx:id="campoBusca" layoutX="19.0" layoutY="144.0" prefHeight="36.0" prefWidth="526.0" promptText="Buscar produto, combo..." onKeyReleased="#onBuscaKeyReleased" style="-fx-background-color: white;" styleClass="text-field">
+                <TextField fx:id="campoBusca" layoutX="19.0" layoutY="144.0" onKeyReleased="#onBuscaKeyReleased" prefHeight="36.0" prefWidth="526.0" promptText="Buscar produto, combo..." style="-fx-background-color: white;" styleClass="text-field">
                     <font>
                         <Font size="15.0" />
                     </font>
@@ -35,7 +35,7 @@
                 </TextField>
 
                 <!-- Botão Novo Combo com Hover  -->
-                <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirTelaCombo" prefHeight="36.0" prefWidth="225.0" styleClass="hover" text="       Novo Combo" textFill="WHITE"/>
+                <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirTelaCombo" prefHeight="36.0" prefWidth="225.0" styleClass="hover" text="       Novo Combo" textFill="WHITE" />
                 <!-- Botão Novo Produto -->
                 <Button layoutX="576.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirCadastroProduto" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Produto" textFill="WHITE">
                     <font>
@@ -61,16 +61,7 @@
                         <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/search-svgrepo-com.png" />
                     </image>
                 </ImageView>
-
-                <!-- Área onde os cards dinâmicos serão renderizados pelo controller -->
-                <!-- Os cards serão adicionados programaticamente começando em X=13, Y=293 -->
-
-                <Label layoutX="13.0" layoutY="477.0" text="Combos">
-                    <font>
-                        <Font name="System Bold" size="31.0" />
-                    </font>
-                </Label>
-             <AnchorPane fx:id="comboContainerPane" layoutX="13.0" layoutY="520.0" prefWidth="1250.0" prefHeight="150.0" style="-fx-background-color: transparent;" />
+             <AnchorPane fx:id="comboContainerPane" layoutX="13.0" layoutY="520.0" prefHeight="150.0" prefWidth="1250.0" style="-fx-background-color: transparent;" />
             <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="606.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />

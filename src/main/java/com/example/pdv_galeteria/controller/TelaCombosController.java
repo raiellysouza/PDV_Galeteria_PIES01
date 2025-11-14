@@ -51,7 +51,6 @@ public class TelaCombosController {
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
 
-
     @FXML
     public void initialize() {
         // será chamado automaticamente se o FXML for carregado normalmente
@@ -197,25 +196,19 @@ public class TelaCombosController {
 
             int quantidade = Integer.parseInt(qtdStr);
 
-            // Busca o produto pelo nome
-          Produto produto = produtoService.buscarPorNome(nomeProduto);
-
+            // Use o método correto do Service
+            Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
             if (produto == null) {
                 mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
-            return;
+                return;
             }
 
-            // Cria um item do combo
+            // Resto do código...
             ComboItem item = new ComboItem();
             item.setProduto(produto);
             item.setQuantidade(quantidade);
-
             itensDoCombo.add(item);
-
-            // Atualiza a área de texto dos produtos adicionados
             atualizarListaDeProdutos();
-
-            // Limpa campos
             nomeProdutoField.clear();
             quantidadeField.clear();
 

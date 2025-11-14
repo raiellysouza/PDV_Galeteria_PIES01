@@ -5,6 +5,7 @@ import java.util.*;
 
 import javafx.scene.control.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.example.pdv_galeteria.model.Produto;
@@ -16,6 +17,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -35,13 +39,27 @@ public class TelaProdutosController implements Initializable {
     @Autowired
     private ProdutoService produtoService;
 
-    // Lista para armazenar os produtos
-    private List<Produto> produtosList = new ArrayList<>();
+    @Autowired
+    private ApplicationContext context;
 
+    @Autowired
+    private TelaCombosController telaCombosController;
+
+    @FXML
+    private Pane mainContentPane;
+
+    private List<Produto> produtosList = new ArrayList<>();
     private Produto produtoSelecionado;
 
     @FXML
+    private TextField campoBusca;
+
+    private List<Produto> todosProdutos = new ArrayList<>();
+    private Timer timerBusca;
+
+    @FXML
     private Pane contentPane;
+
     @FXML
     private AnchorPane comboContainerPane;
 
@@ -58,6 +76,9 @@ public class TelaProdutosController implements Initializable {
         System.out.println("Inicializando TelaProdutosController...");
         System.out.println("MainContentPane: " + (mainContentPane != null ? "ENCONTRADO" : "NULO"));
 
+        // VERIFICAR SE CAMPO DE BUSCA FOI INJETADO
+        System.out.println("🔍 campoBusca: " + (campoBusca != null ? "✅ INJETADO" : "❌ NULO"));
+
         // DEBUG: Verificar caminho e testar popup
         verificarCaminhoFXML();
         testePopupBasico();
@@ -66,11 +87,15 @@ public class TelaProdutosController implements Initializable {
         PdvGaleteriaApplication.debugSpringContext();
         System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
+        // Inicializar timer de busca
+        timerBusca = new Timer();
+
         // Carregar produtos
         carregarProdutos();
+        carregarTelaCombos();
     }
 
-    // Método para carregar produtos (se você ainda não tiver)
+    // ATUALIZE O MÉTODO carregarProdutos PARA SALVAR TODOS OS PRODUTOS
     private void carregarProdutos() {
         try {
             System.out.println("🔄 Carregando produtos do banco de dados...");
@@ -78,11 +103,15 @@ public class TelaProdutosController implements Initializable {
             // Buscar produtos do service
             List<Produto> produtos = produtoService.listarTodos();
 
-            // Atualizar a lista local
+            // Atualizar as listas locais
             produtosList.clear();
             produtosList.addAll(produtos);
 
+            todosProdutos.clear(); // ← IMPORTANTE: Limpar e recarregar
+            todosProdutos.addAll(new ArrayList<>(produtos)); // Cria uma nova lista
+
             System.out.println("✅ " + produtos.size() + " produtos carregados");
+            System.out.println("📦 todosProdutos tem: " + todosProdutos.size() + " produtos");
 
             // Renderizar os produtos na interface
             renderizarProdutos(produtosList);
@@ -94,7 +123,17 @@ public class TelaProdutosController implements Initializable {
         }
     }
 
-     private void carregarTelaCombos() {
+    // MÉTODO PARA VERIFICAR CONEXÕES (ADICIONE ESTE)
+    private void verificarConexoesBusca() {
+        System.out.println("=== 🔍 DIAGNÓSTICO DO SISTEMA DE BUSCA ===");
+        System.out.println("📋 campoBusca: " + (campoBusca != null ? "✅ INJETADO" : "❌ NULO"));
+        System.out.println("📋 produtoService: " + (produtoService != null ? "✅ INJETADO" : "❌ NULO"));
+        System.out.println("📋 todosProdutos: " + (todosProdutos != null ? "✅ " + todosProdutos.size() + " produtos" : "❌ NULO"));
+        System.out.println("==========================================");
+    }
+
+
+    private void carregarTelaCombos() {
         try {
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/Teladisplaycombo.fxml"));
@@ -463,6 +502,11 @@ public class TelaProdutosController implements Initializable {
             alert.setContentText(mensagem);
             alert.showAndWait();
         });
+    }
+
+    @FXML
+    private void abrirTelaCombo() {
+        telaCombosController.abrirTelaCombo();
     }
 
     @FXML
@@ -865,7 +909,67 @@ public class TelaProdutosController implements Initializable {
         }
     }
 
+    // Método chamado quando digitar no campo de busca
+    @FXML
+    private void onBuscaKeyReleased() {
+        String termoBusca = campoBusca.getText().trim();
+        System.out.println("🎯 onBuscaKeyReleased CHAMADO! Texto: '" + termoBusca + "'");
 
+        // Cancelar timer anterior se existir
+        if (timerBusca != null) {
+            timerBusca.cancel();
+            timerBusca.purge(); // Limpa a fila
+        }
+
+        // Se campo estiver vazio, mostrar todos os produtos imediatamente
+        if (termoBusca.isEmpty()) {
+            System.out.println("🔍 Campo VAZIO - restaurando " + todosProdutos.size() + " produtos");
+            if (!todosProdutos.isEmpty()) {
+                renderizarProdutos(todosProdutos);
+            } else {
+                System.out.println("⚠️ todosProdutos está vazio!");
+            }
+            return;
+        }
+
+        // Busca com delay para não sobrecarregar
+        timerBusca = new Timer();
+        timerBusca.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    System.out.println("🚀 Executando busca após delay para: '" + termoBusca + "'");
+                    executarBusca(termoBusca);
+                });
+            }
+        }, 300); // 300ms de delay
     }
 
+    // Método que executa a busca
+    private void executarBusca(String termoBusca) {
+        try {
+            System.out.println("🔍 Buscando no banco por: '" + termoBusca + "'");
 
+            // Usar o método principal corrigido
+            List<Produto> produtosEncontrados = produtoService.buscarListaPorNome(termoBusca);
+
+            System.out.println("✅ " + produtosEncontrados.size() + " produtos encontrados para '" + termoBusca + "'");
+
+            // Renderizar os produtos encontrados
+            renderizarProdutos(produtosEncontrados);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erro na busca: " + e.getMessage());
+            e.printStackTrace();
+
+            // Mostrar mensagem de erro
+            Platform.runLater(() -> {
+                mostrarMensagemErro("Erro ao buscar produtos: " + e.getMessage());
+            });
+
+            // Em caso de erro, mostra todos os produtos
+            renderizarProdutos(todosProdutos);
+        }
+    }
+
+}
