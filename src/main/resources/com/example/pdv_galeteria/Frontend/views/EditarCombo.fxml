@@ -9,28 +9,34 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="483.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="483.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.EditarCombosController"> 
    <children>
       <Label layoutX="14.0" layoutY="14.0" prefHeight="37.0" prefWidth="247.0" text="Editar Combos">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <TextArea layoutX="14.0" layoutY="84.0" prefHeight="38.0" prefWidth="350.0" promptText="Ex: Combo familia" />
+      <TextArea fx:id="nomeComboField" layoutX="14.0" layoutY="84.0" prefHeight="38.0" prefWidth="350.0" promptText="Ex: Combo familia" />
       <Label layoutX="14.0" layoutY="67.0" text="Nome do combo:" />
-      <TextArea layoutX="379.0" layoutY="84.0" prefHeight="39.0" prefWidth="197.0" promptText="00,00" />
+
+      <TextArea fx:id="precoComboField" layoutX="379.0" layoutY="84.0" prefHeight="39.0" prefWidth="197.0" promptText="00,00" />
       <Label layoutX="379.0" layoutY="67.0" text="Preço:" />
+
       <Label layoutX="14.0" layoutY="133.0" text="Escreva o nome do Produto:" />
-      <TextArea layoutX="14.0" layoutY="150.0" prefHeight="39.0" prefWidth="564.0" promptText="Nome produto" />
-      <TextArea layoutX="14.0" layoutY="216.0" prefHeight="39.0" prefWidth="314.0" promptText="Quantidade" />
+      <TextArea fx:id="nomeProdutoField" layoutX="14.0" layoutY="150.0" prefHeight="39.0" prefWidth="564.0" promptText="Nome produto" />
+      
+      <TextArea fx:id="quantidadeField" layoutX="14.0" layoutY="216.0" prefHeight="39.0" prefWidth="314.0" promptText="Quantidade" />
       <Label layoutX="14.0" layoutY="199.0" text="Quantidade:" />
-      <TextArea layoutX="14.0" layoutY="273.0" prefHeight="122.0" prefWidth="564.0" promptText="produtos" />
-      <Button layoutX="12.0" layoutY="415.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="564.0" style="-fx-background-color: orange;" text="Editar Combo" textFill="WHITE">
+      
+      <TextArea fx:id="produtosTextArea" layoutX="14.0" layoutY="273.0" prefHeight="122.0" prefWidth="564.0" promptText="produtos" />
+      
+      
+      <Button fx:id="btnEditarCombo" onAction="#editarCombo" layoutX="12.0" layoutY="415.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="564.0" style="-fx-background-color: orange;" text="Editar Combo" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Button>
-      <Button layoutX="344.0" layoutY="216.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="233.0" style="-fx-background-color: orange;" text="Adicionar" textFill="WHITE">
+      <Button fx:id="btnAdicionar" onAction="#adicionarProduto" layoutX="344.0" layoutY="216.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="233.0" style="-fx-background-color: orange;" text="Adicionar" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>

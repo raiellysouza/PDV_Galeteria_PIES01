@@ -33,7 +33,7 @@ public class ProdutoService {
         produtoRepository.deleteById(id);
     }
 
-    public List<Produto> buscarPorNome(String nome) {
+    public Produto buscarPorNome(String nome) {
         return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }
 

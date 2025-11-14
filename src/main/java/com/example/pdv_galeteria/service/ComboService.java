@@ -1,10 +1,16 @@
 package com.example.pdv_galeteria.service;
 
+
+
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.model.ComboItem;
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.repository.ComboRepository;
 import com.example.pdv_galeteria.repository.ProdutoRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +23,10 @@ public class ComboService {
 
     private final ComboRepository comboRepository;
     private final ProdutoRepository produtoRepository;
+
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public ComboService(ComboRepository comboRepository, ProdutoRepository produtoRepository) {
@@ -49,9 +59,18 @@ public class ComboService {
     }
     
     
-    public List<Combo> buscarTodosCombos() {
-        return comboRepository.findAll();
-    }
+@Transactional(readOnly = true)
+public List<Combo> buscarTodosCombos() {
+    List<Combo> combos = comboRepository.findAll();
+
+    combos.forEach(combo -> {
+        if (combo.getItensDoCombo() != null) {
+            combo.getItensDoCombo().size();
+        }
+    });
+
+    return combos;
+}
     
     
     public Combo buscarComboPorId(Long id) {
@@ -71,5 +90,22 @@ public class ComboService {
         
         comboRepository.delete(comboParaDeletar);
     }
+
+
+    @Transactional
+public Combo buscarPorIdComItens(Long id) {
+    Combo combo = entityManager.find(Combo.class, id);
+    if (combo != null) {
+        combo.getItensDoCombo().size(); // inicializa os itens
+
+        // inicializa os produtos de cada item
+        combo.getItensDoCombo().forEach(item -> {
+            if (item.getProduto() != null) {
+                item.getProduto().getNome(); // força carregamento
+            }
+        });
+    }
+    return combo;
+}
 
 }
