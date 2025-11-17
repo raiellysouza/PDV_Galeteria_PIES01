@@ -66,7 +66,8 @@ public class EditarCombosController {
 
             int quantidade = Integer.parseInt(qtdStr);
 
-            Produto produto = produtoService.buscarPorNome(nomeProduto);
+            // CORREÇÃO: usar nomeProduto em vez de nome
+            Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
             if (produto == null) {
                 mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
                 return;
@@ -123,8 +124,8 @@ public class EditarCombosController {
         StringBuilder sb = new StringBuilder();
         for (ComboItem item : itensDoCombo) {
             sb.append(item.getProduto().getNome())
-              .append(" - Quantidade: ").append(item.getQuantidade())
-              .append("\n");
+                    .append(" - Quantidade: ").append(item.getQuantidade())
+                    .append("\n");
         }
         produtosTextArea.setText(sb.toString());
     }

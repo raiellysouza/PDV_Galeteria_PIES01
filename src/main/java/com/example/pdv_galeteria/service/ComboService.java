@@ -27,6 +27,7 @@ public class ComboService {
     
     @PersistenceContext
     private EntityManager entityManager;
+    private Combo save;
 
     @Autowired
     public ComboService(ComboRepository comboRepository, ProdutoRepository produtoRepository) {
@@ -39,23 +40,68 @@ public class ComboService {
      * @param novoCombo 
      * @return 
      */
-    
+
     @Transactional
     public Combo salvarCombo(Combo novoCombo) {
-     
-        if (novoCombo.getItensDoCombo() != null) {
-            for (ComboItem item : novoCombo.getItensDoCombo()) {
-                item.setCombo(novoCombo); 
-                
-                if (item.getProduto() != null && item.getProduto().getId() != null) {
-                    Produto produtoExistente = produtoRepository.findById(item.getProduto().getId())
-                            .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + item.getProduto().getId()));
-                    item.setProduto(produtoExistente); 
-                }
-            }
-        }
+        System.out.println("🚨🚨🚨 MÉTODO salvarCombo INICIADO 🚨🚨🚨");
 
-        return comboRepository.save(novoCombo);
+        try {
+            // VALIDAÇÕES CRÍTICAS
+            if (novoCombo == null) {
+                System.err.println("❌❌❌ COMBO É NULO!");
+                throw new IllegalArgumentException("Combo não pode ser nulo");
+            }
+
+            System.out.println("📊 Dados do combo recebido:");
+            System.out.println("   Nome: " + novoCombo.getNome());
+            System.out.println("   Preço: " + novoCombo.getPrecoTotal());
+            System.out.println("   Itens: " + (novoCombo.getItensDoCombo() != null ? novoCombo.getItensDoCombo().size() : 0));
+
+            // GARANTIR QUE PREÇO NÃO É NULO
+            if (novoCombo.getPrecoTotal() == null) {
+                System.out.println("⚠️  Preço era nulo, definindo para 0.0");
+                novoCombo.setPrecoTotal(0.0);
+            }
+
+            // GARANTIR QUE NOME NÃO É NULO
+            if (novoCombo.getNome() == null || novoCombo.getNome().trim().isEmpty()) {
+                System.err.println("❌❌❌ NOME DO COMBO É NULO OU VAZIO!");
+                throw new IllegalArgumentException("Nome do combo é obrigatório");
+            }
+
+            // PROCESSAR ITENS (se existirem)
+            if (novoCombo.getItensDoCombo() != null && !novoCombo.getItensDoCombo().isEmpty()) {
+                System.out.println("🛒 Processando " + novoCombo.getItensDoCombo().size() + " itens...");
+
+                for (ComboItem item : novoCombo.getItensDoCombo()) {
+                    item.setCombo(novoCombo);
+
+                    if (item.getProduto() != null && item.getProduto().getId() != null) {
+                        Produto produtoExistente = produtoRepository.findById(item.getProduto().getId())
+                                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + item.getProduto().getId()));
+                        item.setProduto(produtoExistente);
+                    } else {
+                        System.err.println("❌ Produto inválido no item: " + item);
+                        throw new IllegalArgumentException("Produto inválido no item do combo");
+                    }
+                }
+            } else {
+                System.out.println("ℹ️  Combo sem itens - salvando apenas dados básicos");
+            }
+
+            System.out.println("💾 Chamando comboRepository.save()...");
+
+            // SALVAR NO BANCO
+            Combo salvado = comboRepository.save(novoCombo);
+
+            System.out.println("✅✅✅ COMBO SALVO COM SUCESSO! ID: " + salvado.getId());
+            return salvado;
+
+        } catch (Exception e) {
+            System.err.println("❌❌❌ ERRO NO salvarCombo:");
+            e.printStackTrace();
+            throw e; // Re-lança a exceção para o controller
+        }
     }
     
     

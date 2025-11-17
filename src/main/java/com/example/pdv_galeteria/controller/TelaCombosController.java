@@ -3,11 +3,12 @@ package com.example.pdv_galeteria.controller;
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.model.ComboItem;
 import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.repository.ComboRepository;
 import com.example.pdv_galeteria.service.ComboService;
 import com.example.pdv_galeteria.service.ProdutoService;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -15,13 +16,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,12 @@ public class TelaCombosController {
 
     @Autowired
     private ApplicationContext applicationContext;
-    
+
+    @FXML
+    private FlowPane produtosContainer;
+
+    @FXML
+    private FlowPane combosContainer;
 
     // Campos da tela (vinculados pelo fx:id)
     @FXML private TextArea nomeComboField;
@@ -51,43 +56,61 @@ public class TelaCombosController {
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
 
-
     @FXML
     public void initialize() {
         // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
     }
 
+    // Método para receber o container da TelaProdutos
+    public void setCombosContainer(FlowPane combosContainer) {
+        this.combosContainer = combosContainer;
+    }
+
     @FXML
     public void carregarCombos() {
         try {
-            comboContainer.getChildren().clear();
+            if (combosContainer == null) {
+                System.out.println("❌ combosContainer não configurado!");
+                return;
+            }
+
+            System.out.println("🔄 Carregando combos no VBox...");
+            combosContainer.getChildren().clear();
             List<Combo> combos = comboService.buscarTodosCombos();
+
+            System.out.println("📊 Combos encontrados: " + (combos != null ? combos.size() : 0));
 
             if (combos == null || combos.isEmpty()) {
                 Label vazio = new Label("Nenhum combo cadastrado");
-                vazio.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
-                comboContainer.getChildren().add(vazio);
+                vazio.setStyle("-fx-font-size: 14px; -fx-text-fill: #666; -fx-padding: 20;");
+                combosContainer.getChildren().add(vazio);
                 return;
             }
 
             for (Combo combo : combos) {
                 VBox card = criarCardCombo(combo);
-                comboContainer.getChildren().add(card);
+                combosContainer.getChildren().add(card);
             }
+
+            System.out.println("✅ Cards criados: " + combosContainer.getChildren().size());
         } catch (Exception e) {
             e.printStackTrace();
-            comboContainer.getChildren().clear();
-            Label erro = new Label("Erro ao carregar combos: " + e.getMessage());
-            erro.setStyle("-fx-text-fill: red;");
-            comboContainer.getChildren().add(erro);
+            if (combosContainer != null) {
+                combosContainer.getChildren().clear();
+                Label erro = new Label("Erro ao carregar combos: " + e.getMessage());
+                erro.setStyle("-fx-text-fill: red; -fx-padding: 10;");
+                combosContainer.getChildren().add(erro);
+            }
         }
     }
 
+    // Ajuste a largura dos cards para caber 2 por linha
     private VBox criarCardCombo(Combo combo) {
         VBox card = new VBox();
         card.setSpacing(6);
-        card.setPrefWidth(260);
+        card.setPrefWidth(480.0); // Largura para caber 2 cards
+        card.setPrefHeight(120.0); // Altura fixa
         card.setStyle("-fx-padding: 8; -fx-border-color: #ddd; -fx-border-radius: 6; -fx-background-color: white;");
 
         Label nome = new Label(combo.getNome() != null ? combo.getNome() : "Sem nome");
@@ -98,17 +121,22 @@ public class TelaCombosController {
 
         Label qtd = new Label("Itens: " + (combo.getItensDoCombo() != null ? combo.getItensDoCombo().size() : 0));
 
+        // Container para os botões lado a lado - CORRIGIDO
+        HBox botoesContainer = new HBox();
+        botoesContainer.setSpacing(10); // Espaçamento de 10 entre botões
+        botoesContainer.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
         Button btnEditar = new Button("Editar");
         Button btnExcluir = new Button("Excluir");
 
         btnExcluir.setOnAction(e -> excluirCombo(combo));
         btnEditar.setOnAction(e -> abrirTelaEditarCombo(combo));
 
-        card.getChildren().addAll(nome, preco, qtd, btnEditar, btnExcluir);
+        botoesContainer.getChildren().addAll(btnEditar, btnExcluir);
+        card.getChildren().addAll(nome, preco, qtd, botoesContainer);
         return card;
     }
 
-    
     private void abrirTelaEditarCombo(Combo combo) {
     try {
         Combo comboCompleto = comboService.buscarPorIdComItens(combo.getId());
@@ -120,10 +148,8 @@ public class TelaCombosController {
 
         Parent root = loader.load();
 
- 
         EditarCombosController controller = loader.getController();
         controller.setCombo(comboCompleto);
-
         Stage stage = new Stage();
         stage.setTitle("Editar Combo");
         stage.setScene(new Scene(root));
@@ -135,7 +161,6 @@ public class TelaCombosController {
         mostrarAlerta("Erro", "Erro ao abrir tela de edição: " + e.getMessage(), Alert.AlertType.ERROR);
     }
 }
-
 
     private void excluirCombo(Combo combo) {
     Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
@@ -163,27 +188,23 @@ public class TelaCombosController {
     public void abrirTelaCombo() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/example/pdv_galeteria/Frontend/views/telaCombo.fxml")
+                    getClass().getClassLoader().getResource("com/example/pdv_galeteria/Frontend/views/telaCombo.fxml")
             );
 
             loader.setControllerFactory(applicationContext::getBean);
-
             Parent root = loader.load();
+
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Cadastro de Combo");
             stage.setResizable(false);
             stage.show();
-
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Erro", "Erro ao abrir tela de combo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-    /**
-     * Adiciona um produto à lista temporária do combo
-     */
     @FXML
     private void adicionarProduto() {
         try {
@@ -197,28 +218,19 @@ public class TelaCombosController {
 
             int quantidade = Integer.parseInt(qtdStr);
 
-            // Busca o produto pelo nome
-          Produto produto = produtoService.buscarPorNome(nomeProduto);
-
+            Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
             if (produto == null) {
                 mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
-            return;
+                return;
             }
 
-            // Cria um item do combo
             ComboItem item = new ComboItem();
             item.setProduto(produto);
             item.setQuantidade(quantidade);
-
             itensDoCombo.add(item);
-
-            // Atualiza a área de texto dos produtos adicionados
             atualizarListaDeProdutos();
-
-            // Limpa campos
             nomeProdutoField.clear();
             quantidadeField.clear();
-
         } catch (NumberFormatException e) {
             mostrarAlerta("Erro", "Quantidade inválida. Digite um número inteiro.", Alert.AlertType.ERROR);
         } catch (Exception e) {
@@ -242,14 +254,11 @@ public class TelaCombosController {
             }
 
             BigDecimal preco = new BigDecimal(precoStr.replace(",", "."));
-
             Combo combo = new Combo();
             combo.setNome(nomeCombo);
             combo.setPrecoTotal(preco.doubleValue()); // ou use BigDecimal se seu modelo aceitar
             combo.setItensDoCombo(itensDoCombo);
-
             comboService.salvarCombo(combo);
-
             mostrarAlerta("Sucesso", "Combo salvo com sucesso!", Alert.AlertType.INFORMATION);
 
             // Limpa todos os campos e a lista
@@ -262,6 +271,7 @@ public class TelaCombosController {
             e.printStackTrace();
             mostrarAlerta("Erro", "Erro ao salvar combo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+        carregarCombos();
     }
 
     /**
