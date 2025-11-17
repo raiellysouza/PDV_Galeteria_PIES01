@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="14.0" layoutY="14.0" prefHeight="37.0" prefWidth="247.0" text="Adicionar Entrada">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="61.0" text="Escreva o nome do Produto:" />
+      <TextArea layoutX="14.0" layoutY="78.0" prefHeight="39.0" prefWidth="564.0" promptText="Nome produto" />
+      <TextArea layoutX="14.0" layoutY="147.0" prefHeight="39.0" prefWidth="314.0" promptText="Quantidade" />
+      <Label layoutX="14.0" layoutY="130.0" text="Quantidade:" />
+      <TextArea disable="true" layoutX="14.0" layoutY="221.0" prefHeight="122.0" prefWidth="564.0" />
+      <Button layoutX="14.0" layoutY="400.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="564.0" style="-fx-background-color: orange;" text="Adicionar Entrada" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Button layoutX="344.0" layoutY="147.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="233.0" style="-fx-background-color: orange;" text="Adicionar" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Group layoutX="24.0" layoutY="229.0">
+         <children>
+            <Label text="1X">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="22.0" prefHeight="17.0" prefWidth="470.0" text="Produto">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <ImageView fitHeight="26.0" fitWidth="21.0" layoutX="522.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@lixo.png" />
+               </image>
+            </ImageView>
+         </children>
+      </Group>
+      <ImageView fitHeight="26.0" fitWidth="21.0" layoutX="569.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@X.png" />
+         </image>
+      </ImageView>
+   </children>
+</Pane>
