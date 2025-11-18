@@ -1,6 +1,10 @@
 package com.example.pdv_galeteria.controller;
 import java.net.URL;
 import java.util.*;
+
+import com.example.pdv_galeteria.model.Combo;
+import com.example.pdv_galeteria.service.ComboService;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +67,9 @@ public class TelaProdutosController implements Initializable {
     @Autowired
     private TelaCombosController combosController; // Injeta o controller de combos
 
+    @Autowired
+    private ComboService comboService;
+
     private double initialX = 13.0;
     private double initialY = 293.0;
     private double cardWidth = 240.0;
@@ -70,6 +77,9 @@ public class TelaProdutosController implements Initializable {
     private double horizontalGap = 20.0;
     private double verticalGap = 20.0;
     private int cardsPerRow = 2;
+
+    private List<Pane> cardsOriginaisProdutos = new ArrayList<>();
+    private List<Pane> cardsOriginaisCombos = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -349,19 +359,6 @@ public class TelaProdutosController implements Initializable {
         }
 
         return botao;
-    }
-
-    private void mostrarMensagemSemProdutos() {
-        Label mensagem = new Label("Nenhum produto cadastrado");
-        mensagem.setLayoutX(400.0);
-        mensagem.setLayoutY(350.0);
-        mensagem.setStyle("-fx-font-size: 18px; -fx-text-fill: #666;");
-
-        if (mainContentPane != null) {
-            mainContentPane.getChildren().add(mensagem);
-        } else {
-            contentPane.getChildren().add(mensagem);
-        }
     }
 
     private void mostrarMensagemErro(String mensagem) {
@@ -710,17 +707,19 @@ public class TelaProdutosController implements Initializable {
         // Cancelar timer anterior se existir
         if (timerBusca != null) {
             timerBusca.cancel();
-            timerBusca.purge(); // Limpa a fila
+            timerBusca.purge();
         }
 
-        // Se campo estiver vazio, mostrar todos os produtos imediatamente
+        // Se campo estiver vazio, restaurar tela original
         if (termoBusca.isEmpty()) {
-            System.out.println("🔍 Campo VAZIO - restaurando " + todosProdutos.size() + " produtos");
-            if (!todosProdutos.isEmpty()) {
-                renderizarProdutos(todosProdutos);
-            } else {
-                System.out.println("⚠️ todosProdutos está vazio!");
-            }
+            System.out.println("🔍 Campo VAZIO - restaurando tela original");
+            timerBusca = new Timer();
+            timerBusca.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    restaurarTelaOriginal();
+                }
+            }, 100);
             return;
         }
 
@@ -734,34 +733,230 @@ public class TelaProdutosController implements Initializable {
                     executarBusca(termoBusca);
                 });
             }
-        }, 300); // 300ms de delay
+        }, 300);
     }
 
     // Método que executa a busca
     private void executarBusca(String termoBusca) {
         try {
-            System.out.println("🔍 Buscando no banco por: '" + termoBusca + "'");
+            System.out.println("🔍 Buscando produtos E combos por: '" + termoBusca + "'");
 
-            // Usar o método principal corrigido
+            // Buscar produtos normais
             List<Produto> produtosEncontrados = produtoService.buscarListaPorNome(termoBusca);
 
-            System.out.println("✅ " + produtosEncontrados.size() + " produtos encontrados para '" + termoBusca + "'");
+            // Buscar combos
+            List<Combo> combosEncontrados = comboService.buscarCombosPorNome(termoBusca);
 
-            // Renderizar os produtos encontrados
-            renderizarProdutos(produtosEncontrados);
+            System.out.println("✅ " + produtosEncontrados.size() + " produtos + " +
+                    combosEncontrados.size() + " combos encontrados");
+
+            // Renderizar produtos e combos juntos
+            renderizarProdutosECombos(produtosEncontrados, combosEncontrados);
 
         } catch (Exception e) {
             System.err.println("❌ Erro na busca: " + e.getMessage());
             e.printStackTrace();
 
-            // Mostrar mensagem de erro
             Platform.runLater(() -> {
-                mostrarMensagemErro("Erro ao buscar produtos: " + e.getMessage());
+                mostrarMensagemErro("Erro ao buscar itens: " + e.getMessage());
             });
 
-            // Em caso de erro, mostra todos os produtos
-            renderizarProdutos(todosProdutos);
+            // Em caso de erro, restaurar todos os itens
+            try {
+                List<Produto> todosProdutos = produtoService.listarTodos();
+                List<Combo> todosCombos = comboService.buscarTodosCombos();
+                renderizarProdutosECombos(todosProdutos, todosCombos);
+            } catch (Exception ex) {
+                System.err.println("❌ Erro ao restaurar itens após falha: " + ex.getMessage());
+            }
         }
+    }
+
+    private void renderizarProdutosECombos(List<Produto> produtos, List<Combo> combos) {
+        Platform.runLater(() -> {
+            try {
+                System.out.println("🔍 Renderizando resultados da busca");
+
+                // Esconder os containers originais
+                if (produtosContainer != null) {
+                    produtosContainer.setVisible(false);
+                    produtosContainer.setManaged(false);
+                }
+                if (comboContainerPane != null) {
+                    comboContainerPane.setVisible(false);
+                    comboContainerPane.setManaged(false);
+                }
+                if (combosContainer != null) {
+                    combosContainer.setVisible(false);
+                    combosContainer.setManaged(false);
+                }
+
+                // Limpar cards de busca anteriores da área principal
+                Pane container = mainContentPane != null ? mainContentPane : contentPane;
+                if (container != null) {
+                    container.getChildren().removeIf(node ->
+                            node instanceof Pane &&
+                                    node.getId() != null &&
+                                    node.getId().startsWith("card-busca-")
+                    );
+                }
+
+                if (produtos.isEmpty() && combos.isEmpty()) {
+                    mostrarMensagemSemProdutos();
+                    return;
+                }
+
+                // USAR A MESMA LÓGICA DO renderizarProdutos
+                double startX = 315.0;
+                double startY = 240.0;
+                double cardWidth = 400.0;
+                double cardHeight = 178.0;
+                double horizontalGap = 59.0;
+                double verticalGap = 26.0;
+
+                // Renderizar PRODUTOS DA BUSCA
+                if (!produtos.isEmpty()) {
+                    System.out.println("🎨 Renderizando " + produtos.size() + " produtos da busca");
+
+                    int count = 0;
+                    for (Produto produto : produtos) {
+                        double currentX = (count % 2 == 0) ? startX : startX + cardWidth + horizontalGap;
+                        double currentY = startY + ((count / 2) * (cardHeight + verticalGap));
+
+                        Pane cardProduto = criarCardProduto(produto, false);
+                        cardProduto.setLayoutX(currentX);
+                        cardProduto.setLayoutY(currentY);
+                        cardProduto.setId("card-busca-produto-" + produto.getId());
+
+                        if (container != null) {
+                            container.getChildren().add(cardProduto);
+                        }
+                        count++;
+                    }
+                }
+
+                // Renderizar COMBOS DA BUSCA (usando a mesma lógica de posicionamento)
+                if (!combos.isEmpty()) {
+                    System.out.println("🎨 Renderizando " + combos.size() + " combos da busca");
+
+                    double combosStartY = startY + (Math.ceil(produtos.size() / 2.0) * (cardHeight + verticalGap)) + 260;
+
+                    // Largura do card de combo (do seu método criarCardCombo)
+                    double comboCardWidth = 400.0;
+
+                    // Ajuste para centralizar os combos (já que são mais largos)
+                    double comboXOffset = (comboCardWidth - cardWidth) / 2;
+
+                    int comboCount = 0;
+                    for (Combo combo : combos) {
+                        double baseX = (comboCount % 2 == 0) ? startX : startX + cardWidth + horizontalGap;
+                        double currentX = baseX - comboXOffset; // Centralizar
+                        double currentY = combosStartY + ((comboCount / 2) * (cardHeight + verticalGap));
+
+                        VBox cardCombo = telaCombosController.criarCardCombo(combo);
+                        cardCombo.setLayoutX(currentX);
+                        cardCombo.setLayoutY(currentY);
+                        cardCombo.setId("card-busca-combo-" + combo.getId());
+
+                        if (container != null) {
+                            container.getChildren().add(cardCombo);
+                        }
+                        comboCount++;
+                    }
+                }
+
+                System.out.println("✅ Busca renderizada - " +
+                        produtos.size() + " produtos + " + combos.size() + " combos");
+
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao renderizar busca: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void restaurarTelaOriginal() {
+        Platform.runLater(() -> {
+            try {
+                System.out.println("🔄 Restaurando tela original...");
+
+                // Mostrar os containers originais
+                if (produtosContainer != null) {
+                    produtosContainer.setVisible(true);
+                    produtosContainer.setManaged(true);
+                }
+                if (comboContainerPane != null) {
+                    comboContainerPane.setVisible(true);
+                    comboContainerPane.setManaged(true);
+                }
+                if (combosContainer != null) {
+                    combosContainer.setVisible(true);
+                    combosContainer.setManaged(true);
+                }
+
+                // Limpar todos os cards de busca da área principal
+                Pane container = mainContentPane != null ? mainContentPane : contentPane;
+                if (container != null) {
+                    container.getChildren().removeIf(node ->
+                            node instanceof Pane &&
+                                    node.getId() != null &&
+                                    node.getId().startsWith("card-busca-")
+                    );
+                }
+
+                // Recarregar os dados se necessário
+                carregarProdutos();
+                if (combosController != null) {
+                    combosController.carregarCombos();
+                }
+
+                System.out.println("✅ Tela original restaurada com sucesso!");
+
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao restaurar tela original: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void mostrarMensagemSemProdutos() {
+        Platform.runLater(() -> {
+            try {
+                // Esconder containers originais
+                if (produtosContainer != null) {
+                    produtosContainer.setVisible(false);
+                    produtosContainer.setManaged(false);
+                }
+                if (comboContainerPane != null) {
+                    comboContainerPane.setVisible(false);
+                    comboContainerPane.setManaged(false);
+                }
+                if (combosContainer != null) {
+                    combosContainer.setVisible(false);
+                    combosContainer.setManaged(false);
+                }
+
+                // Limpar cards de busca anteriores
+                Pane container = mainContentPane != null ? mainContentPane : contentPane;
+                if (container != null) {
+                    container.getChildren().removeIf(node ->
+                            node instanceof Pane &&
+                                    node.getId() != null &&
+                                    node.getId().startsWith("card-busca-")
+                    );
+
+                    // Mostrar mensagem
+                    Label mensagem = new Label("Nenhum produto ou combo encontrado para: '" + campoBusca.getText() + "'");
+                    mensagem.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 20px;");
+                    mensagem.setLayoutX(400);
+                    mensagem.setLayoutY(300);
+                    container.getChildren().add(mensagem);
+                }
+
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao mostrar mensagem sem produtos: " + e.getMessage());
+            }
+        });
     }
 
 }

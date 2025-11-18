@@ -154,4 +154,29 @@ public Combo buscarPorIdComItens(Long id) {
     return combo;
 }
 
+    @Transactional(readOnly = true)
+    public List<Combo> buscarCombosPorNome(String termoBusca) {
+        try {
+            System.out.println("🔍 Buscando combos por: '" + termoBusca + "'");
+
+            // BUSCAR APENAS POR NOME
+            List<Combo> combos = comboRepository.findByNomeContainingIgnoreCase(termoBusca);
+
+            // Carrega os itens de cada combo
+            combos.forEach(combo -> {
+                if (combo.getItensDoCombo() != null) {
+                    combo.getItensDoCombo().size(); // Force initialization
+                }
+            });
+
+            System.out.println("✅ Encontrados " + combos.size() + " combos para: '" + termoBusca + "'");
+            return combos;
+
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao buscar combos: " + e.getMessage());
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
 }
