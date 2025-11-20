@@ -22,11 +22,13 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Controller
 public class TelaCombosController {
 
     @Autowired
@@ -106,7 +108,7 @@ public class TelaCombosController {
     }
 
     // Ajuste a largura dos cards para caber 2 por linha
-    private VBox criarCardCombo(Combo combo) {
+    public VBox criarCardCombo(Combo combo) {
         VBox card = new VBox();
         card.setSpacing(6);
         card.setPrefWidth(480.0); // Largura para caber 2 cards

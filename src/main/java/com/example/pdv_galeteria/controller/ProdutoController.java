@@ -58,19 +58,19 @@ public class ProdutoController {
     private void configurarCheckboxes() {
         if (checkPrincipal != null) {
             checkPrincipal.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal) desmarcarOutrosCheckboxes();
+                if (newVal) desmarcarOutrosCheckboxes(checkPrincipal);
             });
         }
 
         if (checkBebida != null) {
             checkBebida.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal) desmarcarOutrosCheckboxes();
+                if (newVal) desmarcarOutrosCheckboxes(checkBebida);
             });
         }
 
         if (checkAcompanhamento != null) {
             checkAcompanhamento.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal) desmarcarOutrosCheckboxes();
+                if (newVal) desmarcarOutrosCheckboxes(checkAcompanhamento);
             });
         }
 
@@ -83,11 +83,21 @@ public class ProdutoController {
         }
     }
 
-    private void desmarcarOutrosCheckboxes() {
-        if (checkPrincipal != null && !checkPrincipal.isSelected()) {
-            if (checkBebida != null) checkBebida.setSelected(false);
-            if (checkAcompanhamento != null) checkAcompanhamento.setSelected(false);
-            if (txtOutraCategoria != null) txtOutraCategoria.setText("");
+    private void desmarcarOutrosCheckboxes(CheckBox checkboxSelecionado) {
+        // Desmarca todos os outros checkboxes exceto o que foi selecionado
+        if (checkPrincipal != null && checkPrincipal != checkboxSelecionado) {
+            checkPrincipal.setSelected(false);
+        }
+        if (checkBebida != null && checkBebida != checkboxSelecionado) {
+            checkBebida.setSelected(false);
+        }
+        if (checkAcompanhamento != null && checkAcompanhamento != checkboxSelecionado) {
+            checkAcompanhamento.setSelected(false);
+        }
+
+        // Limpa o campo de texto se algum checkbox foi selecionado
+        if (txtOutraCategoria != null) {
+            txtOutraCategoria.setText("");
         }
     }
 

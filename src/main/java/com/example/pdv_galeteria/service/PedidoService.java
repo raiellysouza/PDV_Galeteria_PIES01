@@ -5,6 +5,7 @@ import com.example.pdv_galeteria.model.Pedido;
 import com.example.pdv_galeteria.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 @Service
 public class PedidoService {
