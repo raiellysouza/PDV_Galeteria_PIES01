@@ -22,7 +22,18 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
-    public Optional<Pedido> buscarPorId(Long id){
-        return pedidoRepository.findById(id);
+    public Pedido buscarPorId(Long id){
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
     }
+
+    @Transactional
+    public void excluirPedido(Long id){
+        if(!pedidoRepository.existsById(id)){
+            throw new RuntimeException("Pedido não encontrado");
+        }
+        pedidoRepository.deleteById(id);
+    }
+
 }
+
