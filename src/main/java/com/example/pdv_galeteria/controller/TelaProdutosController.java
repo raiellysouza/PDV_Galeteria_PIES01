@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.service.ComboService;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -332,6 +333,7 @@ public class TelaProdutosController implements Initializable {
             botao.setGraphic(icone);
             botao.setContentDisplay(ContentDisplay.LEFT);
             botao.setGraphicTextGap(8);
+            botao.setCursor(Cursor.HAND);
         } catch (Exception e) {
             System.out.println("Ícone não encontrado: " + iconePath);
         }
@@ -349,6 +351,7 @@ public class TelaProdutosController implements Initializable {
                 "-fx-border-width: 1; " +
                 "-fx-border-radius: 6; " +
                 "-fx-background-radius: 6;");
+        botao.setCursor(Cursor.HAND);
         try {
             ImageView icone = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
             icone.setFitWidth(16);
