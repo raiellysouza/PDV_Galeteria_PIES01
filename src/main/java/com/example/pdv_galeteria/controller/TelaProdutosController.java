@@ -27,9 +27,11 @@ import javafx.stage.Modality;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.ContentDisplay;
+import org.springframework.stereotype.Controller;
+
 import java.util.*;
 
-@Component
+@Controller
 public class TelaProdutosController implements Initializable {
 
     @Autowired
@@ -434,10 +436,13 @@ public class TelaProdutosController implements Initializable {
                 // Tentar carregar sem o Spring como fallback
                 try {
                     Parent root = loader.load();
-                    Stage stage = new Stage();
+
+                    // MUDANÇA AQUI: Usar o Stage atual em vez de criar novo
+                    Stage stage = (Stage) contentPane.getScene().getWindow();
                     stage.setScene(new Scene(root));
                     stage.setTitle("Registro de Pedidos");
-                    stage.show();
+                    stage.centerOnScreen();
+
                     System.out.println("✅ Tela de vendas aberta sem Spring");
                     return;
                 } catch (Exception fallbackException) {
@@ -452,13 +457,12 @@ public class TelaProdutosController implements Initializable {
 
             Parent root = loader.load();
 
-            // Criar nova stage em vez de reutilizar a atual
-            Stage stage = new Stage();
+            // MUDANÇA PRINCIPAL AQUI: Usar o Stage atual
+            Stage stage = (Stage) contentPane.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Registro de Pedidos");
-            stage.setMaximized(true);
+            stage.centerOnScreen();
 
-            stage.show();
             System.out.println("✅ Tela de vendas aberta com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
