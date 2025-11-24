@@ -5,8 +5,8 @@ import com.example.pdv_galeteria.model.StatusCaixa;
 import com.example.pdv_galeteria.repository.CaixaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -40,10 +40,8 @@ public class CaixaService {
             throw new RuntimeException("Caixa já está fechado.");
         }
 
-        BigDecimal saldoAtual = caixa.getSaldoAtual();
-
         caixa.setDataFechamento(LocalDateTime.now());
-        caixa.setValorFinal(saldoAtual);
+        caixa.setValorFinal(caixa.getSaldoAtual());
         caixa.setStatus(StatusCaixa.FECHADO);
 
         if (observacoes != null && !observacoes.trim().isEmpty()) {
@@ -55,11 +53,28 @@ public class CaixaService {
         return caixaRepository.save(caixa);
     }
 
-    public boolean existeCaixaDoDia() {
-        return caixaRepository.existsCaixaDoDia();
+    public String getStatusTextoBotao() {
+        boolean caixaExiste = caixaRepository.existsCaixaDoDia();
+        boolean caixaAberto = caixaRepository.findCaixaAbertoDoDia().isPresent();
+
+        if (!caixaExiste) {
+            return "Abrir Caixa";
+        } else if (caixaAberto) {
+            return "Fechar Caixa";
+        } else {
+            return "Caixa Já Fechado";
+        }
     }
 
-    public boolean existeCaixaAbertoDoDia() {
+    public boolean podeAbrirCaixa() {
+        return !caixaRepository.existsCaixaDoDia();
+    }
+
+    public boolean podeFecharCaixa() {
         return caixaRepository.findCaixaAbertoDoDia().isPresent();
+    }
+
+    public Optional<Caixa> getCaixaDoDia() {
+        return caixaRepository.findCaixaDoDia();
     }
 }
