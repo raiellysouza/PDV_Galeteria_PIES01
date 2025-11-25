@@ -4,7 +4,6 @@ import java.util.*;
 
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.service.ComboService;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -27,11 +26,9 @@ import javafx.stage.Modality;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.ContentDisplay;
-import org.springframework.stereotype.Controller;
-
 import java.util.*;
 
-@Controller
+@Component
 public class TelaProdutosController implements Initializable {
 
     @Autowired
@@ -335,7 +332,6 @@ public class TelaProdutosController implements Initializable {
             botao.setGraphic(icone);
             botao.setContentDisplay(ContentDisplay.LEFT);
             botao.setGraphicTextGap(8);
-            botao.setCursor(Cursor.HAND);
         } catch (Exception e) {
             System.out.println("Ícone não encontrado: " + iconePath);
         }
@@ -353,7 +349,6 @@ public class TelaProdutosController implements Initializable {
                 "-fx-border-width: 1; " +
                 "-fx-border-radius: 6; " +
                 "-fx-background-radius: 6;");
-        botao.setCursor(Cursor.HAND);
         try {
             ImageView icone = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
             icone.setFitWidth(16);
@@ -436,13 +431,10 @@ public class TelaProdutosController implements Initializable {
                 // Tentar carregar sem o Spring como fallback
                 try {
                     Parent root = loader.load();
-
-                    // MUDANÇA AQUI: Usar o Stage atual em vez de criar novo
-                    Stage stage = (Stage) contentPane.getScene().getWindow();
+                    Stage stage = new Stage();
                     stage.setScene(new Scene(root));
                     stage.setTitle("Registro de Pedidos");
-                    stage.centerOnScreen();
-
+                    stage.show();
                     System.out.println("✅ Tela de vendas aberta sem Spring");
                     return;
                 } catch (Exception fallbackException) {
@@ -457,12 +449,13 @@ public class TelaProdutosController implements Initializable {
 
             Parent root = loader.load();
 
-            // MUDANÇA PRINCIPAL AQUI: Usar o Stage atual
-            Stage stage = (Stage) contentPane.getScene().getWindow();
+            // Criar nova stage em vez de reutilizar a atual
+            Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Registro de Pedidos");
-            stage.centerOnScreen();
+            stage.setMaximized(true);
 
+            stage.show();
             System.out.println("✅ Tela de vendas aberta com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -860,7 +853,7 @@ public class TelaProdutosController implements Initializable {
                         double currentX = baseX - comboXOffset; // Centralizar
                         double currentY = combosStartY + ((comboCount / 2) * (cardHeight + verticalGap));
 
-                        VBox cardCombo = telaCombosController.criarCardCombo(combo);
+                        Pane cardCombo = telaCombosController.criarCardCombo(combo);
                         cardCombo.setLayoutX(currentX);
                         cardCombo.setLayoutY(currentY);
                         cardCombo.setId("card-busca-combo-" + combo.getId());
