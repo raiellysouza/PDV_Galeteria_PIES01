@@ -9,11 +9,10 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.layout.FlowPane?>
 <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.TelaProdutosController">
     <children>
         <Pane layoutX="283.0" layoutY="0.0" prefHeight="700.0" prefWidth="1283.0" style="-fx-background-color: white;">
@@ -82,13 +81,9 @@
                 </Label>
 
                 <!-- SCROLL VERTICAL PARA PRODUTOS - 2 CARDS POR LINHA -->
-                <ScrollPane layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0"
-                            style="-fx-background-color: transparent; -fx-border-color: transparent;"
-                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0" style="-fx-border-color: transparent; -fx-background-color: transparent;" vbarPolicy="AS_NEEDED">
                     <content>
-                        <FlowPane fx:id="produtosContainer" orientation="HORIZONTAL"
-                                  hgap="15" vgap="15" prefWrapLength="1000.0"
-                                  style="-fx-padding: 10; -fx-background-color: transparent;" />
+                        <FlowPane fx:id="produtosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
                 </ScrollPane>
 
@@ -100,13 +95,9 @@
                 </Label>
 
                 <!-- SCROLL VERTICAL PARA COMBOS - 2 CARDS POR LINHA -->
-                <ScrollPane layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0"
-                            style="-fx-background-color: transparent; -fx-border-color: transparent;"
-                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
                     <content>
-                        <FlowPane fx:id="combosContainer" orientation="HORIZONTAL"
-                                  hgap="15" vgap="15" prefWrapLength="1000.0"
-                                  style="-fx-padding: 10; -fx-background-color: transparent;" />
+                        <FlowPane fx:id="combosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
                 </ScrollPane>
 
@@ -180,7 +171,7 @@
         </ImageView>
 
         <!-- Caixa -->
-        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAbrirTelaCaixa" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>

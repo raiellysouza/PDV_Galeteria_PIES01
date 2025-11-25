@@ -1,16 +1,17 @@
 package com.example.pdv_galeteria.controller;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-
 import com.example.pdv_galeteria.model.Combo;
+import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.service.ComboService;
+import javafx.event.ActionEvent;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ProdutoService;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
@@ -28,8 +29,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.ContentDisplay;
 import org.springframework.stereotype.Controller;
-
 import java.util.*;
+import com.example.pdv_galeteria.controller.CaixaController;
+
 
 @Controller
 public class TelaProdutosController implements Initializable {
@@ -966,4 +968,42 @@ public class TelaProdutosController implements Initializable {
         });
     }
 
+    @FXML
+    private void handleAbrirTelaCaixa(ActionEvent event) {
+        try {
+            System.out.println("🔄 Abrindo tela do caixa...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml");
+            if (fxmlUrl == null) {
+                mostrarMensagemErro("Arquivo da tela do caixa não encontrado!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            // 🔥 NÃO usar ControllerFactory - deixar JavaFX criar o controller
+            Parent root = loader.load();
+
+            // 🔥 INJETAR MANUALMENTE o CaixaService
+            CaixaController controller = loader.getController();
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
+                controller.setCaixaService(caixaService);
+                System.out.println("✅ CaixaService injetado manualmente");
+            }
+
+            // Usar o Stage atual
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Controle de Caixa");
+            stage.centerOnScreen();
+
+            System.out.println("✅ Tela do caixa aberta com sucesso!");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao abrir tela do caixa: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensagemErro("Erro ao abrir tela do caixa: " + e.getMessage());
+        }
+    }
 }

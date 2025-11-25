@@ -1,5 +1,6 @@
 package com.example.pdv_galeteria.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -10,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Optional;
@@ -246,5 +248,30 @@ public class TelaRegistroPedidoController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleAbrirTelaCaixa(ActionEvent event) {
+        try {
+            // Carrega o FXML da tela do caixa
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml"));
+            Parent root = loader.load();
+
+            // Obtém o stage atual a partir do evento
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+
+            // Troca a cena no mesmo stage
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setTitle("Controle de Caixa");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarErro("Erro ao abrir tela do caixa: " + e.getMessage());
+        }
+    }
+
+    private void mostrarErro(String mensagem) {
+        System.err.println(mensagem);
     }
 }
