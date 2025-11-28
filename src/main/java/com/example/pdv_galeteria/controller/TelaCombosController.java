@@ -19,10 +19,13 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.Priority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -44,7 +47,12 @@ public class TelaCombosController {
     private FlowPane produtosContainer;
 
     @FXML
+    private VBox produtosListContainer;
+
+    @FXML
     private FlowPane combosContainer;
+
+    @FXML private VBox sugestoesContainer;
 
     // Campos da tela (vinculados pelo fx:id)
     @FXML private TextArea nomeComboField;
@@ -62,6 +70,17 @@ public class TelaCombosController {
     public void initialize() {
         // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
+
+        nomeProdutoField.textProperty().addListener((obs, oldValue, newValue) -> {
+    if (newValue == null || newValue.trim().isEmpty()) {
+        sugestoesContainer.setVisible(false);
+        return;
+        }
+
+        List<Produto> encontrados = produtoService.buscarListaPorNome(newValue.trim());
+        mostrarSugestoes(encontrados);
+        });
+
     }
 
     // Método para receber o container da TelaProdutos
@@ -279,15 +298,81 @@ public class TelaCombosController {
     /**
      * Atualiza o campo de texto com a lista de produtos adicionados
      */
-    private void atualizarListaDeProdutos() {
-        StringBuilder sb = new StringBuilder();
-        for (ComboItem item : itensDoCombo) {
-            sb.append(item.getProduto().getNome())
-              .append(" - Quantidade: ").append(item.getQuantidade())
-              .append("\n");
-        }
-        produtosTextArea.setText(sb.toString());
+private void atualizarListaDeProdutos() {
+
+    produtosListContainer.getChildren().clear(); // limpar visual
+
+    for (int i = 0; i < itensDoCombo.size(); i++) {
+
+        ComboItem item = itensDoCombo.get(i);
+
+        HBox linha = new HBox();
+        linha.setSpacing(10);
+        linha.setStyle("""
+                -fx-background-color: #f7f7f7;
+                -fx-padding: 10;
+                -fx-background-radius: 8;
+                -fx-border-radius: 8;
+                -fx-border-color: #ddd;
+                """);
+
+        Label nome = new Label(item.getQuantidade() + "x  " + item.getProduto().getNome());
+        nome.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+
+        // Empurra o botão para a direita
+        Region espaco = new Region();
+        HBox.setHgrow(espaco, Priority.ALWAYS);
+
+        Button btnExcluir = new Button("🗑");
+        btnExcluir.setStyle("""
+                -fx-background-color: transparent;
+                -fx-font-size: 16px;
+                -fx-cursor: hand;
+                """);
+
+        final int index = i;
+
+        btnExcluir.setOnAction(e -> {
+            itensDoCombo.remove(index);
+            atualizarListaDeProdutos();
+        });
+
+        linha.getChildren().addAll(nome, espaco, btnExcluir);
+        produtosListContainer.getChildren().add(linha);
     }
+}
+
+private void mostrarSugestoes(List<Produto> produtos) {
+    sugestoesContainer.getChildren().clear();
+
+    if (produtos == null || produtos.isEmpty()) {
+        sugestoesContainer.setVisible(false);
+        return;
+    }
+
+    for (Produto p : produtos) {
+
+        Label opcao = new Label(p.getNome());
+        opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;");
+        opcao.setMaxWidth(Double.MAX_VALUE);
+
+        // Efeito hover (fundo cinza quando passa o mouse)
+        opcao.setOnMouseEntered(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: #e6e6e6; -fx-font-size: 14;"));
+        opcao.setOnMouseExited(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;"));
+
+        // Clique → autocompleta
+        opcao.setOnMouseClicked(e -> {
+            nomeProdutoField.setText(p.getNome());
+            sugestoesContainer.setVisible(false);
+        });
+
+        sugestoesContainer.getChildren().add(opcao);
+    }
+
+    sugestoesContainer.setVisible(true);
+}
+
+
 
     /**
      * Exibe alertas simples na tela
