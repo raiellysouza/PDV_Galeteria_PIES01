@@ -59,7 +59,6 @@ public class TelaCombosController {
     @FXML private TextArea precoComboField;
     @FXML private TextArea nomeProdutoField;
     @FXML private TextArea quantidadeField;
-    @FXML private TextArea produtosTextArea;
     @FXML private FlowPane comboContainer;
 
     // Lista temporária para armazenar os produtos do combo
@@ -70,6 +69,10 @@ public class TelaCombosController {
     public void initialize() {
         // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
+
+        if (combosContainer != null) {
+            carregarCombos();
+        }
 
         nomeProdutoField.textProperty().addListener((obs, oldValue, newValue) -> {
     if (newValue == null || newValue.trim().isEmpty()) {
@@ -226,39 +229,53 @@ public class TelaCombosController {
         }
     }
 
-    @FXML
-    private void adicionarProduto() {
-        try {
-            String nomeProduto = nomeProdutoField.getText().trim();
-            String qtdStr = quantidadeField.getText().trim();
+   @FXML
+private void adicionarProduto() {
+    try {
+        String nomeProduto = nomeProdutoField.getText().trim();
+        String qtdStr = quantidadeField.getText().trim();
 
-            if (nomeProduto.isEmpty() || qtdStr.isEmpty()) {
-                mostrarAlerta("Aviso", "Preencha o nome do produto e a quantidade.", Alert.AlertType.WARNING);
-                return;
-            }
+        if (nomeProduto.isEmpty() || qtdStr.isEmpty()) {
+            mostrarAlerta("Aviso", "Preencha o nome do produto e a quantidade.", Alert.AlertType.WARNING);
+            return;
+        }
 
-            int quantidade = Integer.parseInt(qtdStr);
+        int quantidade = Integer.parseInt(qtdStr);
 
-            Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
-            if (produto == null) {
-                mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
-                return;
-            }
+        Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
+        if (produto == null) {
+            mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
+            return;
+        }
 
+        // 🔥 NOVO: verificar se já existe item com o mesmo produto
+        ComboItem existente = itensDoCombo.stream()
+                .filter(i -> i.getProduto().getId().equals(produto.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (existente != null) {
+            // 🔥 SOMA a quantidade
+            existente.setQuantidade(existente.getQuantidade() + quantidade);
+        } else {
+            // 🔥 Adiciona novo item normalmente
             ComboItem item = new ComboItem();
             item.setProduto(produto);
             item.setQuantidade(quantidade);
             itensDoCombo.add(item);
-            atualizarListaDeProdutos();
-            nomeProdutoField.clear();
-            quantidadeField.clear();
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Erro", "Quantidade inválida. Digite um número inteiro.", Alert.AlertType.ERROR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarAlerta("Erro", "Erro ao adicionar produto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+
+        atualizarListaDeProdutos();
+        nomeProdutoField.clear();
+        quantidadeField.clear();
+
+    } catch (NumberFormatException e) {
+        mostrarAlerta("Erro", "Quantidade inválida. Digite um número inteiro.", Alert.AlertType.ERROR);
+    } catch (Exception e) {
+        e.printStackTrace();
+        mostrarAlerta("Erro", "Erro ao adicionar produto: " + e.getMessage(), Alert.AlertType.ERROR);
     }
+}
 
     /**
      * Salva o combo no banco de dados
@@ -285,7 +302,6 @@ public class TelaCombosController {
             // Limpa todos os campos e a lista
             nomeComboField.clear();
             precoComboField.clear();
-            produtosTextArea.clear();
             itensDoCombo.clear();
 
         } catch (Exception e) {
