@@ -23,10 +23,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.Priority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -48,14 +51,18 @@ public class TelaCombosController {
     private FlowPane produtosContainer;
 
     @FXML
+    private VBox produtosListContainer;
+
+    @FXML
     private FlowPane combosContainer;
+
+    @FXML private VBox sugestoesContainer;
 
     // Campos da tela (vinculados pelo fx:id)
     @FXML private TextArea nomeComboField;
     @FXML private TextArea precoComboField;
     @FXML private TextArea nomeProdutoField;
     @FXML private TextArea quantidadeField;
-    @FXML private TextArea produtosTextArea;
     @FXML private FlowPane comboContainer;
 
     // Lista temporária para armazenar os produtos do combo
@@ -66,6 +73,21 @@ public class TelaCombosController {
     public void initialize() {
         // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
+
+        if (combosContainer != null) {
+            carregarCombos();
+        }
+
+        nomeProdutoField.textProperty().addListener((obs, oldValue, newValue) -> {
+    if (newValue == null || newValue.trim().isEmpty()) {
+        sugestoesContainer.setVisible(false);
+        return;
+        }
+
+        List<Produto> encontrados = produtoService.buscarListaPorNome(newValue.trim());
+        mostrarSugestoes(encontrados);
+        });
+
     }
 
     // Método para receber o container da TelaProdutos
@@ -306,39 +328,53 @@ private void abrirTelaEditarCombo(Combo combo) {
         }
     }
 
-    @FXML
-    private void adicionarProduto() {
-        try {
-            String nomeProduto = nomeProdutoField.getText().trim();
-            String qtdStr = quantidadeField.getText().trim();
+   @FXML
+private void adicionarProduto() {
+    try {
+        String nomeProduto = nomeProdutoField.getText().trim();
+        String qtdStr = quantidadeField.getText().trim();
 
-            if (nomeProduto.isEmpty() || qtdStr.isEmpty()) {
-                mostrarAlerta("Aviso", "Preencha o nome do produto e a quantidade.", Alert.AlertType.WARNING);
-                return;
-            }
+        if (nomeProduto.isEmpty() || qtdStr.isEmpty()) {
+            mostrarAlerta("Aviso", "Preencha o nome do produto e a quantidade.", Alert.AlertType.WARNING);
+            return;
+        }
 
-            int quantidade = Integer.parseInt(qtdStr);
+        int quantidade = Integer.parseInt(qtdStr);
 
-            Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
-            if (produto == null) {
-                mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
-                return;
-            }
+        Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
+        if (produto == null) {
+            mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
+            return;
+        }
 
+        // 🔥 NOVO: verificar se já existe item com o mesmo produto
+        ComboItem existente = itensDoCombo.stream()
+                .filter(i -> i.getProduto().getId().equals(produto.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (existente != null) {
+            // 🔥 SOMA a quantidade
+            existente.setQuantidade(existente.getQuantidade() + quantidade);
+        } else {
+            // 🔥 Adiciona novo item normalmente
             ComboItem item = new ComboItem();
             item.setProduto(produto);
             item.setQuantidade(quantidade);
             itensDoCombo.add(item);
-            atualizarListaDeProdutos();
-            nomeProdutoField.clear();
-            quantidadeField.clear();
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Erro", "Quantidade inválida. Digite um número inteiro.", Alert.AlertType.ERROR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarAlerta("Erro", "Erro ao adicionar produto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+
+        atualizarListaDeProdutos();
+        nomeProdutoField.clear();
+        quantidadeField.clear();
+
+    } catch (NumberFormatException e) {
+        mostrarAlerta("Erro", "Quantidade inválida. Digite um número inteiro.", Alert.AlertType.ERROR);
+    } catch (Exception e) {
+        e.printStackTrace();
+        mostrarAlerta("Erro", "Erro ao adicionar produto: " + e.getMessage(), Alert.AlertType.ERROR);
     }
+}
 
     /**
      * Salva o combo no banco de dados
@@ -365,7 +401,6 @@ private void abrirTelaEditarCombo(Combo combo) {
             // Limpa todos os campos e a lista
             nomeComboField.clear();
             precoComboField.clear();
-            produtosTextArea.clear();
             itensDoCombo.clear();
 
         } catch (Exception e) {
@@ -378,15 +413,81 @@ private void abrirTelaEditarCombo(Combo combo) {
     /**
      * Atualiza o campo de texto com a lista de produtos adicionados
      */
-    private void atualizarListaDeProdutos() {
-        StringBuilder sb = new StringBuilder();
-        for (ComboItem item : itensDoCombo) {
-            sb.append(item.getProduto().getNome())
-              .append(" - Quantidade: ").append(item.getQuantidade())
-              .append("\n");
-        }
-        produtosTextArea.setText(sb.toString());
+private void atualizarListaDeProdutos() {
+
+    produtosListContainer.getChildren().clear(); // limpar visual
+
+    for (int i = 0; i < itensDoCombo.size(); i++) {
+
+        ComboItem item = itensDoCombo.get(i);
+
+        HBox linha = new HBox();
+        linha.setSpacing(10);
+        linha.setStyle("""
+                -fx-background-color: #f7f7f7;
+                -fx-padding: 10;
+                -fx-background-radius: 8;
+                -fx-border-radius: 8;
+                -fx-border-color: #ddd;
+                """);
+
+        Label nome = new Label(item.getQuantidade() + "x  " + item.getProduto().getNome());
+        nome.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+
+        // Empurra o botão para a direita
+        Region espaco = new Region();
+        HBox.setHgrow(espaco, Priority.ALWAYS);
+
+        Button btnExcluir = new Button("🗑");
+        btnExcluir.setStyle("""
+                -fx-background-color: transparent;
+                -fx-font-size: 16px;
+                -fx-cursor: hand;
+                """);
+
+        final int index = i;
+
+        btnExcluir.setOnAction(e -> {
+            itensDoCombo.remove(index);
+            atualizarListaDeProdutos();
+        });
+
+        linha.getChildren().addAll(nome, espaco, btnExcluir);
+        produtosListContainer.getChildren().add(linha);
     }
+}
+
+private void mostrarSugestoes(List<Produto> produtos) {
+    sugestoesContainer.getChildren().clear();
+
+    if (produtos == null || produtos.isEmpty()) {
+        sugestoesContainer.setVisible(false);
+        return;
+    }
+
+    for (Produto p : produtos) {
+
+        Label opcao = new Label(p.getNome());
+        opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;");
+        opcao.setMaxWidth(Double.MAX_VALUE);
+
+        // Efeito hover (fundo cinza quando passa o mouse)
+        opcao.setOnMouseEntered(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: #e6e6e6; -fx-font-size: 14;"));
+        opcao.setOnMouseExited(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;"));
+
+        // Clique → autocompleta
+        opcao.setOnMouseClicked(e -> {
+            nomeProdutoField.setText(p.getNome());
+            sugestoesContainer.setVisible(false);
+        });
+
+        sugestoesContainer.getChildren().add(opcao);
+    }
+
+    sugestoesContainer.setVisible(true);
+}
+
+
 
     /**
      * Exibe alertas simples na tela
