@@ -1,4 +1,4 @@
-/* Este é o estilo padrão do botão (quando não está selecionado) */
+
 #meuBotao {
     -fx-background-color: orange;
     -fx-text-fill: white;
@@ -9,12 +9,12 @@
 
 
 #meuBotao:hover {
-     -fx-background-color: #FFB84D; /* Laranja um pouco mais claro */
+     -fx-background-color: #FFB84D; 
 }
 
 
 #meuBotao:selected {
-    -fx-background-color: #CC6600; /* Laranja bem mais escuro */
+    -fx-background-color: #CC6600;
 }
 #Cancel{
     -fx-background-color: rgb(214, 214, 214);
@@ -27,15 +27,15 @@
     -fx-background-color: rgb(158, 158, 158);
 }
 .cadastrar {
-    -fx-background-color: #f0932b; /* Cor normal */
+    -fx-background-color: #f0932b;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
     -fx-cursor: hand;
-    -fx-font-size: 20px; /* Tamanho fixo para não encolher no hover */
+    -fx-font-size: 20px; 
 }
 
-/* O segredo está aqui: o estado :hover */
+
 .cadastrar:hover {
-    -fx-background-color: #bc6b0e; /* Cor mais escura */
+    -fx-background-color: #bc6b0e;
 }
