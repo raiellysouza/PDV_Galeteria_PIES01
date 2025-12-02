@@ -26,3 +26,16 @@
 #Cancel:hover {
     -fx-background-color: rgb(158, 158, 158);
 }
+.cadastrar {
+    -fx-background-color: #f0932b; /* Cor normal */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 20px; /* Tamanho fixo para não encolher no hover */
+}
+
+/* O segredo está aqui: o estado :hover */
+.cadastrar:hover {
+    -fx-background-color: #bc6b0e; /* Cor mais escura */
+}
