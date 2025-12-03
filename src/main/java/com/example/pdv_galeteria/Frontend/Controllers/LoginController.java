@@ -43,10 +43,9 @@ public class LoginController {
 
         if (USUARIO_PADRAO.equals(usuario) && SENHA_PADRAO.equals(senha)) {
             try {
-                // AQUI É ONDE VOCÊ COLOCA O setControllerFactory
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaProdutos.fxml"));
-                loader.setControllerFactory(applicationContext::getBean); // ← AQUI
+                loader.setControllerFactory(applicationContext::getBean);
 
                 Parent root = loader.load();
 

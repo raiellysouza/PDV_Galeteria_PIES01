@@ -12,13 +12,13 @@ public class ConfirmacaoExclusaoController {
 
     @FXML
     private void initialize() {
-        System.out.println("✅ ConfirmacaoExclusaoController inicializado!");
+        System.out.println("ConfirmacaoExclusaoController inicializado!");
     }
 
     @FXML
     private void confirmarExclusao() {
         confirmado = true;
-        System.out.println("✅ Confirmação de exclusão para produto ID: " + produtoId);
+        System.out.println("Confirmação de exclusão para produto ID: " + produtoId);
 
         if (onConfirmCallback != null) {
             onConfirmCallback.run();
@@ -30,7 +30,7 @@ public class ConfirmacaoExclusaoController {
     @FXML
     private void cancelarExclusao() {
         confirmado = false;
-        System.out.println("❌ Exclusão cancelada");
+        System.out.println("Exclusão cancelada");
         fecharPopup();
     }
 
