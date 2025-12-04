@@ -14,6 +14,9 @@ public class EstoqueEntradaService {
     @Autowired
     private EstoqueEntradaRepository estoqueEntradaRepository;
 
+    @Autowired
+    private EstoqueService estoqueService;
+
     public EntradaEstoqueResponse registrarEntrada(EntradaEstoqueRequest request) {
         EstoqueEntrada entrada = new EstoqueEntrada();
         entrada.setProdutoId(request.getProdutoId());
@@ -22,6 +25,11 @@ public class EstoqueEntradaService {
         entrada.setDataEntrada(LocalDateTime.now());
 
         estoqueEntradaRepository.salvar(entrada);
+
+        estoqueService.adicionarAoEstoque(
+            request.getProdutoId(),
+            request.getQuantidade()
+        );
 
         EntradaEstoqueResponse response = new EntradaEstoqueResponse();
         response.setId(entrada.getId());

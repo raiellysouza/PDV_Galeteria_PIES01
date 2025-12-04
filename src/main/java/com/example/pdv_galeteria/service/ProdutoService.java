@@ -1,5 +1,6 @@
 package com.example.pdv_galeteria.service;
 
+import com.example.pdv_galeteria.dto.EntradaEstoqueRequest;
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,9 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private EstoqueEntradaService estoqueEntradaService;
 
     // MÉTODO PARA EditarCombosController e TelaCombosController - retorna UM Produto
     public Produto buscarPrimeiroPorNome(String nome) {
@@ -43,7 +47,16 @@ public class ProdutoService {
     }
 
     public Produto salvar(Produto produto) {
-        return produtoRepository.save(produto);
+        
+        Produto salvo = produtoRepository.save(produto);
+
+        EntradaEstoqueRequest entrada = new EntradaEstoqueRequest();
+        entrada.setProdutoId(salvo.getId());
+        entrada.setQuantidade(salvo.getQuantidade());
+
+        estoqueEntradaService.registrarEntrada(entrada);
+
+        return salvo;
     }
 
     public Optional<Produto> buscarPorId(Long id) {
