@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface ComboRepository extends JpaRepository<Combo, Long> {
 
-    // Método alternativo se quiser buscar apenas por nome
     List<Combo> findByNomeContainingIgnoreCase(String nome);
 }

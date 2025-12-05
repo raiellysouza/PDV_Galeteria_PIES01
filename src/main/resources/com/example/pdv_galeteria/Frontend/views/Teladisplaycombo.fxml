@@ -9,7 +9,6 @@
       spacing="10" style="-fx-padding: 8;">
     <children>
         <FlowPane fx:id="comboContainer" hgap="12" vgap="12" prefWrapLength="1200" />
-        <!-- botão opcional para atualizar manualmente -->
         <Button text="Atualizar Combos" onAction="#carregarCombos" />
     </children>
 </VBox>

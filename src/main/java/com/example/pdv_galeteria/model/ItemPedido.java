@@ -31,7 +31,6 @@ public class ItemPedido {
         this.precoUnitario = precoUnitario;
     }
 
-    // getters e setters pedido
     public Long getId(){return id;}
     public void setId(Long id){this.id = id;}
     public String getProduto(){return produto;}
@@ -43,7 +42,6 @@ public class ItemPedido {
     public Pedido getPedido(){return pedido;}
     public void setPedido(Pedido pedido){this.pedido = pedido;}
 
-        // getters e setters vendaEmLote
     public VendaEmLote getVendaEmLote(){return vendaEmLote;}
     public void setVendaEmLote(VendaEmLote vendaEmLote){
         this.vendaEmLote = vendaEmLote;}

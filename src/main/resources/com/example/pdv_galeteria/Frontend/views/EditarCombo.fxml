@@ -27,13 +27,11 @@
 
       <Label layoutX="14.0" layoutY="133.0" text="Escreva o nome do Produto:" />
 
-      <!-- CAMPO DO PRODUTO -->
       <TextArea fx:id="nomeProdutoField"
                 layoutX="14.0" layoutY="150.0"
                 prefHeight="39.0" prefWidth="564.0"
                 promptText="Nome produto" />
 
-      <!-- LISTA DE SUGESTÕES (AUTOCOMPLETE) — FICA POR CIMA -->
       <VBox fx:id="sugestoesContainer"
             layoutX="14.0"
             layoutY="189.0"

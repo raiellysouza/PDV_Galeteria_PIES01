@@ -14,26 +14,22 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
-    // MÉTODO PARA EditarCombosController e TelaCombosController - retorna UM Produto
     public Produto buscarPrimeiroPorNome(String nome) {
         List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCase(nome);
         if (produtos != null && !produtos.isEmpty()) {
-            return produtos.get(0); // Retorna o primeiro produto encontrado
+            return produtos.get(0);
         }
         return null;
     }
 
-    // MÉTODO PARA TelaProdutosController - retorna LISTA de Produtos
     public List<Produto> buscarListaPorNome(String nome) {
         return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }
 
-    // MÉTODO ORIGINAL (para compatibilidade) - retorna UM Produto
     public Produto buscarPorNome(String nome) {
         return buscarPrimeiroPorNome(nome);
     }
 
-    // Método para buscar por nome exato
     public Optional<Produto> buscarPorNomeExato(String nome) {
         return produtoRepository.findByNomeIgnoreCase(nome);
     }
