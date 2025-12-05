@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import javafx.application.Application;
-import javafx.application.Platform; // ADICIONE ESTE IMPORT
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -38,7 +38,7 @@ public class PdvGaleteriaApplication extends Application {
         primaryStage.setMaximized(true);
         primaryStage.show();
 
-        System.out.println("✅ Spring Boot + JavaFX integrados com sucesso!");
+        System.out.println("Spring Boot + JavaFX integrados com sucesso!");
     }
 
     @Override
@@ -50,16 +50,14 @@ public class PdvGaleteriaApplication extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.println("🚀 Iniciando PDV Galeteria...");
+        System.out.println("Iniciando PDV Galeteria...");
         launch(args);
     }
 
-    // Método estático para acessar o contexto do Spring
     public static ConfigurableApplicationContext getSpringContext() {
         return springContext;
     }
 
-    // Método de debug estático
     public static void debugSpringContext() {
         if (springContext != null) {
             System.out.println("=== DEBUG SPRING CONTEXT ===");
@@ -67,21 +65,18 @@ public class PdvGaleteriaApplication extends Application {
             System.out.println("Beans do ProdutoService: " + springContext.getBeanNamesForType(com.example.pdv_galeteria.service.ProdutoService.class).length);
             System.out.println("Beans do TelaProdutosController: " + springContext.getBeanNamesForType(com.example.pdv_galeteria.controller.TelaProdutosController.class).length);
         } else {
-            System.out.println("❌ Spring Context é nulo!");
+            System.out.println("Spring Context é nulo!");
         }
     }
 
-    // Método corrigido para reiniciar a aplicação
     public static void relaunchApplication() {
         try {
             System.out.println("Reiniciando aplicação...");
 
-            // Fechar o contexto Spring atual
             if (springContext != null && springContext.isActive()) {
-                springContext.close(); // CORRIGIDO: springContext em vez de context
+                springContext.close();
             }
 
-            // Recriar a aplicação
             Platform.runLater(() -> {
                 try {
                     System.out.println("Criando nova instância da aplicação...");
