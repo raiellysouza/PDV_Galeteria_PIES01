@@ -2,6 +2,7 @@ package com.example.pdv_galeteria.service;
 
 import com.example.pdv_galeteria.model.Caixa;
 import com.example.pdv_galeteria.model.StatusCaixa;
+import com.example.pdv_galeteria.model.MovimentoCaixa;
 import com.example.pdv_galeteria.repository.CaixaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class CaixaService {
 
     @Autowired
     private CaixaRepository caixaRepository;
+
+    @Autowired
+    private MovimentoCaixaService movimentoCaixaService;
 
     @Transactional
     public Caixa abrirCaixa(BigDecimal valorInicial, String observacoes) {
@@ -41,7 +45,7 @@ public class CaixaService {
         }
 
         caixa.setDataFechamento(LocalDateTime.now());
-        caixa.setValorFinal(caixa.getSaldoAtual());
+        caixa.setValorFinal(movimentoCaixaService.calcularSaldoAtual(caixa));
         caixa.setStatus(StatusCaixa.FECHADO);
 
         if (observacoes != null && !observacoes.trim().isEmpty()) {
@@ -51,6 +55,34 @@ public class CaixaService {
         caixa.setUpdatedAt(LocalDateTime.now());
 
         return caixaRepository.save(caixa);
+    }
+
+    @Transactional
+    public MovimentoCaixa registrarEntrada(BigDecimal valor, String descricao, String referenciaExterna) {
+        return movimentoCaixaService.registrarEntrada(valor, descricao, referenciaExterna);
+    }
+
+    @Transactional
+    public MovimentoCaixa registrarSaida(BigDecimal valor, String descricao, String referenciaExterna) {
+        return movimentoCaixaService.registrarSaida(valor, descricao, referenciaExterna);
+    }
+
+    public BigDecimal getSaldoAtualDoDia() {
+        Caixa caixa = caixaRepository.findCaixaDoDia()
+                .orElseThrow(() -> new RuntimeException("Nenhum caixa encontrado para hoje."));
+        return movimentoCaixaService.calcularSaldoAtual(caixa);
+    }
+
+    public BigDecimal getTotalEntradasDoDia() {
+        Caixa caixa = caixaRepository.findCaixaDoDia()
+                .orElseThrow(() -> new RuntimeException("Nenhum caixa encontrado para hoje."));
+        return movimentoCaixaService.calcularTotalEntradas(caixa);
+    }
+
+    public BigDecimal getTotalSaidasDoDia() {
+        Caixa caixa = caixaRepository.findCaixaDoDia()
+                .orElseThrow(() -> new RuntimeException("Nenhum caixa encontrado para hoje."));
+        return movimentoCaixaService.calcularTotalSaidas(caixa);
     }
 
     public String getStatusTextoBotao() {
