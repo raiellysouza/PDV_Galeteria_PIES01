@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "caixa")
@@ -39,6 +41,9 @@ public class Caixa {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "caixa", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<MovimentoCaixa> movimentos = new ArrayList<>();
 
     public Caixa() {
         this.createdAt = LocalDateTime.now();
@@ -85,14 +90,31 @@ public class Caixa {
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
     public BigDecimal getSaldoAtual() {
-        return this.valorInicial;
+        BigDecimal totalEntradas = getTotalEntradas();
+        BigDecimal totalSaidas = getTotalSaidas();
+        BigDecimal base = this.valorInicial != null ? this.valorInicial : BigDecimal.ZERO;
+        return base.add(totalEntradas).subtract(totalSaidas);
     }
 
     public BigDecimal getTotalEntradas() {
-        return BigDecimal.ZERO;
+        return movimentos.stream()
+                .filter(m -> m.getTipo() == TipoMovimentoCaixa.ENTRADA)
+                .map(MovimentoCaixa::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getTotalSaidas() {
-        return BigDecimal.ZERO;
+        return movimentos.stream()
+                .filter(m -> m.getTipo() == TipoMovimentoCaixa.SAIDA)
+                .map(MovimentoCaixa::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public List<MovimentoCaixa> getMovimentos() {
+        return movimentos;
+    }
+
+    public void setMovimentos(List<MovimentoCaixa> movimentos) {
+        this.movimentos = movimentos;
     }
 }
