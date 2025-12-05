@@ -8,7 +8,7 @@
 
 
 #meuBotao:hover {
-     -fx-background-color: #FFB84D;
+     -fx-background-color: #FFB84D; 
 }
 
 
@@ -24,4 +24,17 @@
 }
 #Cancel:hover {
     -fx-background-color: rgb(158, 158, 158);
+}
+.cadastrar {
+    -fx-background-color: #f0932b;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-font-size: 20px; 
+}
+
+
+.cadastrar:hover {
+    -fx-background-color: #bc6b0e;
 }

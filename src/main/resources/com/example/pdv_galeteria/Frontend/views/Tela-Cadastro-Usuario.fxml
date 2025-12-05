@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="650.0" prefWidth="900.0" style="-fx-background-color: #6D0C0C;" stylesheets="@/workspaces/PDV_Galeteria_PIES01/src/main/resources/css/BotoesTelaAdcionarPedido.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      
+      <ImageView fitHeight="92.0" fitWidth="95.0" layoutX="405.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@logogaleteria.png" />
+         </image>
+      </ImageView>
+
+      <AnchorPane layoutX="275.0" layoutY="110.0" prefHeight="500.0" prefWidth="350.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);">
+         <children>
+            
+            <Label layoutX="115.0" layoutY="20.0" text="Cadastro">
+               <font>
+                  <Font name="System Bold" size="28.0" />
+               </font>
+            </Label>
+
+            <Label layoutX="35.0" layoutY="70.0" text="Usuário">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtUsuario" layoutX="35.0" layoutY="90.0" prefHeight="35.0" prefWidth="280.0" promptText="Nome de usuário" style="-fx-background-radius: 5; -fx-border-color: #ccc; -fx-border-radius: 5;" />
+
+            <Label layoutX="35.0" layoutY="135.0" text="Senha">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <PasswordField fx:id="txtSenha" layoutX="35.0" layoutY="155.0" prefHeight="35.0" prefWidth="280.0" promptText="Digite sua senha" style="-fx-background-radius: 5; -fx-border-color: #ccc; -fx-border-radius: 5;" />
+
+            <Label layoutX="35.0" layoutY="200.0" text="Confirmar Senha">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <PasswordField fx:id="txtConfirmaSenha" layoutX="35.0" layoutY="220.0" prefHeight="35.0" prefWidth="280.0" promptText="Repita sua senha" style="-fx-background-radius: 5; -fx-border-color: #ccc; -fx-border-radius: 5;" />
+
+            <Label layoutX="35.0" layoutY="265.0" text="Pergunta de segurança">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+           
+
+
+<ComboBox fx:id="cbPergunta" layoutX="35.0" layoutY="285.0" prefHeight="35.0" prefWidth="280.0" promptText="Selecione uma pergunta" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 5; -fx-background-radius: 5;">
+    <items>
+        <FXCollections fx:factory="observableArrayList">
+            <String fx:value="Qual o nome do seu primeiro animal de estimação?" />
+            <String fx:value="Qual o nome da rua onde você morava aos 10 anos?" />
+            <String fx:value="Qual era o seu brinquedo favorito quando criança?" />
+            <String fx:value="Qual a sua cor favorita?" />
+            <String fx:value="Qual o seu esporte favorito?" />
+            <String fx:value="Qual seu destino de férias favorito?" />
+            <String fx:value="Qual a sua comida preferida?" />
+            <String fx:value="Qual o nome da cidade onde seus pais se conheceram?" />
+        </FXCollections>
+    </items>
+</ComboBox>
+           <Label layoutX="35.0" layoutY="330.0" text="Resposta">
+   <font>
+      <Font name="System Bold" size="12.0" />
+   </font>
+</Label>
+<TextField fx:id="txtResposta" layoutX="35.0" layoutY="350.0" prefHeight="35.0" prefWidth="280.0" promptText="Digite a resposta" style="-fx-background-radius: 5; -fx-border-color: #ccc; -fx-border-radius: 5;" />
+
+<Button fx:id="btnCadastrar" 
+        layoutX="35.0" 
+        layoutY="415.0" 
+        mnemonicParsing="false" 
+        prefHeight="45.0" 
+        prefWidth="280.0" 
+        styleClass="cadastrar" 
+        text="Cadastrar">
+</Button>
+
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
