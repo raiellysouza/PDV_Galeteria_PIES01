@@ -58,20 +58,17 @@ public class TelaCombosController {
 
     @FXML private VBox sugestoesContainer;
 
-    // Campos da tela (vinculados pelo fx:id)
     @FXML private TextArea nomeComboField;
     @FXML private TextArea precoComboField;
     @FXML private TextArea nomeProdutoField;
     @FXML private TextArea quantidadeField;
     @FXML private FlowPane comboContainer;
 
-    // Lista temporária para armazenar os produtos do combo
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
 
     @FXML
     public void initialize() {
-        // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
 
         if (combosContainer != null) {
@@ -90,7 +87,6 @@ public class TelaCombosController {
 
     }
 
-    // Método para receber o container da TelaProdutos
     public void setCombosContainer(FlowPane combosContainer) {
         this.combosContainer = combosContainer;
     }
@@ -99,15 +95,15 @@ public class TelaCombosController {
     public void carregarCombos() {
         try {
             if (combosContainer == null) {
-                System.out.println("❌ combosContainer não configurado!");
+                System.out.println("combosContainer não configurado!");
                 return;
             }
 
-            System.out.println("🔄 Carregando combos no VBox...");
+            System.out.println("Carregando combos no VBox...");
             combosContainer.getChildren().clear();
             List<Combo> combos = comboService.buscarTodosCombos();
 
-            System.out.println("📊 Combos encontrados: " + (combos != null ? combos.size() : 0));
+            System.out.println("Combos encontrados: " + (combos != null ? combos.size() : 0));
 
             if (combos == null || combos.isEmpty()) {
                 Label vazio = new Label("Nenhum combo cadastrado");
@@ -121,7 +117,7 @@ public class TelaCombosController {
                 combosContainer.getChildren().add(card);
             }
 
-            System.out.println("✅ Cards criados: " + combosContainer.getChildren().size());
+            System.out.println("Cards criados: " + combosContainer.getChildren().size());
         } catch (Exception e) {
             e.printStackTrace();
             if (combosContainer != null) {
@@ -133,7 +129,6 @@ public class TelaCombosController {
         }
     }
 
-    // Ajuste a largura dos cards para caber 2 por linha
 public Pane criarCardCombo(Combo combo) {
 
     Pane card = new Pane();
@@ -147,13 +142,11 @@ public Pane criarCardCombo(Combo combo) {
             "-fx-border-color: rgba(0,0,0,0.2); " +
             "-fx-border-width: 1;");
 
-    // Nome
     Label labelNome = new Label(combo.getNome());
     labelNome.setLayoutX(14);
     labelNome.setLayoutY(14);
     labelNome.setStyle("-fx-font-weight: bold; -fx-font-size: 21px; -fx-text-fill: black;");
 
-    // Badge "Combo"
     Pane categoriaPane = new Pane();
     categoriaPane.setLayoutX(299);
     categoriaPane.setLayoutY(18);
@@ -168,13 +161,11 @@ public Pane criarCardCombo(Combo combo) {
     labelCategoria.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #374151;");
     categoriaPane.getChildren().add(labelCategoria);
 
-    // Preço do combo
     Label labelPreco = new Label(String.format("R$ %.2f", combo.getPrecoTotal()));
     labelPreco.setLayoutX(14);
     labelPreco.setLayoutY(82);
     labelPreco.setStyle("-fx-font-weight: bold; -fx-font-size: 28px; -fx-text-fill: #2a6df4;");
 
-    // Quantidade de itens
     int qtdItens = (combo.getItensDoCombo() != null)
             ? combo.getItensDoCombo().size()
             : 0;
@@ -184,15 +175,12 @@ public Pane criarCardCombo(Combo combo) {
     labelQtdItens.setLayoutY(120);
     labelQtdItens.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280;");
 
-    // Botão EDITAR
     Button btnEditar = criarBotaoComIcone("Editar", 65, 144, 90, 29, "/assets/imgs/editar.png");
     btnEditar.setOnAction(e -> abrirTelaEditarCombo(combo));
 
-    // Botão EXCLUIR (somente o ícone)
     Button btnApagar = criarBotaoIcone(269, 144, 30, 29, "/assets/imgs/delete.png");
     btnApagar.setOnAction(e -> excluirCombo(combo));
 
-    // Adiciona tudo ao card
     card.getChildren().addAll(
             labelNome,
             categoriaPane,
@@ -304,9 +292,6 @@ private void abrirTelaEditarCombo(Combo combo) {
     }
 }
 
-    /**
-     * Abre a tela de cadastro de combos
-     */
     @FXML
     public void abrirTelaCombo() {
         try {
@@ -347,17 +332,14 @@ private void adicionarProduto() {
             return;
         }
 
-        // 🔥 NOVO: verificar se já existe item com o mesmo produto
         ComboItem existente = itensDoCombo.stream()
                 .filter(i -> i.getProduto().getId().equals(produto.getId()))
                 .findFirst()
                 .orElse(null);
 
         if (existente != null) {
-            // 🔥 SOMA a quantidade
             existente.setQuantidade(existente.getQuantidade() + quantidade);
         } else {
-            // 🔥 Adiciona novo item normalmente
             ComboItem item = new ComboItem();
             item.setProduto(produto);
             item.setQuantidade(quantidade);
@@ -376,9 +358,6 @@ private void adicionarProduto() {
     }
 }
 
-    /**
-     * Salva o combo no banco de dados
-     */
     @FXML
     private void salvarCombo() {
         try {
@@ -393,12 +372,11 @@ private void adicionarProduto() {
             BigDecimal preco = new BigDecimal(precoStr.replace(",", "."));
             Combo combo = new Combo();
             combo.setNome(nomeCombo);
-            combo.setPrecoTotal(preco.doubleValue()); // ou use BigDecimal se seu modelo aceitar
+            combo.setPrecoTotal(preco.doubleValue());
             combo.setItensDoCombo(itensDoCombo);
             comboService.salvarCombo(combo);
             mostrarAlerta("Sucesso", "Combo salvo com sucesso!", Alert.AlertType.INFORMATION);
 
-            // Limpa todos os campos e a lista
             nomeComboField.clear();
             precoComboField.clear();
             itensDoCombo.clear();
@@ -410,12 +388,9 @@ private void adicionarProduto() {
         carregarCombos();
     }
 
-    /**
-     * Atualiza o campo de texto com a lista de produtos adicionados
-     */
 private void atualizarListaDeProdutos() {
 
-    produtosListContainer.getChildren().clear(); // limpar visual
+    produtosListContainer.getChildren().clear();
 
     for (int i = 0; i < itensDoCombo.size(); i++) {
 
@@ -434,7 +409,6 @@ private void atualizarListaDeProdutos() {
         Label nome = new Label(item.getQuantidade() + "x  " + item.getProduto().getNome());
         nome.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
 
-        // Empurra o botão para a direita
         Region espaco = new Region();
         HBox.setHgrow(espaco, Priority.ALWAYS);
 
@@ -471,11 +445,9 @@ private void mostrarSugestoes(List<Produto> produtos) {
         opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;");
         opcao.setMaxWidth(Double.MAX_VALUE);
 
-        // Efeito hover (fundo cinza quando passa o mouse)
         opcao.setOnMouseEntered(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: #e6e6e6; -fx-font-size: 14;"));
         opcao.setOnMouseExited(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;"));
 
-        // Clique → autocompleta
         opcao.setOnMouseClicked(e -> {
             nomeProdutoField.setText(p.getNome());
             sugestoesContainer.setVisible(false);
@@ -489,9 +461,6 @@ private void mostrarSugestoes(List<Produto> produtos) {
 
 
 
-    /**
-     * Exibe alertas simples na tela
-     */
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);

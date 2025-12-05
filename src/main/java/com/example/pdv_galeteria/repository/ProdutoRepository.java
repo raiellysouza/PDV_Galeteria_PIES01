@@ -10,9 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
-    // Busca por nome contendo (retorna lista)
     List<Produto> findByNomeContainingIgnoreCase(String nome);
 
-    // Busca por nome exato (retorna Optional)
     Optional<Produto> findByNomeIgnoreCase(String nome);
 }

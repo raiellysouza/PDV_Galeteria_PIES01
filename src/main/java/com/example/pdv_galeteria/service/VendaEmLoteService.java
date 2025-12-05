@@ -30,9 +30,6 @@ public class VendaEmLoteService {
 
     
 
-    // --------------------------------------------------
-    // Criar venda em lote
-    // --------------------------------------------------
     @Transactional
     public VendaEmLote criarVendaEmLote(VendaEmLote venda) {
         venda.recalcularTotal();
@@ -52,17 +49,11 @@ public class VendaEmLoteService {
         return vendaEmLoteRepository.save(venda);
     }
 
-    // --------------------------------------------------
-    // Buscar por ID
-    // --------------------------------------------------
     public VendaEmLote buscarPorId(Long id) {
         return vendaEmLoteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Venda em lote não encontrada"));
     }
 
-    // --------------------------------------------------
-    // Buscar por horário (intervalo)
-    // --------------------------------------------------
     public List<VendaEmLote> buscarPorHorario(LocalDateTime inicio, LocalDateTime fim) {
         return vendaEmLoteRepository.findByCriadoEmBetween(inicio, fim);
     }
@@ -71,9 +62,6 @@ public class VendaEmLoteService {
     return vendaEmLoteRepository.findByOrigemIgnoreCase(origem);
     }
 
-    // --------------------------------------------------
-    // Excluir venda em lote
-    // --------------------------------------------------
     @Transactional
     public void excluirVendaEmLote(Long id) {
         if (!vendaEmLoteRepository.existsById(id)) {

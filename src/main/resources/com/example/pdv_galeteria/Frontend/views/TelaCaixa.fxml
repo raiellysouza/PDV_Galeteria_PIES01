@@ -36,7 +36,6 @@
                     </cursor>
                 </TextField>
 
-                <!-- Botão Novo Produto -->
                 <Button layoutX="576.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirCadastroProduto" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Produto" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="16.0" />
@@ -46,7 +45,6 @@
                     </cursor>
                 </Button>
 
-                <!-- Botão Novo Combo -->
                 <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirTelaCombo" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Combo" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="16.0" />
@@ -73,28 +71,24 @@
                     </image>
                 </ImageView>
 
-                <!-- SEÇÃO PRODUTOS -->
                 <Label layoutX="19.0" layoutY="180.0" text="Produtos">
                     <font>
                         <Font name="System Bold" size="35.0" />
                     </font>
                 </Label>
 
-                <!-- SCROLL VERTICAL PARA PRODUTOS - 2 CARDS POR LINHA -->
                 <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
                     <content>
                         <FlowPane fx:id="produtosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
                 </ScrollPane>
 
-                <!-- SEÇÃO COMBOS -->
                 <Label layoutX="24.0" layoutY="449.0" text="Combos">
                     <font>
                         <Font name="System Bold" size="35.0" />
                     </font>
                 </Label>
 
-                <!-- SCROLL VERTICAL PARA COMBOS - 2 CARDS POR LINHA -->
                 <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
                     <content>
                         <FlowPane fx:id="combosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />

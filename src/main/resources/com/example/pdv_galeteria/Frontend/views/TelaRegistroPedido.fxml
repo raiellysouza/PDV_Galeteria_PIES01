@@ -48,8 +48,6 @@
                 <Pane layoutX="22.0" layoutY="152.0" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: transparent;">
                         <Pane fx:id="mainContentPane" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: transparent;">
                             <children>
-                                <!-- Cards de produtos serão adicionados dinamicamente aqui -->
-                                <!-- Exemplo de card estático (pode remover depois) -->
                                 <Pane layoutX="0.0" layoutY="14.0" prefHeight="170.0" prefWidth="345.0" styleClass="card-produtos">
                                     <children>
                                         <Label layoutX="14.0" layoutY="14.0" text="Galeto Inteiro">
@@ -158,7 +156,6 @@
                         </Pane>
                 </Pane>
 
-                <!-- CARRINHO (FIXO NA DIREITA) -->
                 <Pane layoutX="751.0" layoutY="65.0" prefHeight="557.0" prefWidth="303.0" style="-fx-border-color: black;" styleClass="card-produtos">
                     <children>
                         <Button layoutX="17.0" layoutY="495.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="270.0" style="-fx-background-color: #f68411; -fx-background-radius: 8px;" styleClass="hover" text="Registrar Pedido" textFill="WHITE">
