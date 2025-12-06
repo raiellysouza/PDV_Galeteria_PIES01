@@ -45,14 +45,14 @@
             </Label>
             <ImageView fitHeight="26.0" fitWidth="21.0" layoutX="522.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@lixo.png" />
+                  <Image url="@/assets/imgs/lixo.png" />
                </image>
             </ImageView>
          </children>
       </Group>
       <ImageView fitHeight="26.0" fitWidth="21.0" layoutX="569.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@X.png" />
+            <Image url="@/assets/imgs/X.png" />
          </image>
       </ImageView>
    </children>

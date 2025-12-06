@@ -10,21 +10,18 @@
 
 <AnchorPane prefHeight="334.0" prefWidth="471.0" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.ProdutoController">
     <children>
-        <!-- Título -->
         <Label layoutX="26.0" layoutY="14.0" text="Cadastrar Produto" textFill="black">
             <font>
                 <Font name="System Bold" size="28.0" />
             </font>
         </Label>
 
-        <!-- Subtítulo -->
         <Label layoutX="26.0" layoutY="50.0" prefWidth="300.0" text="Adicione um novo produto ao sistema" textFill="#555555">
             <font>
                 <Font size="17.0" />
             </font>
         </Label>
 
-        <!-- Nome do Produto -->
         <Label layoutX="26.0" layoutY="106.0" text="Nome do Produto" textFill="black">
             <font>
                 <Font name="System Bold" size="12.0" />
@@ -32,7 +29,6 @@
         </Label>
         <TextField fx:id="txtNome" layoutX="26.0" layoutY="126.0" prefHeight="25.0" prefWidth="422.0" promptText="Ex: Galeto Inteiro" style="-fx-background-radius: 8; -fx-background-color: white;" />
 
-        <!-- Preço -->
         <Label layoutX="26.0" layoutY="170.0" text="Preço (R$)" textFill="black">
             <font>
                 <Font name="System Bold" size="12.0" />
@@ -40,7 +36,6 @@
         </Label>
         <TextField fx:id="txtPreco" layoutX="26.0" layoutY="190.0" prefWidth="180.0" promptText="0,00" style="-fx-background-radius: 8; -fx-background-color: white;" />
 
-        <!-- Estoque -->
         <Label layoutX="267.0" layoutY="170.0" text="Estoque" textFill="black">
             <font>
                 <Font name="System Bold" size="12.0" />
@@ -48,14 +43,12 @@
         </Label>
         <TextField fx:id="txtEstoque" layoutX="267.0" layoutY="190.0" prefHeight="25.0" prefWidth="180.0" promptText="0" style="-fx-background-radius: 8; -fx-background-color: white;" />
 
-        <!-- Categoria -->
         <Label layoutX="26.0" layoutY="230.0" text="Categoria" textFill="black">
             <font>
                 <Font name="System Bold" size="12.0" />
             </font>
         </Label>
 
-        <!-- Botão Adicionar Produto -->
         <Button layoutX="25.0" layoutY="290.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#adicionarProduto" prefHeight="35.0" prefWidth="422.0" styleClass="hover" text="Adicionar Produto" textFill="WHITE">
             <cursor>
                 <Cursor fx:constant="HAND" />

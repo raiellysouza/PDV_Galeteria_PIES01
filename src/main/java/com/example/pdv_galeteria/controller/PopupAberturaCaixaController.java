@@ -1,13 +1,11 @@
 package com.example.pdv_galeteria.controller;
 
-import com.example.pdv_galeteria.model.Caixa;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -18,34 +16,38 @@ import java.util.function.Consumer;
 @Component
 public class PopupAberturaCaixaController implements Initializable {
 
-    // 🔥 ADICIONE esta linha - campo faltante
-    @FXML private TextField txtValorInicialPopup;
-    @FXML private Button btnConfirmarAbertura;
-    @FXML private Button btnCancelarAbertura;
+    @FXML
+    private TextField txtValorInicialPopup;
 
-    @Setter
+    @FXML
+    private Button btnConfirmarAbertura;
+
+    @FXML
+    private Button btnCancelarAbertura;
+
     private Stage popupStage;
-
-    @Setter
     private Consumer<BigDecimal> onConfirmCallback;
-
-    @Setter
     private Runnable onCancelCallback;
-
     private boolean confirmado = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Configurar validação do campo numérico
+        configurarValidacaoCampo();
+        configurarEventos();
+    }
+
+    private void configurarValidacaoCampo() {
         if (txtValorInicialPopup != null) {
             txtValorInicialPopup.textProperty().addListener((observable, oldValue, newValue) -> {
-                // 🔥 CORREÇÃO: Verificar se newValue não é null antes de usar matches
                 if (newValue != null && !newValue.matches("\\d*([\\.,]\\d{0,2})?")) {
                     txtValorInicialPopup.setText(oldValue);
                 }
             });
+        }
+    }
 
-            // Enter no campo confirma
+    private void configurarEventos() {
+        if (txtValorInicialPopup != null) {
             txtValorInicialPopup.setOnAction(event -> confirmarAbertura());
         }
     }
@@ -53,7 +55,6 @@ public class PopupAberturaCaixaController implements Initializable {
     @FXML
     private void confirmarAbertura() {
         try {
-            // 🔥 CORREÇÃO: Verificação mais robusta
             if (txtValorInicialPopup == null) {
                 mostrarErro("Erro: Campo de valor não carregado corretamente!");
                 return;
@@ -65,29 +66,23 @@ public class PopupAberturaCaixaController implements Initializable {
                 return;
             }
 
-            // Converter para BigDecimal
             String valorStr = textoValor.replace(",", ".");
             BigDecimal valorInicial = new BigDecimal(valorStr);
 
-            if (valorInicial.compareTo(BigDecimal.ZERO) < 0) {
-                mostrarErro("O valor não pode ser negativo!");
+            if (valorInicial.compareTo(BigDecimal.ZERO) <= 0) {
+                mostrarErro("O valor deve ser maior que zero!");
                 return;
             }
 
             confirmado = true;
 
-            // Chamar callback se existir
             if (onConfirmCallback != null) {
                 onConfirmCallback.accept(valorInicial);
             }
 
-            // Fechar popup
-            if (popupStage != null) {
-                popupStage.close();
-            }
-
+            fecharPopup();
         } catch (NumberFormatException e) {
-            mostrarErro("Valor inválido! Use números com até 2 casas decimais.\nEx: 50,00 ou 100.50");
+            mostrarErro("Valor inválido! Use números com até 2 casas decimais.");
         } catch (Exception e) {
             mostrarErro("Erro: " + e.getMessage());
         }
@@ -97,14 +92,37 @@ public class PopupAberturaCaixaController implements Initializable {
     private void cancelar() {
         confirmado = false;
 
-        // Chamar callback se existir
         if (onCancelCallback != null) {
             onCancelCallback.run();
         }
 
+        fecharPopup();
+    }
+
+    private void fecharPopup() {
         if (popupStage != null) {
             popupStage.close();
         }
+    }
+
+    private void mostrarErro(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    public void setPopupStage(Stage popupStage) {
+        this.popupStage = popupStage;
+    }
+
+    public void setOnConfirmCallback(Consumer<BigDecimal> onConfirmCallback) {
+        this.onConfirmCallback = onConfirmCallback;
+    }
+
+    public void setOnCancelCallback(Runnable onCancelCallback) {
+        this.onCancelCallback = onCancelCallback;
     }
 
     public boolean isConfirmado() {
@@ -123,15 +141,6 @@ public class PopupAberturaCaixaController implements Initializable {
         }
     }
 
-    private void mostrarErro(String mensagem) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Erro");
-        alert.setHeaderText(null);
-        alert.setContentText(mensagem);
-        alert.showAndWait();
-    }
-
-    // Método para focar no campo automaticamente
     public void focarCampoValor() {
         javafx.application.Platform.runLater(() -> {
             if (txtValorInicialPopup != null) {
@@ -140,7 +149,6 @@ public class PopupAberturaCaixaController implements Initializable {
         });
     }
 
-    // Método para limpar o campo
     public void limparCampo() {
         if (txtValorInicialPopup != null) {
             txtValorInicialPopup.setText("");

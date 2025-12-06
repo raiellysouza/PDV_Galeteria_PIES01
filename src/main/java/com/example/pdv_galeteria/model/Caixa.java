@@ -12,16 +12,16 @@ public class Caixa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "data_caixa", nullable = false, unique = true)
+    @Column(name = "data_caixa", nullable = false)
     private LocalDate dataCaixa;
 
-    @Column(name = "data_abertura", nullable = false)
+    @Column(name = "data_abertura")
     private LocalDateTime dataAbertura;
 
     @Column(name = "data_fechamento")
     private LocalDateTime dataFechamento;
 
-    @Column(name = "valor_inicial", nullable = false, precision = 10, scale = 2)
+    @Column(name = "valor_inicial", precision = 10, scale = 2)
     private BigDecimal valorInicial;
 
     @Column(name = "valor_final", precision = 10, scale = 2)
@@ -40,11 +40,23 @@ public class Caixa {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "saldo_atual", precision = 10, scale = 2)
+    private BigDecimal saldoAtual;
+
+    @Column(name = "total_entradas", precision = 10, scale = 2)
+    private BigDecimal totalEntradas;
+
+    @Column(name = "total_saidas", precision = 10, scale = 2)
+    private BigDecimal totalSaidas;
+
     public Caixa() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.status = StatusCaixa.ABERTO;
+        this.status = StatusCaixa.FECHADO;
         this.dataCaixa = LocalDate.now();
+        this.saldoAtual = BigDecimal.ZERO;
+        this.totalEntradas = BigDecimal.ZERO;
+        this.totalSaidas = BigDecimal.ZERO;
     }
 
     public Caixa(BigDecimal valorInicial, String observacoes) {
@@ -52,48 +64,111 @@ public class Caixa {
         this.valorInicial = valorInicial;
         this.observacoes = observacoes;
         this.dataAbertura = LocalDateTime.now();
+        this.status = StatusCaixa.ABERTO;
+        this.saldoAtual = valorInicial;
     }
 
-    // Getters e Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public LocalDate getDataCaixa() { return dataCaixa; }
-    public void setDataCaixa(LocalDate dataCaixa) { this.dataCaixa = dataCaixa; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public LocalDateTime getDataAbertura() { return dataAbertura; }
-    public void setDataAbertura(LocalDateTime dataAbertura) { this.dataAbertura = dataAbertura; }
+    public LocalDate getDataCaixa() {
+        return dataCaixa;
+    }
 
-    public LocalDateTime getDataFechamento() { return dataFechamento; }
-    public void setDataFechamento(LocalDateTime dataFechamento) { this.dataFechamento = dataFechamento; }
+    public void setDataCaixa(LocalDate dataCaixa) {
+        this.dataCaixa = dataCaixa;
+    }
 
-    public BigDecimal getValorInicial() { return valorInicial; }
-    public void setValorInicial(BigDecimal valorInicial) { this.valorInicial = valorInicial; }
+    public LocalDateTime getDataAbertura() {
+        return dataAbertura;
+    }
 
-    public BigDecimal getValorFinal() { return valorFinal; }
-    public void setValorFinal(BigDecimal valorFinal) { this.valorFinal = valorFinal; }
+    public void setDataAbertura(LocalDateTime dataAbertura) {
+        this.dataAbertura = dataAbertura;
+    }
 
-    public StatusCaixa getStatus() { return status; }
-    public void setStatus(StatusCaixa status) { this.status = status; }
+    public LocalDateTime getDataFechamento() {
+        return dataFechamento;
+    }
 
-    public String getObservacoes() { return observacoes; }
-    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+    public void setDataFechamento(LocalDateTime dataFechamento) {
+        this.dataFechamento = dataFechamento;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public BigDecimal getValorInicial() {
+        return valorInicial;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setValorInicial(BigDecimal valorInicial) {
+        this.valorInicial = valorInicial;
+    }
+
+    public BigDecimal getValorFinal() {
+        return valorFinal;
+    }
+
+    public void setValorFinal(BigDecimal valorFinal) {
+        this.valorFinal = valorFinal;
+    }
+
+    public StatusCaixa getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusCaixa status) {
+        this.status = status;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public BigDecimal getSaldoAtual() {
-        return this.valorInicial;
+        return saldoAtual != null ? saldoAtual : BigDecimal.ZERO;
+    }
+
+    public void setSaldoAtual(BigDecimal saldoAtual) {
+        this.saldoAtual = saldoAtual;
     }
 
     public BigDecimal getTotalEntradas() {
-        return BigDecimal.ZERO;
+        return totalEntradas != null ? totalEntradas : BigDecimal.ZERO;
+    }
+
+    public void setTotalEntradas(BigDecimal totalEntradas) {
+        this.totalEntradas = totalEntradas;
     }
 
     public BigDecimal getTotalSaidas() {
-        return BigDecimal.ZERO;
+        return totalSaidas != null ? totalSaidas : BigDecimal.ZERO;
+    }
+
+    public void setTotalSaidas(BigDecimal totalSaidas) {
+        this.totalSaidas = totalSaidas;
     }
 }

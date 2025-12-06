@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.CaixaController">
+<AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.CaixaController">
     <children>
         <Pane layoutX="283.0" layoutY="0.0" prefHeight="700.0" prefWidth="1283.0" style="-fx-background-color: white;">
             <children>
@@ -25,7 +25,6 @@
                     </font>
                 </Label>
 
-                <!-- Botão Abrir Caixa -->
                 <Button fx:id="btnAcaoCaixa" layoutX="800.0" layoutY="61.0" mnemonicParsing="false" onAction="#handleAcaoCaixa" prefHeight="59.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="     Abrir Caixa" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="24.0" />
@@ -37,19 +36,19 @@
 
                 <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="822.0" layoutY="80.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/cadeado.png" />
+                        <Image url="@/assets/imgs/cadeado.png" />
                     </image>
                 </ImageView>
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="867.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+                        <Image url="@/assets/imgs/mais.png" />
                     </image>
                 </ImageView>
             <Pane layoutX="14.0" layoutY="125.0" prefHeight="80.0" prefWidth="1011.0" style="-fx-border-color: #009A05; -fx-background-radius: 8px; -fx-border-radius: 8px;"  stylesheets="@/css/style.css">
                <children>
                   <ImageView fitHeight="35.0" fitWidth="40.0" layoutX="31.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/cadeado2.png" />
+                        <Image url="@/assets/imgs/cadeado2.png" />
                      </image>
                   </ImageView>
                   <Label layoutX="79.0" layoutY="8.0" text="Caixa Aberto">
@@ -83,7 +82,7 @@
                   </Label>
                   <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/graficoverde.png" />
+                        <Image url="@/assets/imgs/graficoverde.png" />
                      </image>
                   </ImageView>
                </children>
@@ -107,7 +106,7 @@
                   </Label>
                   <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/graficovermelho.png" />
+                        <Image url="@/assets/imgs/graficovermelho.png" />
                      </image>
                   </ImageView>
                </children>
@@ -131,7 +130,7 @@
                   </Label>
                   <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/moneyazul.png" />
+                        <Image url="@/assets/imgs/moneyazul.png" />
                      </image>
                   </ImageView>
                </children>
@@ -155,7 +154,7 @@
                      <children>
                         <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/graficoverde.png" />
+                              <Image url="@/assets/imgs/graficoverde.png" />
                            </image>
                         </ImageView>
                      </children>
@@ -164,7 +163,7 @@
                      <children>
                         <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/graficoverde.png" />
+                              <Image url="@/assets/imgs/graficoverde.png" />
                            </image>
                         </ImageView>
                      </children>
@@ -173,7 +172,7 @@
                      <children>
                         <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../../../../../../../../../../PDV_Galeteria_PIES01/src/main/resources/assets/imgs/graficovermelho.png" />
+                              <Image url="@/assets/imgs/graficovermelho.png" />
                            </image>
                         </ImageView>
                      </children>
@@ -229,10 +228,9 @@
             </children>
         </Pane>
 
-        <!-- Menu Lateral -->
         <ImageView fitHeight="93.0" fitWidth="113.0" layoutX="99.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
+                <Image url="@/assets/imgs/logo-pdv.jpg" />
             </image>
         </ImageView>
 
@@ -247,7 +245,6 @@
 
         <Separator layoutX="-12.0" layoutY="115.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Dashboard -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="121.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Dashboard" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -259,11 +256,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="132.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/casa.png" />
+                <Image url="@/assets/imgs/casa.png" />
             </image>
         </ImageView>
 
-        <!-- Vendas -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="181.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaVendas" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Vendas     " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -275,11 +271,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/carrinho.png" />
+                <Image url="@/assets/imgs/carrinho.png" />
             </image>
         </ImageView>
 
-        <!-- Estoque -->
         <Button fx:id="btnEstoque" alignment="CENTER" layoutX="12.0" layoutY="241.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEstoque" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Estoque    " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -291,11 +286,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/estoque.png" />
+                <Image url="@/assets/imgs/estoque.png" />
             </image>
         </ImageView>
 
-        <!-- Caixa -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEstoque" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -307,11 +301,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/money.png" />
+                <Image url="@/assets/imgs/money.png" />
             </image>
         </ImageView>
 
-        <!-- Entregadores -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -323,11 +316,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="375.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/entregadores.png" />
+                <Image url="@/assets/imgs/entregadores.png" />
             </image>
         </ImageView>
 
-        <!-- Relatórios -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="421.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Relatórios  " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -339,11 +331,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="437.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/relat.png" />
+                <Image url="@/assets/imgs/relat.png" />
             </image>
         </ImageView>
 
-        <!-- Configurações -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="481.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="     Configurações" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -355,13 +346,12 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="497.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/configs.png" />
+                <Image url="@/assets/imgs/configs.png" />
             </image>
         </ImageView>
 
         <Separator layoutX="-1.0" layoutY="540.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Sair -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="553.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#sairParaLogin" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Sair            " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -373,7 +363,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="567.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/sair_.png" />
+                <Image url="@/assets/imgs/sair_.png" />
             </image>
         </ImageView>
     </children>
