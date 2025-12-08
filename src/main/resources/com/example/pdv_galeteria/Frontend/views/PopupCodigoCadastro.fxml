@@ -54,12 +54,7 @@
       </VBox>
 
       <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Confirmar Cadastro">
-         <font>
-            <Font size="16.0" />
-         </font>
-         <padding>
-            <Insets bottom="12.0" top="12.0" />
-         </padding>
+        
       </Button>
 
    </children>
