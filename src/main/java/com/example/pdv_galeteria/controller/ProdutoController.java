@@ -49,8 +49,8 @@ public class ProdutoController {
 
     @FXML
     private void initialize() {
-        System.out.println("✅ ProdutoController inicializado!");
-        System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
+        System.out.println("ProdutoController inicializado!");
+        System.out.println("ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
         configurarCheckboxes();
     }
@@ -108,8 +108,8 @@ public class ProdutoController {
     @FXML
     private void adicionarProduto() {
         try {
-            System.out.println("🎯 Tentando adicionar produto...");
-            System.out.println("🎯 ProdutoService: " + produtoService);
+            System.out.println("Tentando adicionar produto...");
+            System.out.println("ProdutoService: " + produtoService);
 
             if (produtoService == null) {
                 mostrarAlerta("Erro", "Sistema não inicializado. Reinicie a aplicação.");
@@ -130,7 +130,7 @@ public class ProdutoController {
             produto.setQuantidade(Integer.parseInt(txtEstoque.getText().trim()));
 
             Produto produtoSalvo = produtoService.salvar(produto);
-            System.out.println("✅ Produto salvo com ID: " + produtoSalvo.getId());
+            System.out.println("Produto salvo com ID: " + produtoSalvo.getId());
 
             mostrarAlerta("Sucesso", "Produto cadastrado com sucesso!");
             limparCampos();
@@ -147,7 +147,7 @@ public class ProdutoController {
     @FXML
     private void editarProduto() {
         try {
-            System.out.println("✏️ Iniciando edição de produto...");
+            System.out.println("Iniciando edição de produto...");
 
             if (produtoService == null) {
                 mostrarAlerta("Erro", "Sistema não inicializado. Reinicie a aplicação.");
@@ -170,7 +170,7 @@ public class ProdutoController {
             produtoParaEdicao.setPreco(Double.parseDouble(precoText));
 
             Produto produtoAtualizado = produtoService.salvar(produtoParaEdicao);
-            System.out.println("✅ Produto atualizado com ID: " + produtoAtualizado.getId());
+            System.out.println("Produto atualizado com ID: " + produtoAtualizado.getId());
 
             mostrarAlerta("Sucesso", "Produto atualizado com sucesso!");
 
@@ -193,7 +193,7 @@ public class ProdutoController {
         if (produtoParaEdicao != null && txtNomeEditar != null && txtPrecoEditar != null) {
             txtNomeEditar.setText(produtoParaEdicao.getNome());
             txtPrecoEditar.setText(String.format("%.2f", produtoParaEdicao.getPreco()));
-            System.out.println("📝 Carregando dados para edição: " + produtoParaEdicao.getNome());
+            System.out.println("Carregando dados para edição: " + produtoParaEdicao.getNome());
         }
     }
 

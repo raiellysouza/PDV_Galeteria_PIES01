@@ -71,6 +71,11 @@ public class EditarCombosController {
                 mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
                 return;
             }
+        Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
+        if (produto == null) {
+            mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
+            return;
+        }
 
             ComboItem item = new ComboItem();
             item.setProduto(produto);

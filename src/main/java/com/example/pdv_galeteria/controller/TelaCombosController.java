@@ -46,6 +46,8 @@ public class TelaCombosController {
     @FXML
     private FlowPane combosContainer;
 
+    @FXML private VBox sugestoesContainer;
+
     @FXML private TextArea nomeComboField;
     @FXML private TextArea precoComboField;
     @FXML private TextArea nomeProdutoField;
@@ -53,12 +55,20 @@ public class TelaCombosController {
     @FXML private TextArea produtosTextArea;
     @FXML private FlowPane comboContainer;
 
+    // Lista temporária para armazenar os produtos do combo
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
 
     @FXML
     public void initialize() {
+        // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
+    }
+
+        List<Produto> encontrados = produtoService.buscarListaPorNome(newValue.trim());
+        mostrarSugestoes(encontrados);
+        });
+
     }
 
     public void setCombosContainer(FlowPane combosContainer) {
@@ -109,6 +119,18 @@ public class TelaCombosController {
         card.setPrefWidth(480.0);
         card.setPrefHeight(120.0);
         card.setStyle("-fx-padding: 8; -fx-border-color: #ddd; -fx-border-radius: 6; -fx-background-color: white;");
+public Pane criarCardCombo(Combo combo) {
+
+    Pane card = new Pane();
+    card.getStyleClass().add("card-produtos");
+    card.setPrefSize(400, 178);
+    card.setMinSize(400, 178);
+    card.setMaxSize(400, 178);
+    card.setStyle("-fx-background-color: white; " +
+            "-fx-background-radius: 5; " +
+            "-fx-border-radius: 5; " +
+            "-fx-border-color: rgba(0,0,0,0.2); " +
+            "-fx-border-width: 1;");
 
         Label nome = new Label(combo.getNome() != null ? combo.getNome() : "Sem nome");
         nome.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
@@ -121,6 +143,10 @@ public class TelaCombosController {
         HBox botoesContainer = new HBox();
         botoesContainer.setSpacing(10);
         botoesContainer.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+    Label labelPreco = new Label(String.format("R$ %.2f", combo.getPrecoTotal()));
+    labelPreco.setLayoutX(14);
+    labelPreco.setLayoutY(82);
+    labelPreco.setStyle("-fx-font-weight: bold; -fx-font-size: 28px; -fx-text-fill: #2a6df4;");
 
         Button btnEditar = new Button("Editar");
         Button btnExcluir = new Button("Excluir");
@@ -252,11 +278,12 @@ public class TelaCombosController {
             BigDecimal preco = new BigDecimal(precoStr.replace(",", "."));
             Combo combo = new Combo();
             combo.setNome(nomeCombo);
-            combo.setPrecoTotal(preco.doubleValue());
+            combo.setPrecoTotal(preco.doubleValue()); // ou use BigDecimal se seu modelo aceitar
             combo.setItensDoCombo(itensDoCombo);
             comboService.salvarCombo(combo);
             mostrarAlerta("Sucesso", "Combo salvo com sucesso!", Alert.AlertType.INFORMATION);
 
+            // Limpa todos os campos e a lista
             nomeComboField.clear();
             precoComboField.clear();
             produtosTextArea.clear();

@@ -70,7 +70,7 @@ public class TelaProdutosController implements Initializable {
     private AnchorPane comboContainerPane;
 
     @Autowired
-    private TelaCombosController combosController;
+    private TelaCombosController combosController; // Injeta o controller de combos
 
     @Autowired
     private ComboService comboService;
@@ -92,15 +92,20 @@ public class TelaProdutosController implements Initializable {
         System.out.println("MainContentPane: " + (mainContentPane != null ? "ENCONTRADO" : "NULO"));
 
         System.out.println("🔍 campoBusca: " + (campoBusca != null ? "INJETADO" : "NULO"));
+        System.out.println("campoBusca: " + (campoBusca != null ? "INJETADO" : "NULO"));
 
+        // DEBUG: Verificar caminho e testar popup
         verificarCaminhoFXML();
         testePopupBasico();
 
+        // Debug do Spring Context
         PdvGaleteriaApplication.debugSpringContext();
         System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
+        // Inicializar timer de busca
         timerBusca = new Timer();
 
+        // Carregar produtos
         carregarProdutos();
         carregarTelaCombos();
         combosController.setCombosContainer(combosContainer);
@@ -124,12 +129,12 @@ public class TelaProdutosController implements Initializable {
             }
 
             for (Produto produto : produtos) {
-                System.out.println("🎴 Criando card para produto: " + produto.getNome());
+                System.out.println("Criando card para produto: " + produto.getNome());
                 Pane card = criarCardProduto(produto, false);
                 produtosContainer.getChildren().add(card);
             }
 
-            System.out.println("Cards de produtos criados: " + produtosContainer.getChildren().size());
+            System.out.println("✅ Cards de produtos criados: " + produtosContainer.getChildren().size());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,10 +163,11 @@ public class TelaProdutosController implements Initializable {
     }
 
     private void renderizarProdutos(List<Produto> produtos) {
+        // Limpar todos os elementos do mainContentPane
         if (mainContentPane != null) {
             mainContentPane.getChildren().clear();
         } else {
-            System.err.println("❌ mainContentPane é nulo! Usando contentPane como fallback.");
+            System.err.println("mainContentPane é nulo! Usando contentPane como fallback.");
             contentPane.getChildren().removeIf(node -> node instanceof Pane && node.getStyleClass().contains("card-produtos"));
         }
 
@@ -170,6 +176,7 @@ public class TelaProdutosController implements Initializable {
             return;
         }
 
+        // Separar produtos e combos
         List<Produto> produtosNormais = new ArrayList<>();
         List<Produto> combos = new ArrayList<>();
 
@@ -188,6 +195,7 @@ public class TelaProdutosController implements Initializable {
         double horizontalGap = 59.0;
         double verticalGap = 26.0;
 
+        // Renderizar PRODUTOS NORMAIS
         if (!produtosNormais.isEmpty()) {
 
 
@@ -209,7 +217,9 @@ public class TelaProdutosController implements Initializable {
             }
         }
 
+        // Renderizar COMBOS
         if (!combos.isEmpty()) {
+            // Calcular posição Y para combos
             double combosStartY = startY + (Math.ceil(produtosNormais.size() / 2.0) * (cardHeight + verticalGap)) + 50;
 
 
@@ -235,7 +245,7 @@ public class TelaProdutosController implements Initializable {
     private Pane criarCardProduto(Produto produto, boolean isCombo) {
         Pane card = new Pane();
         card.getStyleClass().add("card-produtos");
-        card.setPrefSize(400, 178);
+        card.setPrefSize(400, 178); // TAMANHO FIXO
         card.setMinSize(400, 178);
         card.setMaxSize(400, 178);
         card.setStyle("-fx-background-color: white; " +
@@ -244,11 +254,13 @@ public class TelaProdutosController implements Initializable {
                 "-fx-border-color: rgba(0,0,0,0.2); " +
                 "-fx-border-width: 1;");
 
+        // Nome do produto
         Label labelNome = new Label(produto.getNome());
         labelNome.setLayoutX(14);
         labelNome.setLayoutY(14);
         labelNome.setStyle("-fx-font-weight: bold; -fx-font-size: 21px; -fx-text-fill: black;");
 
+        // Categoria
         String categoria = isCombo ? "Combo" : "Produto";
         Pane categoriaPane = new Pane();
         categoriaPane.setLayoutX(299);
@@ -264,17 +276,20 @@ public class TelaProdutosController implements Initializable {
         labelCategoria.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #374151;");
         categoriaPane.getChildren().add(labelCategoria);
 
+        // Preço
         Label labelPreco = new Label(String.format("R$ %.2f", produto.getPreco()));
         labelPreco.setLayoutX(14);
         labelPreco.setLayoutY(82);
         labelPreco.setStyle("-fx-font-weight: bold; -fx-font-size: 28px; -fx-text-fill: #2a6df4;");
 
+        // BOTÕES
         Button btnEditar = criarBotaoComIcone("Editar", 65, 144, 90, 29, "/assets/imgs/editar.png");
         Button btnSegundo = isCombo
                 ? criarBotaoComIcone("Excluir", 160, 144, 95, 29, "/assets/imgs/delete.png")
                 : criarBotaoComIcone("Entrada", 160, 144, 95, 29, "/assets/imgs/plus-square.png");
         Button btnApagar = criarBotaoIcone(269, 144, 30, 29, "/assets/imgs/delete.png");
 
+        // Ações dos botões
         btnEditar.setOnAction(e -> {
             produtoSelecionado = produto;
             editarProduto();
@@ -288,8 +303,11 @@ public class TelaProdutosController implements Initializable {
             }
         });
 
+        // Adicionar ação ao botão de apagar
         btnApagar.setOnAction(e -> {
             System.out.println("🗑️ Clicou para apagar produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
+            executarExclusaoProduto(produto);
+            System.out.println("Clicou para apagar produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
             executarExclusaoProduto(produto);
         });
 
@@ -375,6 +393,7 @@ public class TelaProdutosController implements Initializable {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/CadastrarProduto.fxml"));
 
+            // Usar o ControllerFactory do Spring (agora estático)
             loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
@@ -404,9 +423,10 @@ public class TelaProdutosController implements Initializable {
         try {
             System.out.println("Abrindo tela de vendas...");
 
+            // PRIMEIRO: Verificar se o arquivo FXML existe
             URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRegistroPedido.fxml");
             if (fxmlUrl == null) {
-                System.err.println("Arquivo FXML não encontrado: TelaRegistroPedido.fxml");
+                System.err.println("❌ Arquivo FXML não encontrado: TelaRegistroPedido.fxml");
                 mostrarMensagemErro("Arquivo da tela de vendas não encontrado!");
                 return;
             }
@@ -414,12 +434,15 @@ public class TelaProdutosController implements Initializable {
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
+            // Verificar se o contexto do Spring está disponível
             if (PdvGaleteriaApplication.getSpringContext() == null) {
                 System.err.println("❌ Contexto do Spring não disponível");
+                System.err.println("Contexto do Spring não disponível");
                 try {
                     Parent root = loader.load();
 
                     Stage stage = (Stage) contentPane.getScene().getWindow();
+                    Stage stage = new Stage();
                     stage.setScene(new Scene(root));
                     stage.setTitle("Registro de Pedidos");
                     stage.centerOnScreen();
@@ -433,11 +456,13 @@ public class TelaProdutosController implements Initializable {
                 }
             }
 
+            // Usar o ControllerFactory do Spring
             loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
 
             Stage stage = (Stage) contentPane.getScene().getWindow();
+            Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Registro de Pedidos");
             stage.centerOnScreen();
@@ -445,8 +470,9 @@ public class TelaProdutosController implements Initializable {
             System.out.println("✅ Tela de vendas aberta com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao abrir tela de vendas: " + e.getMessage());
+            System.err.println("❌ Erro ao abrir tela de vendas: " + e.getMessage());
 
+            // Mostrar detalhes mais específicos do erro
             String errorDetails = "Erro ao abrir tela de vendas:\n";
             if (e.getCause() != null) {
                 errorDetails += "Causa: " + e.getCause().getMessage();
@@ -490,6 +516,7 @@ public class TelaProdutosController implements Initializable {
             e.printStackTrace();
             System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
 
+            // Fallback com alerta
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmação de Saída");
             alert.setHeaderText("Deseja realmente sair?");
@@ -511,6 +538,7 @@ public class TelaProdutosController implements Initializable {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
+            // Usar o ControllerFactory do Spring para garantir injeção de dependências
             loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
@@ -523,8 +551,9 @@ public class TelaProdutosController implements Initializable {
             System.out.println("✅ Tela de login carregada com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao voltar para login: " + e.getMessage());
+            System.err.println("❌ Erro ao voltar para login: " + e.getMessage());
 
+            // Tentar reiniciar a aplicação completamente
             reiniciarAplicacaoCompleta();
         }
     }
@@ -533,9 +562,11 @@ public class TelaProdutosController implements Initializable {
         try {
             System.out.println("Tentando reiniciar aplicação completamente...");
 
+            // Fechar a janela atual
             Stage stage = (Stage) contentPane.getScene().getWindow();
             stage.close();
 
+            // Usar o método de reinício da aplicação principal
             PdvGaleteriaApplication.relaunchApplication();
 
         } catch (Exception e) {
@@ -552,8 +583,9 @@ public class TelaProdutosController implements Initializable {
     }
 
     private void testePopupBasico() {
-        System.out.println("TESTE BÁSICO DO POPUP...");
+        System.out.println("🎯 TESTE BÁSICO DO POPUP...");
         try {
+            // Método mais simples possível
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pdv_galeteria/view/popupExclusaoConfirmacao.fxml"));
 
             Stage stage = new Stage();
@@ -606,11 +638,14 @@ public class TelaProdutosController implements Initializable {
                 return;
             }
 
+            // Executar a exclusão
             produtoService.deletar(produto.getId());
             System.out.println("✅ Produto excluído do banco com sucesso");
 
+            // Recarregar a lista de produtos
             carregarProdutos();
 
+            // Mostrar mensagem de sucesso
             mostrarMensagemSucesso("Produto '" + produto.getNome() + "' excluído com sucesso!");
         } catch (Exception e) {
             System.err.println("❌ ERRO na exclusão: " + e.getMessage());
@@ -629,6 +664,7 @@ public class TelaProdutosController implements Initializable {
                 return;
             }
 
+            // Carregar o FXML específico de edição
             URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEditarProdutos.fxml");
             if (fxmlUrl == null) {
                 System.err.println("❌ Arquivo FXML não encontrado: TelaEditarProdutos.fxml");
@@ -641,14 +677,18 @@ public class TelaProdutosController implements Initializable {
 
             Parent root = loader.load();
 
+            // Obter o controller
             ProdutoController produtoController = loader.getController();
 
+            // Configurar para modo edição
             produtoController.setProdutoParaEdicao(produtoSelecionado);
             produtoController.setOnEdicaoConcluidaCallback(() -> {
-                System.out.println("Edição concluída, atualizando lista...");
-                carregarProdutos();
+                // Callback quando a edição for concluída
+                System.out.println("✅ Edição concluída, atualizando lista...");
+                carregarProdutos(); // Recarrega a lista
             });
 
+            // Criar e mostrar o popup
             Stage popupStage = new Stage();
             popupStage.setTitle("Editar Produto");
             popupStage.initModality(Modality.APPLICATION_MODAL);
@@ -669,16 +709,19 @@ public class TelaProdutosController implements Initializable {
         }
     }
 
+    // Método chamado quando digitar no campo de busca
     @FXML
     private void onBuscaKeyReleased() {
         String termoBusca = campoBusca.getText().trim();
-        System.out.println("onBuscaKeyReleased CHAMADO! Texto: '" + termoBusca + "'");
+        System.out.println("🎯 onBuscaKeyReleased CHAMADO! Texto: '" + termoBusca + "'");
 
+        // Cancelar timer anterior se existir
         if (timerBusca != null) {
             timerBusca.cancel();
             timerBusca.purge();
         }
 
+        // Se campo estiver vazio, restaurar tela original
         if (termoBusca.isEmpty()) {
             System.out.println("🔍 Campo VAZIO - restaurando tela original");
             timerBusca = new Timer();
@@ -691,6 +734,7 @@ public class TelaProdutosController implements Initializable {
             return;
         }
 
+        // Busca com delay para não sobrecarregar
         timerBusca = new Timer();
         timerBusca.schedule(new TimerTask() {
             @Override
@@ -703,27 +747,32 @@ public class TelaProdutosController implements Initializable {
         }, 300);
     }
 
+    // Método que executa a busca
     private void executarBusca(String termoBusca) {
         try {
             System.out.println("🔍 Buscando produtos E combos por: '" + termoBusca + "'");
 
+            // Buscar produtos normais
             List<Produto> produtosEncontrados = produtoService.buscarListaPorNome(termoBusca);
 
+            // Buscar combos
             List<Combo> combosEncontrados = comboService.buscarCombosPorNome(termoBusca);
 
             System.out.println("✅ " + produtosEncontrados.size() + " produtos + " +
                     combosEncontrados.size() + " combos encontrados");
 
+            // Renderizar produtos e combos juntos
             renderizarProdutosECombos(produtosEncontrados, combosEncontrados);
 
         } catch (Exception e) {
-            System.err.println("Erro na busca: " + e.getMessage());
+            System.err.println("❌ Erro na busca: " + e.getMessage());
             e.printStackTrace();
 
             Platform.runLater(() -> {
                 mostrarMensagemErro("Erro ao buscar itens: " + e.getMessage());
             });
 
+            // Em caso de erro, restaurar todos os itens
             try {
                 List<Produto> todosProdutos = produtoService.listarTodos();
                 List<Combo> todosCombos = comboService.buscarTodosCombos();
@@ -739,6 +788,7 @@ public class TelaProdutosController implements Initializable {
             try {
                 System.out.println("🔍 Renderizando resultados da busca");
 
+                // Esconder os containers originais
                 if (produtosContainer != null) {
                     produtosContainer.setVisible(false);
                     produtosContainer.setManaged(false);
@@ -752,6 +802,7 @@ public class TelaProdutosController implements Initializable {
                     combosContainer.setManaged(false);
                 }
 
+                // Limpar cards de busca anteriores da área principal
                 Pane container = mainContentPane != null ? mainContentPane : contentPane;
                 if (container != null) {
                     container.getChildren().removeIf(node ->
@@ -766,6 +817,7 @@ public class TelaProdutosController implements Initializable {
                     return;
                 }
 
+                // USAR A MESMA LÓGICA DO renderizarProdutos
                 double startX = 315.0;
                 double startY = 240.0;
                 double cardWidth = 400.0;
@@ -773,6 +825,7 @@ public class TelaProdutosController implements Initializable {
                 double horizontalGap = 59.0;
                 double verticalGap = 26.0;
 
+                // Renderizar PRODUTOS DA BUSCA
                 if (!produtos.isEmpty()) {
                     System.out.println("🎨 Renderizando " + produtos.size() + " produtos da busca");
 
@@ -793,19 +846,22 @@ public class TelaProdutosController implements Initializable {
                     }
                 }
 
+                // Renderizar COMBOS DA BUSCA (usando a mesma lógica de posicionamento)
                 if (!combos.isEmpty()) {
                     System.out.println("🎨 Renderizando " + combos.size() + " combos da busca");
 
                     double combosStartY = startY + (Math.ceil(produtos.size() / 2.0) * (cardHeight + verticalGap)) + 260;
 
+                    // Largura do card de combo (do seu método criarCardCombo)
                     double comboCardWidth = 400.0;
 
+                    // Ajuste para centralizar os combos (já que são mais largos)
                     double comboXOffset = (comboCardWidth - cardWidth) / 2;
 
                     int comboCount = 0;
                     for (Combo combo : combos) {
                         double baseX = (comboCount % 2 == 0) ? startX : startX + cardWidth + horizontalGap;
-                        double currentX = baseX - comboXOffset;
+                        double currentX = baseX - comboXOffset; // Centralizar
                         double currentY = combosStartY + ((comboCount / 2) * (cardHeight + verticalGap));
 
                         VBox cardCombo = telaCombosController.criarCardCombo(combo);
@@ -835,6 +891,7 @@ public class TelaProdutosController implements Initializable {
             try {
                 System.out.println("🔄 Restaurando tela original...");
 
+                // Mostrar os containers originais
                 if (produtosContainer != null) {
                     produtosContainer.setVisible(true);
                     produtosContainer.setManaged(true);
@@ -848,6 +905,7 @@ public class TelaProdutosController implements Initializable {
                     combosContainer.setManaged(true);
                 }
 
+                // Limpar todos os cards de busca da área principal
                 Pane container = mainContentPane != null ? mainContentPane : contentPane;
                 if (container != null) {
                     container.getChildren().removeIf(node ->
@@ -857,6 +915,7 @@ public class TelaProdutosController implements Initializable {
                     );
                 }
 
+                // Recarregar os dados se necessário
                 carregarProdutos();
                 if (combosController != null) {
                     combosController.carregarCombos();
@@ -874,6 +933,7 @@ public class TelaProdutosController implements Initializable {
     private void mostrarMensagemSemProdutos() {
         Platform.runLater(() -> {
             try {
+                // Esconder containers originais
                 if (produtosContainer != null) {
                     produtosContainer.setVisible(false);
                     produtosContainer.setManaged(false);
@@ -887,6 +947,7 @@ public class TelaProdutosController implements Initializable {
                     combosContainer.setManaged(false);
                 }
 
+                // Limpar cards de busca anteriores
                 Pane container = mainContentPane != null ? mainContentPane : contentPane;
                 if (container != null) {
                     container.getChildren().removeIf(node ->
@@ -895,6 +956,7 @@ public class TelaProdutosController implements Initializable {
                                     node.getId().startsWith("card-busca-")
                     );
 
+                    // Mostrar mensagem
                     Label mensagem = new Label("Nenhum produto ou combo encontrado para: '" + campoBusca.getText() + "'");
                     mensagem.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 20px;");
                     mensagem.setLayoutX(400);
@@ -921,15 +983,18 @@ public class TelaProdutosController implements Initializable {
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
+            // 🔥 NÃO usar ControllerFactory - deixar JavaFX criar o controller
             Parent root = loader.load();
 
+            // 🔥 INJETAR MANUALMENTE o CaixaService
             CaixaController controller = loader.getController();
             if (PdvGaleteriaApplication.getSpringContext() != null) {
                 CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
                 controller.setCaixaService(caixaService);
-                System.out.println("CaixaService injetado manualmente");
+                System.out.println("✅ CaixaService injetado manualmente");
             }
 
+            // Usar o Stage atual
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Controle de Caixa");

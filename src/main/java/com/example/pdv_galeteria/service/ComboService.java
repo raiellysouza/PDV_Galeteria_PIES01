@@ -46,8 +46,10 @@ public class ComboService {
         System.out.println("🚨🚨🚨 MÉTODO salvarCombo INICIADO 🚨🚨🚨");
 
         try {
+            // VALIDAÇÕES CRÍTICAS
             if (novoCombo == null) {
                 System.err.println("COMBO É NULO!");
+                System.err.println("Combo é nulo!");
                 throw new IllegalArgumentException("Combo não pode ser nulo");
             }
 
@@ -56,16 +58,20 @@ public class ComboService {
             System.out.println("   Preço: " + novoCombo.getPrecoTotal());
             System.out.println("   Itens: " + (novoCombo.getItensDoCombo() != null ? novoCombo.getItensDoCombo().size() : 0));
 
+            // GARANTIR QUE PREÇO NÃO É NULO
             if (novoCombo.getPrecoTotal() == null) {
                 System.out.println("⚠️  Preço era nulo, definindo para 0.0");
                 novoCombo.setPrecoTotal(0.0);
             }
 
+            // GARANTIR QUE NOME NÃO É NULO
             if (novoCombo.getNome() == null || novoCombo.getNome().trim().isEmpty()) {
                 System.err.println("NOME DO COMBO É NULO OU VAZIO!");
+                System.err.println("Nome do combo é nulo ou vazio!");
                 throw new IllegalArgumentException("Nome do combo é obrigatório");
             }
 
+            // PROCESSAR ITENS (se existirem)
             if (novoCombo.getItensDoCombo() != null && !novoCombo.getItensDoCombo().isEmpty()) {
                 System.out.println("🛒 Processando " + novoCombo.getItensDoCombo().size() + " itens...");
 
@@ -87,15 +93,16 @@ public class ComboService {
 
             System.out.println("💾 Chamando comboRepository.save()...");
 
+            // SALVAR NO BANCO
             Combo salvado = comboRepository.save(novoCombo);
 
-            System.out.println("COMBO SALVO COM SUCESSO! ID: " + salvado.getId());
+            System.out.println("✅✅✅ COMBO SALVO COM SUCESSO! ID: " + salvado.getId());
             return salvado;
 
         } catch (Exception e) {
             System.err.println("❌❌❌ ERRO NO salvarCombo:");
             e.printStackTrace();
-            throw e;
+            throw e; // Re-lança a exceção para o controller
         }
     }
     
@@ -137,11 +144,12 @@ public List<Combo> buscarTodosCombos() {
 public Combo buscarPorIdComItens(Long id) {
     Combo combo = entityManager.find(Combo.class, id);
     if (combo != null) {
-        combo.getItensDoCombo().size();
+        combo.getItensDoCombo().size(); // inicializa os itens
 
+        // inicializa os produtos de cada item
         combo.getItensDoCombo().forEach(item -> {
             if (item.getProduto() != null) {
-                item.getProduto().getNome();
+                item.getProduto().getNome(); // força carregamento
             }
         });
     }
@@ -153,11 +161,13 @@ public Combo buscarPorIdComItens(Long id) {
         try {
             System.out.println("🔍 Buscando combos por: '" + termoBusca + "'");
 
+            // BUSCAR APENAS POR NOME
             List<Combo> combos = comboRepository.findByNomeContainingIgnoreCase(termoBusca);
 
+            // Carrega os itens de cada combo
             combos.forEach(combo -> {
                 if (combo.getItensDoCombo() != null) {
-                    combo.getItensDoCombo().size();
+                    combo.getItensDoCombo().size(); // Force initialization
                 }
             });
 
