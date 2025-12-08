@@ -90,8 +90,6 @@ public class CaixaService {
         return caixaRepository.save(caixa);
     }
 
-    // Métodos adicionais úteis
-
     public Optional<Caixa> getCaixaAbertoDoDia() {
         return caixaRepository.findCaixaAbertoDoDia();
     }

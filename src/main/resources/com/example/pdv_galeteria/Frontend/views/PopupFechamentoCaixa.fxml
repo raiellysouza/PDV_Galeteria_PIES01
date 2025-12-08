@@ -14,14 +14,12 @@
     <children>
         <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
             <children>
-                <!-- Título -->
                 <Label text="Fechamento de Caixa" textAlignment="CENTER">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Label>
 
-                <!-- Descrição -->
                 <Label maxWidth="350.0" text="Confirme o fechamento do caixa" textAlignment="CENTER" wrapText="true">
                     <font>
                         <Font size="14.0" />
@@ -31,7 +29,6 @@
                     </VBox.margin>
                 </Label>
 
-                <!-- Seção de Resumo -->
                 <VBox alignment="CENTER" maxWidth="350.0" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 15;">
                     <children>
                         <Label text="Resumo Final do Dia" textAlignment="CENTER">
@@ -40,9 +37,7 @@
                             </font>
                         </Label>
 
-                        <!-- Grid de valores -->
                         <VBox spacing="10.0" alignment="CENTER_LEFT">
-                            <!-- Valor Inicial -->
                             <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
                                 <Label text="Valor Inicial:" style="-fx-text-fill: #666666; -fx-min-width: 120;">
                                     <font>
@@ -56,7 +51,6 @@
                                 </Label>
                             </HBox>
 
-                            <!-- Total Entradas -->
                             <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
                                 <Label text="Total Entradas:" style="-fx-text-fill: #666666; -fx-min-width: 120;">
                                     <font>
@@ -70,7 +64,6 @@
                                 </Label>
                             </HBox>
 
-                            <!-- Total Saídas -->
                             <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
                                 <Label text="Total Saídas:" style="-fx-text-fill: #666666; -fx-min-width: 120;">
                                     <font>
@@ -84,14 +77,12 @@
                                 </Label>
                             </HBox>
 
-                            <!-- Separador -->
                             <Line endX="300.0" stroke="#dddddd" strokeWidth="1.0">
                                 <VBox.margin>
                                     <Insets top="5.0" bottom="5.0" />
                                 </VBox.margin>
                             </Line>
 
-                            <!-- Saldo Final -->
                             <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
                                 <Label text="Saldo Final:" style="-fx-font-weight: bold; -fx-min-width: 120;">
                                     <font>
@@ -105,7 +96,6 @@
                                 </Label>
                             </HBox>
 
-                            <!-- Valor para Retirada -->
                             <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
                                 <Label text="Valor para Retirada:" style="-fx-font-weight: bold; -fx-min-width: 120;">
                                     <font>
@@ -125,10 +115,8 @@
                     </VBox.margin>
                 </VBox>
 
-                <!-- Linha separadora -->
                 <Line endX="360.0" stroke="#eeeeee" strokeWidth="1.0" />
 
-                <!-- Botões -->
                 <HBox spacing="20.0" alignment="CENTER">
                     <Button fx:id="btnCancelarFechamento" mnemonicParsing="false" onAction="#cancelar"
                             prefHeight="40.0" prefWidth="120.0"

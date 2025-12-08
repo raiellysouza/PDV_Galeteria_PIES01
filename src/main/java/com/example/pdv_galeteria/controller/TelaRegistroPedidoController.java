@@ -68,34 +68,28 @@ public class TelaRegistroPedidoController implements Initializable {
     @FXML
     private void buscarProdutos() {
         System.out.println("Buscando produtos...");
-        // Implementação futura de busca
     }
 
     @FXML
     private void adicionarProdutoAoCarrinho() {
         System.out.println("Adicionando produto ao carrinho...");
-        // Implementação futura
     }
 
     @FXML
     private void incrementarQuantidade() {
         System.out.println("Incrementando quantidade...");
-        // Implementação futura
     }
 
     @FXML
     private void decrementarQuantidade() {
         System.out.println("Decrementando quantidade...");
-        // Implementação futura
     }
 
-    // === MÉTODO DE SAIR PARA LOGIN ===
     @FXML
     private void sairParaLogin() {
         try {
-            System.out.println("🎯 Iniciando processo de saída para login...");
+            System.out.println("Iniciando processo de saída para login...");
 
-            // Primeiro tentar abrir o popup de confirmação
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
 
@@ -125,12 +119,10 @@ public class TelaRegistroPedidoController implements Initializable {
             System.err.println("❌ Erro ao abrir pop-up de confirmação: " + e.getMessage());
             e.printStackTrace();
 
-            // Fallback: usar alerta de confirmação simples
             usarFallbackConfirmacao();
         }
     }
 
-    // === FALLBACK CASO O POPUP FALHE ===
     private void usarFallbackConfirmacao() {
         System.out.println("🔄 Usando fallback de confirmação...");
 
@@ -139,7 +131,6 @@ public class TelaRegistroPedidoController implements Initializable {
         alert.setHeaderText("Deseja realmente sair?");
         alert.setContentText("Você será redirecionado para a tela de login.");
 
-        // Personalizar botões
         ButtonType btnSim = new ButtonType("Sim, Sair", ButtonBar.ButtonData.YES);
         ButtonType btnNao = new ButtonType("Cancelar", ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(btnSim, btnNao);
@@ -153,7 +144,6 @@ public class TelaRegistroPedidoController implements Initializable {
         }
     }
 
-    // === VOLTAR PARA TELA DE LOGIN ===
     private void voltarParaTelaLogin() {
         try {
             System.out.println("🔄 Iniciando volta para tela de login...");
@@ -163,7 +153,6 @@ public class TelaRegistroPedidoController implements Initializable {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
-            // Usar o ControllerFactory do Spring para garantir injeção de dependências
             loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
@@ -179,27 +168,22 @@ public class TelaRegistroPedidoController implements Initializable {
             System.err.println("❌ Erro ao voltar para login: " + e.getMessage());
             e.printStackTrace();
 
-            // Tentar reiniciar a aplicação completamente
             reiniciarAplicacaoCompleta();
         }
     }
 
-    // === REINICIAR APLICAÇÃO EM CASO DE ERRO ===
     private void reiniciarAplicacaoCompleta() {
         try {
             System.out.println("🔄 Tentando reiniciar aplicação completamente...");
 
-            // Fechar a janela atual
             Stage stage = (Stage) contentPane.getScene().getWindow();
             stage.close();
 
-            // Usar o método de reinício da aplicação principal
             PdvGaleteriaApplication.relaunchApplication();
 
         } catch (Exception e) {
             System.err.println("💥 Erro ao reiniciar aplicação: " + e.getMessage());
 
-            // Último recurso
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erro");
             alert.setHeaderText("Erro ao reiniciar aplicação");
@@ -210,7 +194,6 @@ public class TelaRegistroPedidoController implements Initializable {
         }
     }
 
-    // === MÉTODOS PARA OUTRAS TELAS (placeholder) ===
     @FXML
     private void abrirDashboard() {
         System.out.println("Abrindo Dashboard...");
@@ -241,7 +224,6 @@ public class TelaRegistroPedidoController implements Initializable {
         mostrarAlerta("Funcionalidade em Desenvolvimento", "Configurações estará disponível em breve!", Alert.AlertType.INFORMATION);
     }
 
-    // === MÉTODO AUXILIAR PARA MOSTRAR ALERTAS ===
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
@@ -253,14 +235,11 @@ public class TelaRegistroPedidoController implements Initializable {
     @FXML
     private void handleAbrirTelaCaixa(ActionEvent event) {
         try {
-            // Carrega o FXML da tela do caixa
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml"));
             Parent root = loader.load();
 
-            // Obtém o stage atual a partir do evento
             Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
 
-            // Troca a cena no mesmo stage
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("Controle de Caixa");

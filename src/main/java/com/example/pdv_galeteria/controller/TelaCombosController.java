@@ -46,7 +46,6 @@ public class TelaCombosController {
     @FXML
     private FlowPane combosContainer;
 
-    // Campos da tela (vinculados pelo fx:id)
     @FXML private TextArea nomeComboField;
     @FXML private TextArea precoComboField;
     @FXML private TextArea nomeProdutoField;
@@ -54,17 +53,14 @@ public class TelaCombosController {
     @FXML private TextArea produtosTextArea;
     @FXML private FlowPane comboContainer;
 
-    // Lista temporária para armazenar os produtos do combo
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
 
     @FXML
     public void initialize() {
-        // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
     }
 
-    // Método para receber o container da TelaProdutos
     public void setCombosContainer(FlowPane combosContainer) {
         this.combosContainer = combosContainer;
     }
@@ -107,12 +103,11 @@ public class TelaCombosController {
         }
     }
 
-    // Ajuste a largura dos cards para caber 2 por linha
     public VBox criarCardCombo(Combo combo) {
         VBox card = new VBox();
         card.setSpacing(6);
-        card.setPrefWidth(480.0); // Largura para caber 2 cards
-        card.setPrefHeight(120.0); // Altura fixa
+        card.setPrefWidth(480.0);
+        card.setPrefHeight(120.0);
         card.setStyle("-fx-padding: 8; -fx-border-color: #ddd; -fx-border-radius: 6; -fx-background-color: white;");
 
         Label nome = new Label(combo.getNome() != null ? combo.getNome() : "Sem nome");
@@ -123,9 +118,8 @@ public class TelaCombosController {
 
         Label qtd = new Label("Itens: " + (combo.getItensDoCombo() != null ? combo.getItensDoCombo().size() : 0));
 
-        // Container para os botões lado a lado - CORRIGIDO
         HBox botoesContainer = new HBox();
-        botoesContainer.setSpacing(10); // Espaçamento de 10 entre botões
+        botoesContainer.setSpacing(10);
         botoesContainer.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
         Button btnEditar = new Button("Editar");
@@ -258,12 +252,11 @@ public class TelaCombosController {
             BigDecimal preco = new BigDecimal(precoStr.replace(",", "."));
             Combo combo = new Combo();
             combo.setNome(nomeCombo);
-            combo.setPrecoTotal(preco.doubleValue()); // ou use BigDecimal se seu modelo aceitar
+            combo.setPrecoTotal(preco.doubleValue());
             combo.setItensDoCombo(itensDoCombo);
             comboService.salvarCombo(combo);
             mostrarAlerta("Sucesso", "Combo salvo com sucesso!", Alert.AlertType.INFORMATION);
 
-            // Limpa todos os campos e a lista
             nomeComboField.clear();
             precoComboField.clear();
             produtosTextArea.clear();

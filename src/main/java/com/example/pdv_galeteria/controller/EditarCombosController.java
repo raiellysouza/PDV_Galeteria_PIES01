@@ -66,7 +66,6 @@ public class EditarCombosController {
 
             int quantidade = Integer.parseInt(qtdStr);
 
-            // CORREÇÃO: usar nomeProduto em vez de nome
             Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
             if (produto == null) {
                 mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
