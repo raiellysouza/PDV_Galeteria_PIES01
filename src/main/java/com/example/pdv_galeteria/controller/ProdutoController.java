@@ -49,8 +49,8 @@ public class ProdutoController {
 
     @FXML
     private void initialize() {
-        System.out.println("✅ ProdutoController inicializado!");
-        System.out.println("✅ ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
+        System.out.println("ProdutoController inicializado!");
+        System.out.println("ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
         configurarCheckboxes();
     }
@@ -84,7 +84,6 @@ public class ProdutoController {
     }
 
     private void desmarcarOutrosCheckboxes(CheckBox checkboxSelecionado) {
-        // Desmarca todos os outros checkboxes exceto o que foi selecionado
         if (checkPrincipal != null && checkPrincipal != checkboxSelecionado) {
             checkPrincipal.setSelected(false);
         }
@@ -95,7 +94,6 @@ public class ProdutoController {
             checkAcompanhamento.setSelected(false);
         }
 
-        // Limpa o campo de texto se algum checkbox foi selecionado
         if (txtOutraCategoria != null) {
             txtOutraCategoria.setText("");
         }
@@ -110,21 +108,19 @@ public class ProdutoController {
     @FXML
     private void adicionarProduto() {
         try {
-            System.out.println("🎯 Tentando adicionar produto...");
-            System.out.println("🎯 ProdutoService: " + produtoService);
+            System.out.println("Tentando adicionar produto...");
+            System.out.println("ProdutoService: " + produtoService);
 
             if (produtoService == null) {
                 mostrarAlerta("Erro", "Sistema não inicializado. Reinicie a aplicação.");
                 return;
             }
 
-            // Validar campos obrigatórios
             if (txtNome.getText().isEmpty() || txtPreco.getText().isEmpty() || txtEstoque.getText().isEmpty()) {
                 mostrarAlerta("Erro", "Preencha todos os campos obrigatórios!");
                 return;
             }
 
-            // Criar e salvar produto
             Produto produto = new Produto();
             produto.setNome(txtNome.getText().trim());
 
@@ -133,9 +129,8 @@ public class ProdutoController {
 
             produto.setQuantidade(Integer.parseInt(txtEstoque.getText().trim()));
 
-            // Salvar no banco
             Produto produtoSalvo = produtoService.salvar(produto);
-            System.out.println("✅ Produto salvo com ID: " + produtoSalvo.getId());
+            System.out.println("Produto salvo com ID: " + produtoSalvo.getId());
 
             mostrarAlerta("Sucesso", "Produto cadastrado com sucesso!");
             limparCampos();
@@ -152,38 +147,33 @@ public class ProdutoController {
     @FXML
     private void editarProduto() {
         try {
-            System.out.println("✏️ Iniciando edição de produto...");
+            System.out.println("Iniciando edição de produto...");
 
             if (produtoService == null) {
                 mostrarAlerta("Erro", "Sistema não inicializado. Reinicie a aplicação.");
                 return;
             }
 
-            // Validar campos obrigatórios (usando os campos da tela de edição)
             if (txtNomeEditar.getText().isEmpty() || txtPrecoEditar.getText().isEmpty()) {
                 mostrarAlerta("Erro", "Preencha todos os campos obrigatórios!");
                 return;
             }
 
-            // Verificar se há um produto para editar
             if (produtoParaEdicao == null || produtoParaEdicao.getId() == null) {
                 mostrarAlerta("Erro", "Nenhum produto selecionado para edição.");
                 return;
             }
 
-            // Atualizar os dados do produto
             produtoParaEdicao.setNome(txtNomeEditar.getText().trim());
 
             String precoText = txtPrecoEditar.getText().replace(",", ".");
             produtoParaEdicao.setPreco(Double.parseDouble(precoText));
 
-            // Atualizar no banco
             Produto produtoAtualizado = produtoService.salvar(produtoParaEdicao);
-            System.out.println("✅ Produto atualizado com ID: " + produtoAtualizado.getId());
+            System.out.println("Produto atualizado com ID: " + produtoAtualizado.getId());
 
             mostrarAlerta("Sucesso", "Produto atualizado com sucesso!");
 
-            // Fechar janela após sucesso
             fecharJanelaEdicao();
 
         } catch (NumberFormatException e) {
@@ -194,34 +184,28 @@ public class ProdutoController {
         }
     }
 
-    // Método para configurar o produto para edição
     public void setProdutoParaEdicao(Produto produto) {
         this.produtoParaEdicao = produto;
         carregarDadosProdutoEdicao();
     }
 
-    // Método para carregar os dados do produto nos campos de edição
     private void carregarDadosProdutoEdicao() {
         if (produtoParaEdicao != null && txtNomeEditar != null && txtPrecoEditar != null) {
             txtNomeEditar.setText(produtoParaEdicao.getNome());
             txtPrecoEditar.setText(String.format("%.2f", produtoParaEdicao.getPreco()));
-            System.out.println("📝 Carregando dados para edição: " + produtoParaEdicao.getNome());
+            System.out.println("Carregando dados para edição: " + produtoParaEdicao.getNome());
         }
     }
 
-    // Método para configurar callback quando a edição for concluída
     public void setOnEdicaoConcluidaCallback(Runnable callback) {
         this.onEdicaoConcluidaCallback = callback;
     }
 
-    // Método específico para fechar a janela de edição
     private void fecharJanelaEdicao() {
-        // Notificar que a edição foi concluída
         if (onEdicaoConcluidaCallback != null) {
             onEdicaoConcluidaCallback.run();
         }
 
-        // Fechar a janela de edição
         if (txtNomeEditar != null && txtNomeEditar.getScene() != null) {
             Stage stage = (Stage) txtNomeEditar.getScene().getWindow();
             stage.close();

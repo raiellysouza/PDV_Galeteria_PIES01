@@ -77,7 +77,9 @@
                     </font>
                 </Label>
 
-                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0" style="-fx-border-color: transparent; -fx-background-color: transparent;" vbarPolicy="AS_NEEDED">
+                <ScrollPane layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0"
+                            style="-fx-background-color: transparent; -fx-border-color: transparent;"
+                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
                     <content>
                         <FlowPane fx:id="produtosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
@@ -89,7 +91,9 @@
                     </font>
                 </Label>
 
-                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
+                <ScrollPane layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0"
+                            style="-fx-background-color: transparent; -fx-border-color: transparent;"
+                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
                     <content>
                         <FlowPane fx:id="combosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>

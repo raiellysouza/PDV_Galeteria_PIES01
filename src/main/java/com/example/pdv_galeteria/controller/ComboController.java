@@ -20,19 +20,11 @@ public class ComboController {
     @Autowired
     private ComboService comboService;
 
-    /**
-     * Busca e retorna todos os Combos.
-     * @return 
-     */
     public List<Combo> listarTodos() {
         return comboService.buscarTodosCombos();
     }
 
-    /**
-     * Busca um Combo por ID.
-     * @param id 
-     * @return 
-     */
+
     public Optional<Combo> buscarPorId(Long id) {
   
 
@@ -43,21 +35,12 @@ public class ComboController {
         }
     }
 
-    /**
-     * Salva ou atualiza um novo Combo.
-     * @param combo 
-     * @return 
-     */
+   
     public Combo salvar(Combo combo) {
         return comboService.salvarCombo(combo);
     }
 
-    /**
-     * Atualiza um Combo existente.
-     * @param id 
-     * @param comboDetalhes 
-     * @return 
-     */
+  
     public Optional<Combo> atualizar(Long id, Combo comboDetalhes) {
         try {
             Combo existing = comboService.buscarComboPorId(id);
@@ -75,10 +58,7 @@ public class ComboController {
         }
     }
 
-    /**
-     * Deleta um Combo por ID.
-     * @param id 
-     */
+    
     public void deletar(Long id) {
         comboService.deletarCombo(id);
     }
