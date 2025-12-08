@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.PopupFechamentoCaixaController">
+    <children>
+        <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+            <children>
+                <!-- Título -->
+                <Label text="Fechamento de Caixa" textAlignment="CENTER">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                </Label>
+
+                <!-- Descrição -->
+                <Label maxWidth="350.0" text="Confirme o fechamento do caixa" textAlignment="CENTER" wrapText="true">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets left="20.0" right="20.0" />
+                    </VBox.margin>
+                </Label>
+
+                <!-- Seção de Resumo -->
+                <VBox alignment="CENTER" maxWidth="350.0" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 15;">
+                    <children>
+                        <Label text="Resumo Final do Dia" textAlignment="CENTER">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+
+                        <!-- Grid de valores -->
+                        <VBox spacing="10.0" alignment="CENTER_LEFT">
+                            <!-- Valor Inicial -->
+                            <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
+                                <Label text="Valor Inicial:" style="-fx-text-fill: #666666; -fx-min-width: 120;">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblValorInicial" style="-fx-font-weight: bold;">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                            </HBox>
+
+                            <!-- Total Entradas -->
+                            <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
+                                <Label text="Total Entradas:" style="-fx-text-fill: #666666; -fx-min-width: 120;">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblTotalEntradas" style="-fx-font-weight: bold; -fx-text-fill: #009A05;">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                            </HBox>
+
+                            <!-- Total Saídas -->
+                            <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
+                                <Label text="Total Saídas:" style="-fx-text-fill: #666666; -fx-min-width: 120;">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblTotalSaidas" style="-fx-font-weight: bold; -fx-text-fill: #F42A2A;">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                            </HBox>
+
+                            <!-- Separador -->
+                            <Line endX="300.0" stroke="#dddddd" strokeWidth="1.0">
+                                <VBox.margin>
+                                    <Insets top="5.0" bottom="5.0" />
+                                </VBox.margin>
+                            </Line>
+
+                            <!-- Saldo Final -->
+                            <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
+                                <Label text="Saldo Final:" style="-fx-font-weight: bold; -fx-min-width: 120;">
+                                    <font>
+                                        <Font size="15.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblSaldoAtual" style="-fx-font-weight: bold; -fx-text-fill: #2A6DF4;">
+                                    <font>
+                                        <Font size="16.0" />
+                                    </font>
+                                </Label>
+                            </HBox>
+
+                            <!-- Valor para Retirada -->
+                            <HBox spacing="10.0" alignment="CENTER_LEFT" prefWidth="300.0">
+                                <Label text="Valor para Retirada:" style="-fx-font-weight: bold; -fx-min-width: 120;">
+                                    <font>
+                                        <Font size="15.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblValorFinal" style="-fx-font-weight: bold; -fx-text-fill: #f68411;">
+                                    <font>
+                                        <Font size="18.0" />
+                                    </font>
+                                </Label>
+                            </HBox>
+                        </VBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets left="20.0" right="20.0" />
+                    </VBox.margin>
+                </VBox>
+
+                <!-- Linha separadora -->
+                <Line endX="360.0" stroke="#eeeeee" strokeWidth="1.0" />
+
+                <!-- Botões -->
+                <HBox spacing="20.0" alignment="CENTER">
+                    <Button fx:id="btnCancelarFechamento" mnemonicParsing="false" onAction="#cancelar"
+                            prefHeight="40.0" prefWidth="120.0"
+                            style="-fx-background-color: #6c757d; -fx-background-radius: 8; -fx-text-fill: white;"
+                            text="Cancelar">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                        <cursor>
+                            <Cursor fx:constant="HAND" />
+                        </cursor>
+                    </Button>
+
+                    <Button fx:id="btnConfirmarFechamento" mnemonicParsing="false" onAction="#confirmarFechamento"
+                            prefHeight="45.0" prefWidth="180.0"
+                            style="-fx-background-color: #f68411; -fx-background-radius: 8; -fx-text-fill: white;"
+                            text="Confirmar Fechamento">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                        <cursor>
+                            <Cursor fx:constant="HAND" />
+                        </cursor>
+                    </Button>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+    <padding>
+        <Insets bottom="20.0" top="20.0" />
+    </padding>
+</AnchorPane>

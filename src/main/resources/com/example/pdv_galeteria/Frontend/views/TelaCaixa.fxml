@@ -44,187 +44,186 @@
                         <Image url="@/assets/imgs/mais.png" />
                     </image>
                 </ImageView>
-            <Pane layoutX="14.0" layoutY="125.0" prefHeight="80.0" prefWidth="1011.0" style="-fx-border-color: #009A05; -fx-background-radius: 8px; -fx-border-radius: 8px;"  stylesheets="@/css/style.css">
-               <children>
-                  <ImageView fitHeight="35.0" fitWidth="40.0" layoutX="31.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@/assets/imgs/cadeado2.png" />
-                     </image>
-                  </ImageView>
-                  <Label layoutX="79.0" layoutY="8.0" text="Caixa Aberto">
-                     <font>
-                        <Font name="System Bold" size="36.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="31.0" layoutY="51.0" text="O caixa está operando normalmente">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                  </Label>
-               </children>
-            </Pane>
-            <Pane layoutX="14.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
-               <children>
-                  <Label layoutX="25.0" layoutY="14.0" text="Total Entradas">
-                     <font>
-                        <Font name="System Bold" size="20.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #009A05;" text="R$ 0,00">
-                     <font>
-                        <Font name="System Bold" size="28.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="25.0" layoutY="100.0" text="Hoje">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@/assets/imgs/graficoverde.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </Pane>
-            <Pane layoutX="360.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
-               <children>
-                  <Label layoutX="25.0" layoutY="14.0" text="Total Saídas">
-                     <font>
-                        <Font name="System Bold" size="20.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #F42A2A;" text="R$ 0,00" textFill="#f42a2a">
-                     <font>
-                        <Font name="System Bold" size="28.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="25.0" layoutY="100.0" text="Hoje">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@/assets/imgs/graficovermelho.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </Pane>
-            <Pane layoutX="707.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
-               <children>
-                  <Label layoutX="25.0" layoutY="14.0" text="Total Saídas">
-                     <font>
-                        <Font name="System Bold" size="20.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #2A6DF4;" text="R$ 0,00" textFill="#2a6df4">
-                     <font>
-                        <Font name="System Bold" size="28.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="25.0" layoutY="100.0" text="No Caixa">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@/assets/imgs/moneyazul.png" />
-                     </image>
-                  </ImageView>
-               </children>
-            </Pane>
-            <Pane layoutX="14.0" layoutY="386.0" prefHeight="320.0" prefWidth="1011.0" styleClass="card-produtos">
-               <children>
-                  <Pane layoutX="53.0" layoutY="246.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
-                  <Pane layoutX="53.0" layoutY="179.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
-                  <Pane layoutX="53.0" layoutY="113.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
-                  <Label layoutX="26.0" layoutY="29.0" text="Movimentações do dia">
-                     <font>
-                        <Font name="System Bold" size="31.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="26.0" layoutY="65.0" text="Histórico de Entradas e Saídas">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                  </Label>
-                  <Pane layoutX="67.0" layoutY="125.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #E3F0DF; -fx-background-radius: 20px;">
-                     <children>
-                        <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@/assets/imgs/graficoverde.png" />
-                           </image>
+                <Pane fx:id="paneStatusCaixa" layoutX="14.0" layoutY="125.0" prefHeight="80.0" prefWidth="1011.0" style="-fx-border-color: #009A05; -fx-background-radius: 8px; -fx-border-radius: 8px;" stylesheets="@/css/style.css">
+                    <children>
+                        <ImageView fx:id="imgCadeadoStatus" fitHeight="35.0" fitWidth="40.0" layoutX="31.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/cadeado2.png" />
+                            </image>
                         </ImageView>
-                     </children>
-                  </Pane>
-                  <Pane layoutX="67.0" layoutY="259.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #E3F0DF; -fx-background-radius: 20px;">
-                     <children>
-                        <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@/assets/imgs/graficoverde.png" />
-                           </image>
+                        <Label fx:id="lblCaixaStatus" layoutX="79.0" layoutY="8.0" text="Caixa Aberto">
+                            <font>
+                                <Font name="System Bold" size="36.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblDescricaoStatus" layoutX="31.0" layoutY="51.0" text="O caixa está operando normalmente">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </Pane>
+                <Pane layoutX="14.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
+                    <children>
+                        <Label layoutX="25.0" layoutY="14.0" text="Total Entradas">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblTotalEntradas" layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #009A05;" text="R$ 0,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="25.0" layoutY="100.0" text="Hoje">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/graficoverde.png" />
+                            </image>
                         </ImageView>
-                     </children>
-                  </Pane>
-                  <Pane layoutX="67.0" layoutY="191.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #FFE0E0; -fx-background-radius: 20px;">
-                     <children>
-                        <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@/assets/imgs/graficovermelho.png" />
-                           </image>
+                    </children>
+                </Pane>
+                <Pane layoutX="360.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
+                    <children>
+                        <Label layoutX="25.0" layoutY="14.0" text="Total Saídas">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblTotalSaidas" layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #F42A2A;" text="R$ 0,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="25.0" layoutY="100.0" text="Hoje">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/graficovermelho.png" />
+                            </image>
                         </ImageView>
-                     </children>
-                  </Pane>
-                  <Label layoutX="111.0" layoutY="117.0" text="Venda #001">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="111.0" layoutY="135.0" opacity="0.5" text="14:32">
-                     <font>
-                        <Font size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="111.0" layoutY="184.0" text="Troco">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="111.0" layoutY="202.0" opacity="0.5" text="14:00">
-                     <font>
-                        <Font size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="108.0" layoutY="251.0" text="Venda #002">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="111.0" layoutY="268.0" opacity="0.5" text="14:32">
-                     <font>
-                        <Font size="17.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="848.0" layoutY="122.0" style="-fx-text-fill: #009A05;" text="+R$ 34,50">
-                     <font>
-                        <Font name="System Bold" size="28.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="848.0" layoutY="258.0" style="-fx-text-fill: #009A05;" text="+R$ 34,50">
-                     <font>
-                        <Font name="System Bold" size="28.0" />
-                     </font>
-                  </Label>
-                  <Label layoutX="852.0" layoutY="189.0" style="-fx-text-fill: #E02525;" text="-R$ 25,00">
-                     <font>
-                        <Font name="System Bold" size="28.0" />
-                     </font>
-                  </Label>
-               </children>
-            </Pane>
-
+                    </children>
+                </Pane>
+                <Pane layoutX="707.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
+                    <children>
+                        <Label layoutX="25.0" layoutY="14.0" text="Saldo Atual">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblSaldo" layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #2A6DF4;" text="R$ 0,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="25.0" layoutY="100.0" text="No Caixa">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/moneyazul.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </Pane>
+                <Pane layoutX="14.0" layoutY="386.0" prefHeight="320.0" prefWidth="1011.0" styleClass="card-produtos">
+                    <children>
+                        <Pane layoutX="53.0" layoutY="246.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
+                        <Pane layoutX="53.0" layoutY="179.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
+                        <Pane layoutX="53.0" layoutY="113.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
+                        <Label layoutX="26.0" layoutY="29.0" text="Movimentações do dia">
+                            <font>
+                                <Font name="System Bold" size="31.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="26.0" layoutY="65.0" text="Histórico de Entradas e Saídas">
+                            <font>
+                                <Font size="20.0" />
+                            </font>
+                        </Label>
+                        <Pane layoutX="67.0" layoutY="125.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #E3F0DF; -fx-background-radius: 20px;">
+                            <children>
+                                <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/assets/imgs/graficoverde.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Pane layoutX="67.0" layoutY="259.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #E3F0DF; -fx-background-radius: 20px;">
+                            <children>
+                                <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/assets/imgs/graficoverde.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Pane layoutX="67.0" layoutY="191.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #FFE0E0; -fx-background-radius: 20px;">
+                            <children>
+                                <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/assets/imgs/graficovermelho.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label layoutX="111.0" layoutY="117.0" text="Venda #001">
+                            <font>
+                                <Font name="System Bold" size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="135.0" opacity="0.5" text="14:32">
+                            <font>
+                                <Font size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="184.0" text="Troco">
+                            <font>
+                                <Font name="System Bold" size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="202.0" opacity="0.5" text="14:00">
+                            <font>
+                                <Font size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="108.0" layoutY="251.0" text="Venda #002">
+                            <font>
+                                <Font name="System Bold" size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="268.0" opacity="0.5" text="14:32">
+                            <font>
+                                <Font size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="848.0" layoutY="122.0" style="-fx-text-fill: #009A05;" text="+R$ 34,50">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="848.0" layoutY="258.0" style="-fx-text-fill: #009A05;" text="+R$ 34,50">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="852.0" layoutY="189.0" style="-fx-text-fill: #E02525;" text="-R$ 25,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </Pane>
             </children>
         </Pane>
 

@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.Cursor?>
 
-<AnchorPane prefHeight="300.0" prefWidth="400.0"
-            style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);"
-            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.pdv_galeteria.controller.PopupAberturaCaixaController">
+<AnchorPane prefHeight="300.0" prefWidth="400.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.PopupAberturaCaixaController">
     <children>
         <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
             <children>
@@ -25,7 +22,7 @@
                 </Label>
 
                 <!-- Descrição -->
-                <Label text="Informe o valor inicial em dinheiro no caixa" textAlignment="CENTER" wrapText="true" maxWidth="350.0">
+                <Label maxWidth="350.0" text="Informe o valor inicial em dinheiro no caixa" textAlignment="CENTER" wrapText="true">
                     <font>
                         <Font size="14.0" />
                     </font>
@@ -35,16 +32,16 @@
                 </Label>
 
                 <!-- Seção Valor Inicial -->
-                <VBox alignment="CENTER_LEFT" spacing="5.0" maxWidth="350.0">
+                <VBox alignment="CENTER_LEFT" maxWidth="350.0" spacing="5.0">
                     <children>
-                        <Label text="Valor Inicial (R$)" textAlignment="LEFT">
+                        <Label text="Valor Inicial (R$)" textAlignment="LEFT"> <!-- CORRIGIDO: "Valor Final" para "Valor Inicial" -->
                             <font>
                                 <Font name="System Bold" size="14.0" />
                             </font>
                         </Label>
 
                         <!-- Campo de valor -->
-                        <TextField fx:id="txtValorInicialPopup" promptText="0,00" style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #cccccc; -fx-padding: 8 12;" prefHeight="40.0" prefWidth="350.0">
+                        <TextField fx:id="txtValorInicialPopup" prefHeight="40.0" prefWidth="350.0" promptText="0,00" style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #cccccc; -fx-padding: 8 12;">
                             <font>
                                 <Font size="16.0" />
                             </font>
@@ -59,7 +56,7 @@
                 <Line endX="360.0" stroke="#eeeeee" strokeWidth="1.0" />
 
                 <!-- Botão Confirmar -->
-                <Button fx:id="btnConfirmarAbertura" mnemonicParsing="false" onAction="#confirmarAbertura" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #007bff; -fx-background-radius: 8; -fx-text-fill: white;" text="Confirmar Abertura">
+                <Button fx:id="btnConfirmarAbertura" mnemonicParsing="false" onAction="#confirmarAbertura" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #f68411; -fx-background-radius: 8; -fx-text-fill: white;" text="Confirmar Abertura"> <!-- CORRIGIDO: "Confirmar Fechamento" para "Confirmar Abertura" -->
                     <font>
                         <Font name="System Bold" size="14.0" />
                     </font>
@@ -81,6 +78,6 @@
         </VBox>
     </children>
     <padding>
-        <Insets top="20.0" bottom="20.0" />
+        <Insets bottom="20.0" top="20.0" />
     </padding>
 </AnchorPane>
