@@ -13,7 +13,6 @@ public class VendaEmLote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Ex: WhatsApp, iFood, Site etc.
     private String origem;
 
     private LocalDateTime criadoEm = LocalDateTime.now();
@@ -33,7 +32,6 @@ public class VendaEmLote {
         this.origem = origem;
     }
 
-    // ---------------- Métodos ----------------
     public void addItem(ItemPedido item) {
         item.setVendaEmLote(this);
         itens.add(item);
@@ -52,7 +50,6 @@ public class VendaEmLote {
                 .sum();
     }
 
-    // ---------------- Getters / Setters ----------------
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

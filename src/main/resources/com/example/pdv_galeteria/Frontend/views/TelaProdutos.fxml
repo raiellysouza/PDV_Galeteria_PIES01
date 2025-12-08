@@ -37,7 +37,6 @@
                     </cursor>
                 </TextField>
 
-                <!-- Botão Novo Produto -->
                 <Button layoutX="576.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirCadastroProduto" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Produto" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="16.0" />
@@ -47,7 +46,6 @@
                     </cursor>
                 </Button>
 
-                <!-- Botão Novo Combo -->
                 <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirTelaCombo" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Combo" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="16.0" />
@@ -74,14 +72,12 @@
                     </image>
                 </ImageView>
 
-                <!-- SEÇÃO PRODUTOS -->
                 <Label layoutX="19.0" layoutY="180.0" text="Produtos">
                     <font>
                         <Font name="System Bold" size="35.0" />
                     </font>
                 </Label>
 
-                <!-- SCROLL VERTICAL PARA PRODUTOS - 2 CARDS POR LINHA -->
                 <ScrollPane layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0"
                             style="-fx-background-color: transparent; -fx-border-color: transparent;"
                             hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
@@ -92,14 +88,12 @@
                     </content>
                 </ScrollPane>
 
-                <!-- SEÇÃO COMBOS -->
                 <Label layoutX="24.0" layoutY="449.0" text="Combos">
                     <font>
                         <Font name="System Bold" size="35.0" />
                     </font>
                 </Label>
 
-                <!-- SCROLL VERTICAL PARA COMBOS - 2 CARDS POR LINHA -->
                 <ScrollPane layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0"
                             style="-fx-background-color: transparent; -fx-border-color: transparent;"
                             hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
@@ -113,7 +107,6 @@
             </children>
         </Pane>
 
-        <!-- Menu Lateral -->
         <ImageView fitHeight="93.0" fitWidth="113.0" layoutX="99.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
@@ -131,7 +124,6 @@
 
         <Separator layoutX="-12.0" layoutY="115.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Dashboard -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="121.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Dashboard" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -147,7 +139,6 @@
             </image>
         </ImageView>
 
-        <!-- Vendas -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="181.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaVendas" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Vendas     " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -163,7 +154,6 @@
             </image>
         </ImageView>
 
-        <!-- Estoque -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="241.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Estoque    " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -179,7 +169,6 @@
             </image>
         </ImageView>
 
-        <!-- Caixa -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -195,7 +184,6 @@
             </image>
         </ImageView>
 
-        <!-- Entregadores -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -211,7 +199,6 @@
             </image>
         </ImageView>
 
-        <!-- Relatórios -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="421.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Relatórios  " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -227,7 +214,6 @@
             </image>
         </ImageView>
 
-        <!-- Configurações -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="481.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="     Configurações" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -245,7 +231,6 @@
 
         <Separator layoutX="-1.0" layoutY="540.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Sair -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="553.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#sairParaLogin" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Sair            " textFill="WHITE">
             <font>
                 <Font size="27.0" />
