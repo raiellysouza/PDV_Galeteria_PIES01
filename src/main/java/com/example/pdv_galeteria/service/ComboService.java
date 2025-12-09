@@ -43,11 +43,10 @@ public class ComboService {
 
     @Transactional
     public Combo salvarCombo(Combo novoCombo) {
-        System.out.println("MÉTODO salvarCombo INICIADO");
+        System.out.println("Método salvarCombo iniciado");
 
         try {
             if (novoCombo == null) {
-                System.err.println("COMBO É NULO!");
                 System.err.println("Combo é nulo!");
                 throw new IllegalArgumentException("Combo não pode ser nulo");
             }
@@ -63,7 +62,6 @@ public class ComboService {
             }
 
             if (novoCombo.getNome() == null || novoCombo.getNome().trim().isEmpty()) {
-                System.err.println("NOME DO COMBO É NULO OU VAZIO!");
                 System.err.println("Nome do combo é nulo ou vazio!");
                 throw new IllegalArgumentException("Nome do combo é obrigatório");
             }
@@ -91,11 +89,11 @@ public class ComboService {
 
             Combo salvado = comboRepository.save(novoCombo);
 
-            System.out.println("COMBO SALVO COM SUCESSO! ID: " + salvado.getId());
+            System.out.println("Combo salvo com sucesso! ID: " + salvado.getId());
             return salvado;
 
         } catch (Exception e) {
-            System.err.println("ERRO NO salvarCombo:");
+            System.err.println("Erro no salvarCombo:");
             e.printStackTrace();
             throw e;
         }
