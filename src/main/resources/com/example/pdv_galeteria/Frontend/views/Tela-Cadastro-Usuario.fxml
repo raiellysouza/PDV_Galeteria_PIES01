@@ -9,12 +9,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="650.0" prefWidth="900.0" style="-fx-background-color: #6D0C0C;" stylesheets="@teste.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="650.0" prefWidth="900.0" style="-fx-background-color: #6D0C0C;" stylesheets="@/css/teste.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       
       <ImageView fitHeight="92.0" fitWidth="95.0" layoutX="405.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@logogaleteria.png" />
+            <Image url="@/assets/imgs/logo-pdv.jpg" />
          </image>
       </ImageView>
 
