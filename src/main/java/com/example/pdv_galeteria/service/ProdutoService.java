@@ -1,5 +1,6 @@
 package com.example.pdv_galeteria.service;
 
+import com.example.pdv_galeteria.dto.EntradaEstoqueRequest;
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,16 @@ public class ProdutoService {
     }
 
     public Produto salvar(Produto produto) {
-        return produtoRepository.save(produto);
+        
+        Produto salvo = produtoRepository.save(produto);
+
+        EntradaEstoqueRequest entrada = new EntradaEstoqueRequest();
+        entrada.setProdutoId(salvo.getId());
+        entrada.setQuantidade(salvo.getQuantidade());
+
+        estoqueEntradaService.registrarEntrada(entrada);
+
+        return salvo;
     }
 
     public Optional<Produto> buscarPorId(Long id) {
