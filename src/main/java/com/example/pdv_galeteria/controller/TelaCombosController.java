@@ -55,13 +55,11 @@ public class TelaCombosController {
     @FXML private TextArea produtosTextArea;
     @FXML private FlowPane comboContainer;
 
-    // Lista temporária para armazenar os produtos do combo
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
 
     @FXML
     public void initialize() {
-        // será chamado automaticamente se o FXML for carregado normalmente
         carregarCombos();
     }
 
@@ -79,15 +77,15 @@ public class TelaCombosController {
     public void carregarCombos() {
         try {
             if (combosContainer == null) {
-                System.out.println("❌ combosContainer não configurado!");
+                System.out.println("combosContainer não configurado!");
                 return;
             }
 
-            System.out.println("🔄 Carregando combos no VBox...");
+            System.out.println("Carregando combos no VBox...");
             combosContainer.getChildren().clear();
             List<Combo> combos = comboService.buscarTodosCombos();
 
-            System.out.println("📊 Combos encontrados: " + (combos != null ? combos.size() : 0));
+            System.out.println("Combos encontrados: " + (combos != null ? combos.size() : 0));
 
             if (combos == null || combos.isEmpty()) {
                 Label vazio = new Label("Nenhum combo cadastrado");
@@ -101,7 +99,7 @@ public class TelaCombosController {
                 combosContainer.getChildren().add(card);
             }
 
-            System.out.println("✅ Cards criados: " + combosContainer.getChildren().size());
+            System.out.println("Cards criados: " + combosContainer.getChildren().size());
         } catch (Exception e) {
             e.printStackTrace();
             if (combosContainer != null) {
@@ -203,9 +201,6 @@ public Pane criarCardCombo(Combo combo) {
     }
 }
 
-    /**
-     * Abre a tela de cadastro de combos
-     */
     @FXML
     public void abrirTelaCombo() {
         try {
@@ -261,9 +256,6 @@ public Pane criarCardCombo(Combo combo) {
         }
     }
 
-    /**
-     * Salva o combo no banco de dados
-     */
     @FXML
     private void salvarCombo() {
         try {
@@ -278,12 +270,11 @@ public Pane criarCardCombo(Combo combo) {
             BigDecimal preco = new BigDecimal(precoStr.replace(",", "."));
             Combo combo = new Combo();
             combo.setNome(nomeCombo);
-            combo.setPrecoTotal(preco.doubleValue()); // ou use BigDecimal se seu modelo aceitar
+            combo.setPrecoTotal(preco.doubleValue());
             combo.setItensDoCombo(itensDoCombo);
             comboService.salvarCombo(combo);
             mostrarAlerta("Sucesso", "Combo salvo com sucesso!", Alert.AlertType.INFORMATION);
 
-            // Limpa todos os campos e a lista
             nomeComboField.clear();
             precoComboField.clear();
             produtosTextArea.clear();
@@ -296,9 +287,6 @@ public Pane criarCardCombo(Combo combo) {
         carregarCombos();
     }
 
-    /**
-     * Atualiza o campo de texto com a lista de produtos adicionados
-     */
     private void atualizarListaDeProdutos() {
         StringBuilder sb = new StringBuilder();
         for (ComboItem item : itensDoCombo) {
@@ -309,9 +297,6 @@ public Pane criarCardCombo(Combo combo) {
         produtosTextArea.setText(sb.toString());
     }
 
-    /**
-     * Exibe alertas simples na tela
-     */
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);

@@ -35,9 +35,6 @@ public class EditarCombosController {
     private Combo comboAtual;
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
-    /**
-     * Recebe o combo que será editado
-     */
     public void setCombo(Combo combo) {
         this.comboAtual = combo;
         carregarDadosCombo();
