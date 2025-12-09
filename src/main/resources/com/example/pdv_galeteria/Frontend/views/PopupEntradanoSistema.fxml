@@ -15,7 +15,7 @@
       </Label>
       <ImageView fitHeight="31.0" fitWidth="40.0" layoutX="14.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@check.png" />
+            <Image url="@/assets/imgs/check.png" />
          </image>
       </ImageView>
    </children>

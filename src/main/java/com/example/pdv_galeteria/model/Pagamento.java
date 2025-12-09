@@ -1,3 +1,4 @@
+/**
 package com.example.pdv_galeteria.model;
 
 import java.math.BigDecimal;
@@ -21,3 +22,4 @@ public class PaymentResult {
     public BigDecimal getChange() { return change; }
     public Map<String, Integer> getBreakdown() { return breakdown; }
 }
+**/

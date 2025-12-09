@@ -1,3 +1,4 @@
+/**
 package com.example.pdv_galeteria.service;
 
 import com.example.pdv_galeteria.model.PaymentResult;
@@ -56,3 +57,4 @@ public class ChangeCalculator {
         return new PaymentResult(totalDue, paid, change, breakdown);
     }
 }
+**/

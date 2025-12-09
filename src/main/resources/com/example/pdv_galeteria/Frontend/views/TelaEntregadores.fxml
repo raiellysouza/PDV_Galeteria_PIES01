@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.EntregadorController">
    <content>
       <VBox prefHeight="646.0" prefWidth="947.0" spacing="30.0" style="-fx-background-color: #F9FAFB;">
          <padding>
@@ -36,7 +36,7 @@
                      </children>
                   </VBox>
                   <Region HBox.hgrow="ALWAYS" />
-                  <Button style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="+ Novo Entregador">
+                  <Button onAction="#abrirPopupCadastro" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="+ Novo Entregador">
                     
                   </Button>
                </children>
@@ -204,7 +204,7 @@
                                  </font>
                               </Label>
 
-                              <Button style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;" text="Desativar" textFill="#374151">
+                              <Button onAction="#desativarEntregador" style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;" text="Desativar" textFill="#374151">
                                  <padding>
                                     <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
                                  </padding>

@@ -54,20 +54,29 @@ public class EntregadorController implements Initializable {
         colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        tableView.setItems(entregadoresList);
-
-        tableView.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSelection, newSelection) -> {
-                    if (newSelection != null) {
+        tableView.setRowFactory(tv -> new TableRow<Entregador>() {
+            @Override
+            protected void updateItem(Entregador entregador, boolean empty) {
+                super.updateItem(entregador, empty);
+                if (entregador == null || empty) {
+                    setStyle("");
+                } else {
+                    if (entregador.getStatus() == StatusEntregador.INATIVO) {
+                        setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
+                    } else {
+                        setStyle("");
                     }
                 }
-        );
-    }
+            }
+        });
 
+        tableView.setItems(entregadoresList);
+    }
     private void carregarEntregadores() {
         try {
             entregadoresList.clear();
             entregadoresList.addAll(entregadorService.listarTodos());
+
         } catch (Exception e) {
             mostrarAlerta(Alert.AlertType.ERROR, "Erro",
                     "Erro ao carregar entregadores: " + e.getMessage());
@@ -171,7 +180,7 @@ public class EntregadorController implements Initializable {
     private void abrirPopup(Entregador entregadorParaEditar) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupCadastroEntregador.fxml")
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCadastroEntregadores.fxml")
             );
 
             loader.setController(this);
@@ -407,5 +416,42 @@ public class EntregadorController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void desativarEntregador() {
+        Entregador selecionado = tableView.getSelectionModel().getSelectedItem();
+        if (selecionado == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
+                    "Selecione um entregador para desativar.");
+            return;
+        }
+
+        if (selecionado.getStatus() == StatusEntregador.INATIVO) {
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Informação",
+                    "Este entregador já está desativado.");
+            return;
+        }
+
+        Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacao.setTitle("Confirmar Desativação");
+        confirmacao.setHeaderText("Desativar Entregador");
+        confirmacao.setContentText("Tem certeza que deseja desativar o entregador " +
+                selecionado.getNomeCompleto() + "?\n\n" +
+                "Observação: Entregadores desativados não poderão ser atribuídos a novas entregas.");
+
+        confirmacao.showAndWait().ifPresent(resposta -> {
+            if (resposta == ButtonType.OK) {
+                try {
+                    entregadorService.atualizarStatus(selecionado.getId(), StatusEntregador.INATIVO);
+                    mostrarAlerta(Alert.AlertType.INFORMATION, "Sucesso",
+                            "Entregador desativado com sucesso!");
+                    carregarEntregadores();
+                } catch (Exception e) {
+                    mostrarAlerta(Alert.AlertType.ERROR, "Erro",
+                            "Erro ao desativar entregador: " + e.getMessage());
+                }
+            }
+        });
     }
 }
