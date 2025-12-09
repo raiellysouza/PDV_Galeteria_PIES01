@@ -1006,4 +1006,34 @@ public class TelaProdutosController implements Initializable {
             mostrarMensagemErro("Erro ao abrir tela do caixa: " + e.getMessage());
         }
     }
+
+    @FXML
+    private void abrirTelaEntregadores() {
+        try {
+            Stage stage = (Stage) campoBusca.getScene().getWindow(); // Use qualquer componente @FXML
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml")
+            );
+
+            if (com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(
+                        com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext()::getBean
+                );
+            }
+
+            Parent root = loader.load();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Entregadores");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText(null);
+            alert.setContentText("Erro ao abrir tela de entregadores: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
 }

@@ -2,9 +2,8 @@ package com.example.pdv_galeteria.model;
 
 public enum StatusEntregador {
     DISPONIVEL("Disponível"),
-    EM_ENTREGA("Em entrega"),
-    AUSENTE("Ausente"),
-    DESLIGADO("Desligado");
+    EM_ENTREGA("Em Entrega"),
+    INATIVO("Inativo");
 
     private final String descricao;
 

@@ -181,7 +181,7 @@
         </ImageView>
 
         <!-- Entregadores -->
-        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEntregadores" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>

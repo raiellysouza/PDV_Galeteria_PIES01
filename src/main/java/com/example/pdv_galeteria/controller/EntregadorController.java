@@ -454,4 +454,19 @@ public class EntregadorController implements Initializable {
             }
         });
     }
+
+    @FXML
+    private void abrirTelaRelatorios() {
+        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaRelatorios.fxml", "Relatórios");
+    }
+
+    @FXML
+    private void abrirTelaConfiguracao() {
+        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml", "Configurações");
+    }
+
+    @FXML
+    private void abrirTelaDashboard() {
+        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaDashboard.fxml", "Dashboard");
+    }
 }
