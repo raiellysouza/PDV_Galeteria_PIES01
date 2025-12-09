@@ -8,16 +8,20 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -33,6 +37,11 @@ public class EntregadorController implements Initializable {
     @FXML private TableColumn<Entregador, String> colTelefone;
     @FXML private TableColumn<Entregador, String> colStatus;
     @FXML private TextField txtBusca;
+    @FXML private Button btnNovoEntregador;
+    @FXML private Label labelTotalEntregadores;
+    @FXML private Label labelAtivosHoje;
+    @FXML private Label labelEntregasHoje;
+    @FXML private VBox containerEntregadores;
 
     @FXML private TextField txtNomeCompletoPopup;
     @FXML private TextField txtTelefonePopup;
@@ -468,5 +477,27 @@ public class EntregadorController implements Initializable {
     @FXML
     private void abrirTelaDashboard() {
         navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaDashboard.fxml", "Dashboard");
+    }
+
+    private void carregarEntregadoresNoContainer() {
+        try {
+            containerEntregadores.getChildren().clear();
+            List<Entregador> entregadores = entregadorService.listarTodos();
+
+            for (Entregador entregador : entregadores) {
+                HBox cardEntregador = criarCardEntregador(entregador);
+                containerEntregadores.getChildren().add(cardEntregador);
+            }
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Erro ao carregar entregadores: " + e.getMessage());
+        }
+    }
+
+    private HBox criarCardEntregador(Entregador entregador) {
+        HBox card = new HBox(15);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setStyle("-fx-background-color: #F8FAFC; -fx-background-radius: 8; -fx-padding: 15;");
+
+        return card;
     }
 }
