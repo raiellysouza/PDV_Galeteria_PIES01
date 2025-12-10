@@ -206,3 +206,13 @@
 .semBorda {
     -fx-border:none;
 }
+
+.infoCaixaAberto {
+    -fx-border-color: 009A05;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 2);
+}
+
+

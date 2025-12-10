@@ -8,7 +8,7 @@ public class PaymentResult {
     private final BigDecimal totalDue;
     private final BigDecimal paid;
     private final BigDecimal change;
-    private final Map<String, Integer> breakdown; // ex: "100.00" -> 1, "0.50" -> 2
+    private final Map<String, Integer> breakdown;
 
     public PaymentResult(BigDecimal totalDue, BigDecimal paid, BigDecimal change, Map<String, Integer> breakdown) {
         this.totalDue = totalDue;

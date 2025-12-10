@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="com.example.pdv_galeteria.controller.TelaRegistroPedidoController">
+<AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.TelaRegistroPedidoController">
     <children>
         <Pane layoutX="283.0" layoutY="-26.0" prefHeight="730.0" prefWidth="1084.0" style="-fx-background-color: white;">
             <children>
@@ -208,7 +208,7 @@
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
                                 </ImageView>
-                                <Label layoutX="172.0" layoutY="7.0" text="1">
+                                <Label layoutX="172.0" layoutY="7.0" style="-fx-font-size: 25px; -fx-font-weight: bold;" text="1">
                                     <font>
                                         <Font name="System Bold" size="25.0" />
                                     </font>
@@ -239,7 +239,7 @@
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
                                 </ImageView>
-                                <Label layoutX="172.0" layoutY="7.0" text="1">
+                                <Label layoutX="172.0" layoutY="7.0" style="-fx-font-size: 25px; -fx-font-weight: bold;" text="1">
                                     <font>
                                         <Font name="System Bold" size="25.0" />
                                     </font>
@@ -272,7 +272,7 @@
                                 </ImageView>
                                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="200.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@/assets/imgs/menos.png" />
+                                        <Image url="@/assets/imgs/maisp.png" />
                                     </image>
                                     <cursor>
                                         <Cursor fx:constant="HAND" />
@@ -286,7 +286,7 @@
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
                                 </ImageView>
-                                <Label layoutX="172.0" layoutY="7.0" text="1">
+                                <Label layoutX="172.0" layoutY="7.0" style="-fx-font-size: 25px; -fx-font-weight: bold;" text="1">
                                     <font>
                                         <Font name="System Bold" size="25.0" />
                                     </font>
@@ -325,7 +325,7 @@
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
                                 </ImageView>
-                                <Label layoutX="172.0" layoutY="7.0" text="1">
+                                <Label layoutX="172.0" layoutY="7.0" style="-fx-font-size: 25px; -fx-font-weight: bold;" text="1">
                                     <font>
                                         <Font name="System Bold" size="25.0" />
                                     </font>
@@ -398,7 +398,7 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
-        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAbrirTelaCaixa" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -406,7 +406,7 @@
                 <Cursor fx:constant="HAND" />
             </cursor>
         </Button>
-        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEntregadores" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>

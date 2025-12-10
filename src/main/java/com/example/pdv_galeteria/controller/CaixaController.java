@@ -7,7 +7,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -749,35 +747,6 @@ public class CaixaController implements Initializable {
         } catch (Exception e) {
             System.err.println("Erro fatal ao carregar imagem: " + e.getMessage());
             e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void abrirTelaEntregadores() {
-        try {
-            Stage stageAtual = (Stage) javafx.stage.Window.getWindows().stream()
-                    .filter(window -> window instanceof Stage && window.isShowing())
-                    .findFirst()
-                    .orElse(null);
-
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml")
-            );
-
-            if (com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(
-                        com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext()::getBean
-                );
-            }
-
-            Parent root = loader.load();
-
-            stageAtual.setScene(new Scene(root));
-            stageAtual.setTitle("Entregadores");
-            stageAtual.centerOnScreen();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

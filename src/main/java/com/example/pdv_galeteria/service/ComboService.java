@@ -35,9 +35,15 @@ public class ComboService {
         this.produtoRepository = produtoRepository;
     }
 
+    /**
+     * Salva um novo Combo no banco de dados.
+     * @param novoCombo
+     * @return
+     */
+
     @Transactional
     public Combo salvarCombo(Combo novoCombo) {
-        System.out.println("Método salvar combo iniciado!");
+        System.out.println("Método salvarCombo iniciado");
 
         try {
             if (novoCombo == null) {
@@ -83,11 +89,11 @@ public class ComboService {
 
             Combo salvado = comboRepository.save(novoCombo);
 
-            System.out.println("COMBO SALVO COM SUCESSO! ID: " + salvado.getId());
+            System.out.println("Combo salvo com sucesso! ID: " + salvado.getId());
             return salvado;
 
         } catch (Exception e) {
-            System.err.println("ERRO NO salvarCombo:");
+            System.err.println("Erro no salvarCombo:");
             e.printStackTrace();
             throw e;
         }
@@ -112,6 +118,11 @@ public List<Combo> buscarTodosCombos() {
         return comboRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Combo não encontrado com ID: " + id));
     }
+
+    /**
+     * Deleta um Combo por ID.
+     * @param id 
+     */
 
     @Transactional
     public void deletarCombo(Long id) {

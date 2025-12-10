@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class ChangeCalculator {
 
-    // moedas / notas em reais (ordem decrescente para breakdown)
     private static final BigDecimal[] DENOMINATIONS = new BigDecimal[] {
         new BigDecimal("100.00"),
         new BigDecimal("50.00"),
