@@ -215,4 +215,198 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 2);
 }
 
+.card-produtos {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
+    -fx-padding: 16;
+    -fx-pref-width: 330;
+    -fx-pref-height: 530;
+}
+
+.card-produtos:hover {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #f68411;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.2), 8, 0, 0, 2);
+}
+
+.card-produtos .nome-produto {
+    -fx-font-weight: bold;
+    -fx-font-size: 21px;
+    -fx-text-fill: #111827;
+}
+
+.card-produtos .categoria-tag {
+    -fx-background-color: #f3f4f6;
+    -fx-background-radius: 20;
+    -fx-padding: 4 12;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: #374151;
+}
+
+.card-produtos .preco {
+    -fx-font-weight: bold;
+    -fx-font-size: 28px;
+    -fx-text-fill: #2a6df4;
+}
+
+.card-produtos .btn-adicionar {
+    -fx-background-color: #f97316;
+    -fx-border-color: #ea580c;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+
+.card-produtos .btn-adicionar:hover {
+    -fx-background-color: #ea580c;
+    -fx-border-color: #c2410c;
+}
+
+.item-carrinho {
+    -fx-background-color: #f3f4f6;
+    -fx-background-radius: 8;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-padding: 10;
+    -fx-pref-width: 267;
+    -fx-pref-height: 50;
+}
+
+.item-carrinho .nome-produto {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #111827;
+}
+
+.item-carrinho .detalhes {
+    -fx-opacity: 0.7;
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+.item-carrinho .quantidade {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.btn-carrinho {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-carrinho .icon {
+    -fx-fit-width: 20;
+    -fx-fit-height: 20;
+}
+
+.btn-carrinho:hover {
+    -fx-opacity: 0.8;
+}
+
+.carrinho-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);
+}
+
+.carrinho-container .titulo {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+    -fx-padding: 0 0 16 0;
+}
+
+.carrinho-container .total {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2a6df4;
+    -fx-padding: 16 0 0 0;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1 0 0 0;
+}
+
+.btn-registrar-pedido {
+    -fx-background-color: #10b981;
+    -fx-border-color: #059669;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+    -fx-pref-width: 267;
+}
+
+.btn-registrar-pedido:hover {
+    -fx-background-color: #059669;
+    -fx-border-color: #047857;
+}
+
+.campo-busca {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-padding: 10 12;
+    -fx-font-size: 14px;
+    -fx-pref-width: 267;
+}
+
+.campo-busca:focused {
+    -fx-border-color: #3b82f6;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.2), 4, 0, 0, 0);
+}
+
+.produtos-container {
+    -fx-background-color: transparent;
+    -fx-hgap: 20;
+    -fx-vgap: 20;
+    -fx-padding: 20;
+}
+
+.sidebar {
+    -fx-background-color: #1f2937;
+    -fx-padding: 20;
+    -fx-spacing: 8;
+}
+
+.sidebar .menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d1d5db;
+    -fx-font-size: 14px;
+    -fx-padding: 10 16;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+}
+
+.sidebar .menu-item:hover {
+    -fx-background-color: #374151;
+    -fx-text-fill: white;
+}
+
+.sidebar .menu-item.active {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+}
+
 
