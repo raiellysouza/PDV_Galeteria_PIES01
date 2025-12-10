@@ -2,6 +2,7 @@ package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.model.Caixa;
 import com.example.pdv_galeteria.model.MovimentoCaixa;
+import com.example.pdv_galeteria.model.StatusCaixa;
 import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import javafx.application.Platform;
@@ -27,7 +28,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import com.example.pdv_galeteria.model.StatusCaixa;
 
 @Component
 public class CaixaController implements Initializable {
@@ -68,10 +68,6 @@ public class CaixaController implements Initializable {
     @FXML
     private Label lblDescricaoStatus;
 
-    public void setCaixaService(CaixaService caixaService) {
-        this.caixaService = caixaService;
-    }
-
     public CaixaController() {
         System.out.println("CaixaController instanciado!");
     }
@@ -79,6 +75,27 @@ public class CaixaController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("CaixaController.initialize() chamado");
+
+        if (caixaService == null) {
+            System.err.println("ERRO CRÍTICO: caixaService é nulo!");
+            System.err.println("Spring não injetou o CaixaService no controller!");
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                System.out.println("Tentando obter CaixaService do contexto Spring...");
+                try {
+                    caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
+                    if (caixaService != null) {
+                        System.out.println("CaixaService obtido do contexto Spring com sucesso!");
+                    } else {
+                        System.err.println("Não foi possível obter CaixaService do contexto Spring!");
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao obter CaixaService: " + e.getMessage());
+                }
+            }
+        } else {
+            System.out.println("CaixaService injetado com sucesso!");
+        }
 
         Platform.runLater(() -> {
             atualizarInterface();
@@ -89,7 +106,21 @@ public class CaixaController implements Initializable {
         System.out.println("atualizarInterface() chamado");
 
         try {
+            if (caixaService == null) {
+                System.err.println("ERRO: caixaService ainda é nulo! Verifique a injeção de dependências.");
+                btnAcaoCaixa.setText("Abrir Caixa");
+                lblCaixaStatus.setText("Nenhum Caixa Aberto");
+                lblDescricaoStatus.setText("Abra um caixa para começar");
+                lblTotalEntradas.setText("R$ 0,00");
+                lblTotalSaidas.setText("R$ 0,00");
+                lblSaldo.setText("R$ 0,00");
+                return;
+            }
+
             String statusTexto = caixaService.getStatusTextoBotao();
+            System.out.println("Texto do botão obtido do serviço: '" + statusTexto + "'");
+
+            statusTexto = statusTexto.trim();
             btnAcaoCaixa.setText(statusTexto);
 
             Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
@@ -154,6 +185,13 @@ public class CaixaController implements Initializable {
         } catch (Exception e) {
             System.err.println("Erro ao atualizar interface: " + e.getMessage());
             e.printStackTrace();
+
+            btnAcaoCaixa.setText("Abrir Caixa");
+            lblCaixaStatus.setText("Nenhum Caixa Aberto");
+            lblDescricaoStatus.setText("Abra um caixa para começar");
+            lblTotalEntradas.setText("R$ 0,00");
+            lblTotalSaidas.setText("R$ 0,00");
+            lblSaldo.setText("R$ 0,00");
         }
     }
 
@@ -382,8 +420,8 @@ public class CaixaController implements Initializable {
     @FXML
     private void handleAcaoCaixa() {
         try {
-            String acaoAtual = btnAcaoCaixa.getText();
-            System.out.println("Botão clicado: " + acaoAtual);
+            String acaoAtual = btnAcaoCaixa.getText().trim();
+            System.out.println("Botão clicado: '" + acaoAtual + "'");
 
             if (acaoAtual.equals("Abrir Caixa")) {
                 System.out.println("Abrindo popup de abertura...");
@@ -391,6 +429,8 @@ public class CaixaController implements Initializable {
             } else if (acaoAtual.equals("Fechar Caixa")) {
                 System.out.println("Abrindo popup de fechamento...");
                 abrirPopupFechamentoCaixa();
+            } else {
+                System.err.println("Ação não reconhecida: " + acaoAtual);
             }
 
         } catch (Exception e) {
@@ -518,7 +558,7 @@ public class CaixaController implements Initializable {
                     atualizarInterface();
 
                     mostrarSucesso("Caixa fechado com sucesso!\n" +
-                            "Valor final: R$ " + formatarValor(valorFinalDigitado));
+                            "Valor final: R$ " + formatarValor(caixaFechado.getValorFinal()));
 
                 } catch (Exception e) {
                     System.err.println("Erro ao fechar caixa: " + e.getMessage());
@@ -568,16 +608,57 @@ public class CaixaController implements Initializable {
             Optional<ButtonType> resultado = alert.showAndWait();
 
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                BigDecimal valorFinal = caixa.getSaldoAtual();
-                Caixa caixaFechado = caixaService.fecharCaixa(valorFinal);
-                mostrarSucesso("Caixa fechado com sucesso!\n" +
-                        "Valor final para retirada: R$ " + formatarValor(caixaFechado.getValorFinal()));
-                atualizarInterface();
+                TextInputDialog dialog = new TextInputDialog(caixa.getSaldoAtual().toString());
+                dialog.setTitle("Valor Final do Caixa");
+                dialog.setHeaderText("Informe o valor final para fechamento:");
+                dialog.setContentText("Valor final (R$):");
+
+                Optional<String> resultadoValor = dialog.showAndWait();
+                if (resultadoValor.isPresent() && !resultadoValor.get().isEmpty()) {
+                    try {
+                        BigDecimal valorFinal = new BigDecimal(resultadoValor.get());
+                        Caixa caixaFechado = caixaService.fecharCaixa(valorFinal);
+                        mostrarSucesso("Caixa fechado com sucesso!\n" +
+                                "Valor final para retirada: R$ " + formatarValor(caixaFechado.getValorFinal()));
+                        atualizarInterface();
+                    } catch (NumberFormatException e) {
+                        mostrarErro("Valor inválido! Digite um número válido.");
+                    }
+                }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             mostrarErro("Erro ao fechar caixa: " + e.getMessage());
+        }
+    }
+
+    private void abrirCaixa(BigDecimal valorInicial) {
+        try {
+            if (caixaService == null) {
+                throw new RuntimeException("Serviço de caixa não disponível");
+            }
+
+            if (valorInicial == null || valorInicial.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException("Valor inicial inválido");
+            }
+
+            Caixa caixaAberto = caixaService.abrirCaixa(valorInicial);
+
+            if (caixaAberto == null) {
+                throw new RuntimeException("Falha ao abrir caixa");
+            }
+
+            System.out.println("Caixa aberto com sucesso! ID: " + caixaAberto.getId());
+
+            atualizarInterface();
+
+            mostrarSucesso("Caixa aberto com sucesso!\n" +
+                    "Valor inicial: R$ " + formatarValor(valorInicial));
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir caixa: " + e.getMessage());
+            mostrarErro("Erro ao abrir caixa: " + e.getMessage());
         }
     }
 
@@ -667,35 +748,6 @@ public class CaixaController implements Initializable {
         }
     }
 
-    private void abrirCaixa(BigDecimal valorInicial) {
-        try {
-            if (caixaService == null) {
-                throw new RuntimeException("Serviço de caixa não disponível");
-            }
-
-            if (valorInicial == null || valorInicial.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new RuntimeException("Valor inicial inválido");
-            }
-
-            Caixa caixaAberto = caixaService.abrirCaixa(valorInicial);
-
-            if (caixaAberto == null) {
-                throw new RuntimeException("Falha ao abrir caixa");
-            }
-
-            System.out.println("Caixa aberto com sucesso! ID: " + caixaAberto.getId());
-
-            atualizarInterface();
-
-            mostrarSucesso("Caixa aberto com sucesso!\n" +
-                    "Valor inicial: R$ " + formatarValor(valorInicial));
-
-        } catch (Exception e) {
-            System.err.println("Erro ao abrir caixa: " + e.getMessage());
-            mostrarErro("Erro ao abrir caixa: " + e.getMessage());
-        }
-    }
-
     @FXML
     private void abrirTelaEntregadores() {
         try {
@@ -722,7 +774,6 @@ public class CaixaController implements Initializable {
 
             Stage stage = null;
 
-
             if (lblSaldo != null && lblSaldo.getScene() != null) {
                 stage = (Stage) lblSaldo.getScene().getWindow();
                 System.out.println("Usando campoBusca para obter stage");
@@ -739,25 +790,49 @@ public class CaixaController implements Initializable {
             System.err.println("=== ERRO AO ABRIR TELA ENTREGADORES ===");
             System.err.println("Mensagem: " + e.getMessage());
             e.printStackTrace();
-
         }
+    }
+
     public MovimentoCaixa registrarEntrada(BigDecimal valor, String descricao, String referenciaExterna) {
+        if (caixaService == null) {
+            throw new RuntimeException("Serviço de caixa não disponível");
+        }
         return caixaService.registrarEntrada(valor, descricao, referenciaExterna);
     }
 
     public MovimentoCaixa registrarSaida(BigDecimal valor, String descricao, String referenciaExterna) {
+        if (caixaService == null) {
+            throw new RuntimeException("Serviço de caixa não disponível");
+        }
         return caixaService.registrarSaida(valor, descricao, referenciaExterna);
     }
 
     public BigDecimal getSaldoAtualDoDia() {
+        if (caixaService == null) {
+            System.err.println("ERRO: caixaService é nulo ao obter saldo!");
+            return BigDecimal.ZERO;
+        }
         return caixaService.getSaldoAtualDoDia();
     }
 
     public BigDecimal getTotalEntradasDoDia() {
+        if (caixaService == null) {
+            System.err.println("ERRO: caixaService é nulo ao obter total de entradas!");
+            return BigDecimal.ZERO;
+        }
         return caixaService.getTotalEntradasDoDia();
     }
 
     public BigDecimal getTotalSaidasDoDia() {
+        if (caixaService == null) {
+            System.err.println("ERRO: caixaService é nulo ao obter total de saídas!");
+            return BigDecimal.ZERO;
+        }
         return caixaService.getTotalSaidasDoDia();
+    }
+
+    public void setCaixaService(CaixaService caixaService) {
+        System.out.println("setCaixaService() chamado: " + (caixaService != null ? "OK" : "NULL"));
+        this.caixaService = caixaService;
     }
 }

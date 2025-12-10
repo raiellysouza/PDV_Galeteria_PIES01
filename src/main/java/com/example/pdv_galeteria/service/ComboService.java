@@ -24,7 +24,7 @@ public class ComboService {
     private final ComboRepository comboRepository;
     private final ProdutoRepository produtoRepository;
 
-    
+
     @PersistenceContext
     private EntityManager entityManager;
     private Combo save;
@@ -98,22 +98,22 @@ public class ComboService {
             throw e;
         }
     }
-    
-    
-@Transactional(readOnly = true)
-public List<Combo> buscarTodosCombos() {
-    List<Combo> combos = comboRepository.findAll();
 
-    combos.forEach(combo -> {
-        if (combo.getItensDoCombo() != null) {
-            combo.getItensDoCombo().size();
-        }
-    });
 
-    return combos;
-}
-    
-    
+    @Transactional(readOnly = true)
+    public List<Combo> buscarTodosCombos() {
+        List<Combo> combos = comboRepository.findAll();
+
+        combos.forEach(combo -> {
+            if (combo.getItensDoCombo() != null) {
+                combo.getItensDoCombo().size();
+            }
+        });
+
+        return combos;
+    }
+
+
     public Combo buscarComboPorId(Long id) {
         return comboRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Combo não encontrado com ID: " + id));
@@ -121,32 +121,32 @@ public List<Combo> buscarTodosCombos() {
 
     /**
      * Deleta um Combo por ID.
-     * @param id 
+     * @param id
      */
 
     @Transactional
     public void deletarCombo(Long id) {
         Combo comboParaDeletar = comboRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Error, combo não encontrado com ID: " + id));
-        
+
         comboRepository.delete(comboParaDeletar);
     }
 
 
     @Transactional
-public Combo buscarPorIdComItens(Long id) {
-    Combo combo = entityManager.find(Combo.class, id);
-    if (combo != null) {
-        combo.getItensDoCombo().size();
+    public Combo buscarPorIdComItens(Long id) {
+        Combo combo = entityManager.find(Combo.class, id);
+        if (combo != null) {
+            combo.getItensDoCombo().size();
 
-        combo.getItensDoCombo().forEach(item -> {
-            if (item.getProduto() != null) {
-                item.getProduto().getNome();
-            }
-        });
+            combo.getItensDoCombo().forEach(item -> {
+                if (item.getProduto() != null) {
+                    item.getProduto().getNome();
+                }
+            });
+        }
+        return combo;
     }
-    return combo;
-}
 
     @Transactional(readOnly = true)
     public List<Combo> buscarCombosPorNome(String termoBusca) {

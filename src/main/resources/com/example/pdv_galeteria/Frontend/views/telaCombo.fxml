@@ -47,11 +47,12 @@
         <TextArea fx:id="quantidadeField" layoutX="14.0" layoutY="216.0" prefHeight="39.0" prefWidth="314.0" promptText="Quantidade" />
         <Label layoutX="14.0" layoutY="199.0" text="Quantidade:" />
 
-        <Pane layoutX="14.0" layoutY="273.0" prefHeight="122.0" prefWidth="564.0" style="-fx-border-color: #ccc; -fx-border-radius: 6; -fx-background-color: #fff;">
-            <children>
-                <VBox fx:id="produtosListContainer" prefWidth="564" prefHeight="122" spacing="8" style="-fx-background-color: #ffffff; -fx-padding: 8;" />
-            </children>
-        </Pane>      
+        <TextArea fx:id="produtosTextArea"
+                  layoutX="14.0" layoutY="273.0"
+                  prefHeight="122.0" prefWidth="564.0"
+                  editable="false" wrapText="true"
+                  style="-fx-border-color: #ccc; -fx-border-radius: 6; -fx-background-color: #fff;"
+                  promptText="Produtos adicionados aparecerão aqui..." />
         <Button layoutX="12.0" layoutY="415.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="564.0" style="-fx-background-color: orange;" text="Adicionar Combo" textFill="WHITE" onAction="#salvarCombo">
             <font>
                 <Font name="System Bold" size="14.0" />
