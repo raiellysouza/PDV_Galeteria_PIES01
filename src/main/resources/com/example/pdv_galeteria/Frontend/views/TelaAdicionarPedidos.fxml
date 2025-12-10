@@ -13,7 +13,7 @@
 
 <ScrollPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <content>
-      <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1439.0" prefWidth="600.0" stylesheets="file:/workspaces/PDV_Galeteria_PIES01/src/main/resources/css/BotoesTelaAdcionarPedido.css">
+      <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1439.0" prefWidth="600.0" stylesheets="/css/BotoesTelaAdcionarPedido.css">
          <children>
             <Label layoutX="24.0" layoutY="24.0" prefHeight="37.0" prefWidth="247.0" text="Registrar Pedido">
                <font>
@@ -123,7 +123,7 @@
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
-            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="30.0" layoutY="901.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="file:/workspaces/PDV_Galeteria_PIES01/src/main/resources/css/BotoesTelaAdcionarPedido.css" text="Pix" textFill="WHITE">
+            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="30.0" layoutY="901.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="/css/BotoesTelaAdcionarPedido.css" text="Pix" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -131,7 +131,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </ToggleButton>
-            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="290.0" layoutY="901.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="file:/workspaces/PDV_Galeteria_PIES01/src/main/resources/css/BotoesTelaAdcionarPedido.css" text="Dinheiro" textFill="WHITE">
+            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="290.0" layoutY="901.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="/css/BotoesTelaAdcionarPedido.css" text="Dinheiro" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -139,7 +139,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </ToggleButton>
-            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="30.0" layoutY="977.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="file:/workspaces/PDV_Galeteria_PIES01/src/main/resources/css/BotoesTelaAdcionarPedido.css" text="Débito" textFill="WHITE">
+            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="30.0" layoutY="977.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="/css/BotoesTelaAdcionarPedido.css" text="Débito" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -147,7 +147,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </ToggleButton>
-            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="290.0" layoutY="977.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="file:/workspaces/PDV_Galeteria_PIES01/src/main/resources/css/BotoesTelaAdcionarPedido.css" text="Crédito" textFill="WHITE">
+            <ToggleButton id="meuBotao" blendMode="DARKEN" layoutX="290.0" layoutY="977.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="246.0" stylesheets="/css/BotoesTelaAdcionarPedido.css" text="Crédito" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>

@@ -9,11 +9,10 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.layout.FlowPane?>
 <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.TelaProdutosController">
     <children>
         <Pane layoutX="283.0" layoutY="0.0" prefHeight="700.0" prefWidth="1283.0" style="-fx-background-color: white;">
@@ -57,18 +56,18 @@
 
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="520.0" layoutY="155.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/search-svgrepo-com.png" />
+                        <Image url="@/assets/imgs/search-svgrepo-com.png" />
                     </image>
                 </ImageView>
 
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="606.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+                        <Image url="@/assets/imgs/mais.png" />
                     </image>
                 </ImageView>
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="858.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+                        <Image url="@/assets/imgs/mais.png" />
                     </image>
                 </ImageView>
 
@@ -82,9 +81,7 @@
                             style="-fx-background-color: transparent; -fx-border-color: transparent;"
                             hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
                     <content>
-                        <FlowPane fx:id="produtosContainer" orientation="HORIZONTAL"
-                                  hgap="15" vgap="15" prefWrapLength="1000.0"
-                                  style="-fx-padding: 10; -fx-background-color: transparent;" />
+                        <FlowPane fx:id="produtosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
                 </ScrollPane>
 
@@ -98,9 +95,7 @@
                             style="-fx-background-color: transparent; -fx-border-color: transparent;"
                             hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
                     <content>
-                        <FlowPane fx:id="combosContainer" orientation="HORIZONTAL"
-                                  hgap="15" vgap="15" prefWrapLength="1000.0"
-                                  style="-fx-padding: 10; -fx-background-color: transparent;" />
+                        <FlowPane fx:id="combosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
                 </ScrollPane>
 
@@ -109,7 +104,7 @@
 
         <ImageView fitHeight="93.0" fitWidth="113.0" layoutX="99.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
+                <Image url="@/assets/imgs/logo-pdv.jpg" />
             </image>
         </ImageView>
 
@@ -135,7 +130,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="132.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/casa.png" />
+                <Image url="@/assets/imgs/casa.png" />
             </image>
         </ImageView>
 
@@ -150,7 +145,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/carrinho.png" />
+                <Image url="@/assets/imgs/carrinho.png" />
             </image>
         </ImageView>
 
@@ -165,11 +160,11 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/estoque.png" />
+                <Image url="@/assets/imgs/estoque.png" />
             </image>
         </ImageView>
 
-        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAbrirTelaCaixa" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -180,7 +175,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/money.png" />
+                <Image url="@/assets/imgs/money.png" />
             </image>
         </ImageView>
 
@@ -195,7 +190,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="375.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/entregadores.png" />
+                <Image url="@/assets/imgs/entregadores.png" />
             </image>
         </ImageView>
 
@@ -210,7 +205,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="437.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/relat.png" />
+                <Image url="@/assets/imgs/relat.png" />
             </image>
         </ImageView>
 
@@ -225,7 +220,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="497.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/configs.png" />
+                <Image url="@/assets/imgs/configs.png" />
             </image>
         </ImageView>
 
@@ -242,7 +237,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="567.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/sair_.png" />
+                <Image url="@/assets/imgs/sair_.png" />
             </image>
         </ImageView>
     </children>

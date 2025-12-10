@@ -1,7 +1,9 @@
 package com.example.pdv_galeteria.service;
 
+import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.model.VendaEmLote;
 import com.example.pdv_galeteria.repository.VendaEmLoteRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,14 +14,38 @@ import java.util.List;
 public class VendaEmLoteService {
 
     private final VendaEmLoteRepository vendaEmLoteRepository;
+    private final ProdutoService produtoService;
+    private final EstoqueService estoqueService;
 
-    public VendaEmLoteService(VendaEmLoteRepository vendaEmLoteRepository) {
+
+    public VendaEmLoteService(
+        VendaEmLoteRepository vendaEmLoteRepository,
+        EstoqueService estoqueService,
+        ProdutoService produtoService
+    ) {
         this.vendaEmLoteRepository = vendaEmLoteRepository;
-    }
+        this.estoqueService = estoqueService;
+        this.produtoService = produtoService;
+}
+
+    
 
     @Transactional
     public VendaEmLote criarVendaEmLote(VendaEmLote venda) {
         venda.recalcularTotal();
+
+        List<EstoqueService.RemocaoRequest> itensParaRemover = venda.getItens().stream()
+        .map(item -> {
+            Produto produto = produtoService.buscarPorNome(item.getProduto());
+            return new EstoqueService.RemocaoRequest(
+                    produto.getId(),
+                    item.getQuantidade()
+            );
+        })
+        .toList();
+
+    estoqueService.removerMultiplosItens(itensParaRemover);
+
         return vendaEmLoteRepository.save(venda);
     }
 

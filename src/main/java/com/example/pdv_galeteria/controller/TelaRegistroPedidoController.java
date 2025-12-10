@@ -1,5 +1,6 @@
 package com.example.pdv_galeteria.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -10,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Optional;
@@ -86,6 +88,8 @@ public class TelaRegistroPedidoController implements Initializable {
     @FXML
     private void sairParaLogin() {
         try {
+            System.out.println("Iniciando processo de saída para login...");
+
             System.out.println("Iniciando processo de saída para login...");
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
@@ -190,6 +194,7 @@ public class TelaRegistroPedidoController implements Initializable {
             javafx.application.Platform.exit();
         }
     }
+
     @FXML
     private void abrirDashboard() {
         System.out.println("Abrindo Dashboard...");
@@ -226,5 +231,27 @@ public class TelaRegistroPedidoController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleAbrirTelaCaixa(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setTitle("Controle de Caixa");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarErro("Erro ao abrir tela do caixa: " + e.getMessage());
+        }
+    }
+
+    private void mostrarErro(String mensagem) {
+        System.err.println(mensagem);
     }
 }

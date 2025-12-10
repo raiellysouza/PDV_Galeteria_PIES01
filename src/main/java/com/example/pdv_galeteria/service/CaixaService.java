@@ -4,15 +4,19 @@ import com.example.pdv_galeteria.model.Caixa;
 import com.example.pdv_galeteria.model.StatusCaixa;
 import com.example.pdv_galeteria.model.MovimentoCaixa;
 import com.example.pdv_galeteria.repository.CaixaRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CaixaService {
 
     @Autowired
@@ -21,42 +25,93 @@ public class CaixaService {
     @Autowired
     private MovimentoCaixaService movimentoCaixaService;
 
-    @Transactional
-    public Caixa abrirCaixa(BigDecimal valorInicial, String observacoes) {
-        if (caixaRepository.existsCaixaDoDia()) {
-            throw new RuntimeException("Já existe um caixa para hoje.");
-        }
-
-        if (valorInicial == null || valorInicial.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("Valor inicial deve ser maior ou igual a zero.");
-        }
-
-        Caixa caixa = new Caixa(valorInicial, observacoes);
-        return caixaRepository.save(caixa);
+    public Optional<Caixa> getCaixaDoDia() {
+        return caixaRepository.findByDataCaixa(LocalDate.now());
     }
 
-    @Transactional
-    public Caixa fecharCaixa(String observacoes) {
-        Caixa caixa = caixaRepository.findCaixaDoDia()
-                .orElseThrow(() -> new RuntimeException("Nenhum caixa encontrado para hoje."));
+    public Optional<Caixa> getCaixaAbertoDoDia() {
+        return caixaRepository.findCaixaAbertoDoDia();
+    }
 
-        if (caixa.getStatus() == StatusCaixa.FECHADO) {
-            throw new RuntimeException("Caixa já está fechado.");
+    public boolean existeCaixaDoDia() {
+        return caixaRepository.existsCaixaDoDia();
+    }
+
+    public boolean podeAbrirCaixa() {
+        Optional<Caixa> caixaOpt = getCaixaDoDia();
+        if (caixaOpt.isPresent()) {
+            return caixaOpt.get().getStatus() != StatusCaixa.ABERTO;
         }
+        return true;
+    }
 
-        caixa.setDataFechamento(LocalDateTime.now());
-        caixa.setValorFinal(movimentoCaixaService.calcularSaldoAtual(caixa));
-        caixa.setStatus(StatusCaixa.FECHADO);
+    public String getStatusTextoBotao() {
+        boolean caixaExiste = caixaRepository.existsCaixaDoDia();
+        boolean caixaAberto = caixaRepository.findCaixaAbertoDoDia().isPresent();
 
-        if (observacoes != null && !observacoes.trim().isEmpty()) {
+        if (!caixaExiste) {
+            return "Abrir Caixa";
+        } else if (caixaAberto) {
+            return "Fechar Caixa";
+        } else {
+            return "Caixa Já Fechado";
+        }
+    }
+
+    public Caixa abrirCaixa(BigDecimal valorInicial, String observacoes) {
+
+        Optional<Caixa> caixaOpt = getCaixaDoDia();
+
+        if (caixaOpt.isPresent()) {
+            Caixa caixa = caixaOpt.get();
+
+            if (caixa.getStatus() == StatusCaixa.ABERTO) {
+                throw new RuntimeException("Caixa já está aberto hoje!");
+            }
+
+            caixa.setStatus(StatusCaixa.ABERTO);
+            caixa.setDataAbertura(LocalDateTime.now());
+            caixa.setValorInicial(valorInicial);
             caixa.setObservacoes(observacoes);
+            caixa.setSaldoAtual(valorInicial);
+            caixa.setUpdatedAt(LocalDateTime.now());
+
+            return caixaRepository.save(caixa);
+
+        } else {
+            Caixa novoCaixa = new Caixa(valorInicial, observacoes);
+            novoCaixa.setDataCaixa(LocalDate.now());
+            novoCaixa.setSaldoAtual(valorInicial);
+
+            return caixaRepository.save(novoCaixa);
         }
+    }
+  
+    public Caixa fecharCaixa(String observacoes) {
+
+        Optional<Caixa> caixaOpt = getCaixaDoDia();
+
+        if (!caixaOpt.isPresent()) {
+            throw new RuntimeException("Não há caixa para hoje!");
+        }
+
+        Caixa caixa = caixaOpt.get();
+
+        if (caixa.getStatus() != StatusCaixa.ABERTO) {
+            throw new RuntimeException("Caixa não está aberto!");
+        }
+
+        caixa.setStatus(StatusCaixa.FECHADO);
+        caixa.setDataFechamento(LocalDateTime.now());
+        caixa.setObservacoes(observacoes);
+
+        caixa.setValorFinal(movimentoCaixaService.calcularSaldoAtual(caixa));
 
         caixa.setUpdatedAt(LocalDateTime.now());
 
         return caixaRepository.save(caixa);
     }
-
+  
     @Transactional
     public MovimentoCaixa registrarEntrada(BigDecimal valor, String descricao, String referenciaExterna) {
         return movimentoCaixaService.registrarEntrada(valor, descricao, referenciaExterna);
@@ -85,28 +140,31 @@ public class CaixaService {
         return movimentoCaixaService.calcularTotalSaidas(caixa);
     }
 
-    public String getStatusTextoBotao() {
-        boolean caixaExiste = caixaRepository.existsCaixaDoDia();
-        boolean caixaAberto = caixaRepository.findCaixaAbertoDoDia().isPresent();
+    public void adicionarEntrada(BigDecimal valor, String descricao) {
 
-        if (!caixaExiste) {
-            return "Abrir Caixa";
-        } else if (caixaAberto) {
-            return "Fechar Caixa";
-        } else {
-            return "Caixa Já Fechado";
+        Caixa caixa = getCaixaAbertoDoDia()
+                .orElseThrow(() -> new RuntimeException("Não há caixa aberto!"));
+
+        caixa.setSaldoAtual(caixa.getSaldoAtual().add(valor));
+        caixa.setTotalEntradas(caixa.getTotalEntradas().add(valor));
+        caixa.setUpdatedAt(LocalDateTime.now());
+
+        caixaRepository.save(caixa);
+    }
+
+    public void adicionarSaida(BigDecimal valor, String descricao) {
+
+        Caixa caixa = getCaixaAbertoDoDia()
+                .orElseThrow(() -> new RuntimeException("Não há caixa aberto!"));
+
+        if (caixa.getSaldoAtual().compareTo(valor) < 0) {
+            throw new RuntimeException("Saldo insuficiente!");
         }
-    }
 
-    public boolean podeAbrirCaixa() {
-        return !caixaRepository.existsCaixaDoDia();
-    }
+        caixa.setSaldoAtual(caixa.getSaldoAtual().subtract(valor));
+        caixa.setTotalSaidas(caixa.getTotalSaidas().add(valor));
+        caixa.setUpdatedAt(LocalDateTime.now());
 
-    public boolean podeFecharCaixa() {
-        return caixaRepository.findCaixaAbertoDoDia().isPresent();
-    }
-
-    public Optional<Caixa> getCaixaDoDia() {
-        return caixaRepository.findCaixaDoDia();
+        caixaRepository.save(caixa);
     }
 }
