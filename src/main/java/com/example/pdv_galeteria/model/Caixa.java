@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "caixa")
 public class Caixa {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,23 +43,14 @@ public class Caixa {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "saldo_atual", precision = 10, scale = 2)
-    private BigDecimal saldoAtual;
-
-    @Column(name = "total_entradas", precision = 10, scale = 2)
-    private BigDecimal totalEntradas;
-
-    @Column(name = "total_saidas", precision = 10, scale = 2)
-    private BigDecimal totalSaidas;
+    @OneToMany(mappedBy = "caixa", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<MovimentoCaixa> movimentos = new ArrayList<>();
 
     public Caixa() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.status = StatusCaixa.FECHADO;
         this.dataCaixa = LocalDate.now();
-        this.saldoAtual = BigDecimal.ZERO;
-        this.totalEntradas = BigDecimal.ZERO;
-        this.totalSaidas = BigDecimal.ZERO;
     }
 
     public Caixa(BigDecimal valorInicial, String observacoes) {
@@ -65,7 +59,6 @@ public class Caixa {
         this.observacoes = observacoes;
         this.dataAbertura = LocalDateTime.now();
         this.status = StatusCaixa.ABERTO;
-        this.saldoAtual = valorInicial;
     }
 
     public Long getId() {
@@ -149,26 +142,29 @@ public class Caixa {
     }
 
     public BigDecimal getSaldoAtual() {
-        return saldoAtual != null ? saldoAtual : BigDecimal.ZERO;
-    }
-
-    public void setSaldoAtual(BigDecimal saldoAtual) {
-        this.saldoAtual = saldoAtual;
+        BigDecimal base = (this.valorInicial != null ? this.valorInicial : BigDecimal.ZERO);
+        return base.add(getTotalEntradas()).subtract(getTotalSaidas());
     }
 
     public BigDecimal getTotalEntradas() {
-        return totalEntradas != null ? totalEntradas : BigDecimal.ZERO;
-    }
-
-    public void setTotalEntradas(BigDecimal totalEntradas) {
-        this.totalEntradas = totalEntradas;
+        return movimentos.stream()
+                .filter(m -> m.getTipo() == TipoMovimentoCaixa.ENTRADA)
+                .map(MovimentoCaixa::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getTotalSaidas() {
-        return totalSaidas != null ? totalSaidas : BigDecimal.ZERO;
+        return movimentos.stream()
+                .filter(m -> m.getTipo() == TipoMovimentoCaixa.SAIDA)
+                .map(MovimentoCaixa::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void setTotalSaidas(BigDecimal totalSaidas) {
-        this.totalSaidas = totalSaidas;
+    public List<MovimentoCaixa> getMovimentos() {
+        return movimentos;
+    }
+
+    public void setMovimentos(List<MovimentoCaixa> movimentos) {
+        this.movimentos = movimentos;
     }
 }
