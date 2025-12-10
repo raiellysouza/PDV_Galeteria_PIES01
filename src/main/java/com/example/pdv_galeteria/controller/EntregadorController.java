@@ -2,502 +2,414 @@ package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.model.Entregador;
 import com.example.pdv_galeteria.model.StatusEntregador;
-import com.example.pdv_galeteria.service.EntregadorService;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.example.pdv_galeteria.repository.EntregadorRepository;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.SVGPath;
+import javafx.scene.text.Font;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
-import java.net.URL;
 import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
 
-@Controller
-public class EntregadorController implements Initializable {
+@Service
+public class EntregadorController {
 
-    @Autowired
-    private EntregadorService entregadorService;
-
-    @FXML private TableView<Entregador> tableView;
-    @FXML private TableColumn<Entregador, Long> colId;
-    @FXML private TableColumn<Entregador, String> colNome;
-    @FXML private TableColumn<Entregador, String> colTelefone;
-    @FXML private TableColumn<Entregador, String> colStatus;
-    @FXML private TextField txtBusca;
-    @FXML private Button btnNovoEntregador;
+    @FXML private VBox containerEntregadores;
     @FXML private Label labelTotalEntregadores;
     @FXML private Label labelAtivosHoje;
     @FXML private Label labelEntregasHoje;
-    @FXML private VBox containerEntregadores;
 
-    @FXML private TextField txtNomeCompletoPopup;
-    @FXML private TextField txtTelefonePopup;
+    @Autowired
+    private EntregadorRepository entregadorRepository;
 
-    private Stage popupStage;
-    private ObservableList<Entregador> entregadoresList = FXCollections.observableArrayList();
-    private Entregador entregadorParaEdicao;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        configurarTabela();
+    @FXML
+    public void initialize() {
+        System.out.println("=== INICIALIZANDO CONTROLLER ENTREGADORES ===");
         carregarEntregadores();
-        configurarBusca();
     }
 
-    private void configurarTabela() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNome.setCellValueFactory(new PropertyValueFactory<>("nomeCompleto"));
-        colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-
-        tableView.setRowFactory(tv -> new TableRow<Entregador>() {
-            @Override
-            protected void updateItem(Entregador entregador, boolean empty) {
-                super.updateItem(entregador, empty);
-                if (entregador == null || empty) {
-                    setStyle("");
-                } else {
-                    if (entregador.getStatus() == StatusEntregador.INATIVO) {
-                        setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
-                    } else {
-                        setStyle("");
-                    }
-                }
-            }
-        });
-
-        tableView.setItems(entregadoresList);
-    }
     private void carregarEntregadores() {
         try {
-            entregadoresList.clear();
-            entregadoresList.addAll(entregadorService.listarTodos());
+            System.out.println("Carregando entregadores do banco...");
 
-        } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro",
-                    "Erro ao carregar entregadores: " + e.getMessage());
-        }
-    }
-
-    private void configurarBusca() {
-        txtBusca.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.trim().isEmpty()) {
-                carregarEntregadores();
-            } else {
-                buscarEntregadores(newValue.trim());
-            }
-        });
-    }
-
-    private void buscarEntregadores(String termo) {
-        try {
-            entregadoresList.clear();
-            entregadoresList.addAll(entregadorService.buscarPorNome(termo));
-        } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro",
-                    "Erro na busca: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void abrirPopupCadastro() {
-        abrirPopup(null);
-    }
-
-    @FXML
-    private void editarEntregador() {
-        Entregador selecionado = tableView.getSelectionModel().getSelectedItem();
-        if (selecionado != null) {
-            abrirPopup(selecionado);
-        } else {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
-                    "Selecione um entregador para editar.");
-        }
-    }
-
-    @FXML
-    private void excluirEntregador() {
-        Entregador selecionado = tableView.getSelectionModel().getSelectedItem();
-        if (selecionado == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
-                    "Selecione um entregador para excluir.");
-            return;
-        }
-
-        Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacao.setTitle("Confirmar Exclusão");
-        confirmacao.setHeaderText("Excluir Entregador");
-        confirmacao.setContentText("Tem certeza que deseja excluir " + selecionado.getNomeCompleto() + "?");
-
-        confirmacao.showAndWait().ifPresent(resposta -> {
-            if (resposta == ButtonType.OK) {
-                try {
-                    entregadorService.excluirEntregador(selecionado.getId());
-                    mostrarAlerta(Alert.AlertType.INFORMATION, "Sucesso",
-                            "Entregador excluído com sucesso!");
-                    carregarEntregadores();
-                } catch (Exception e) {
-                    mostrarAlerta(Alert.AlertType.ERROR, "Erro",
-                            "Erro ao excluir: " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    @FXML
-    private void atualizarStatusParaDisponivel() {
-        atualizarStatus(StatusEntregador.DISPONIVEL);
-    }
-
-    @FXML
-    private void atualizarStatusParaEmEntrega() {
-        atualizarStatus(StatusEntregador.EM_ENTREGA);
-    }
-
-    private void atualizarStatus(StatusEntregador status) {
-        Entregador selecionado = tableView.getSelectionModel().getSelectedItem();
-        if (selecionado == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
-                    "Selecione um entregador para alterar o status.");
-            return;
-        }
-
-        try {
-            entregadorService.atualizarStatus(selecionado.getId(), status);
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Sucesso",
-                    "Status atualizado para: " + status.getDescricao());
-            carregarEntregadores();
-        } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro",
-                    "Erro ao atualizar status: " + e.getMessage());
-        }
-    }
-
-    private void abrirPopup(Entregador entregadorParaEditar) {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCadastroEntregadores.fxml")
-            );
-
-            loader.setController(this);
-
-            Parent root = loader.load();
-
-            this.entregadorParaEdicao = entregadorParaEditar;
-            if (entregadorParaEditar != null) {
-                txtNomeCompletoPopup.setText(entregadorParaEditar.getNomeCompleto());
-                txtTelefonePopup.setText(entregadorParaEditar.getTelefone());
-            } else {
-                limparCamposPopup();
-            }
-
-            popupStage = new Stage();
-            popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(tableView.getScene().getWindow());
-
-            Scene scene = new Scene(root);
-            popupStage.setScene(scene);
-            popupStage.setTitle(entregadorParaEditar != null ? "Editar Entregador" : "Cadastrar Entregador");
-            popupStage.setResizable(false);
-
-            popupStage.showAndWait();
-
-        } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro",
-                    "Não foi possível abrir a tela de cadastro: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void salvarEntregador() {
-        if (validarCamposPopup()) {
-            try {
-                String nome = txtNomeCompletoPopup.getText().trim();
-                String telefone = txtTelefonePopup.getText().trim();
-
-                if (entregadorParaEdicao != null) {
-                    entregadorParaEdicao.setNomeCompleto(nome);
-                    entregadorParaEdicao.setTelefone(telefone);
-                    entregadorService.atualizarEntregador(entregadorParaEdicao);
-                    mostrarAlerta(Alert.AlertType.INFORMATION, "Sucesso",
-                            "Entregador atualizado com sucesso!");
-                } else {
-                    entregadorService.cadastrarEntregador(nome, telefone);
-                    mostrarAlerta(Alert.AlertType.INFORMATION, "Sucesso",
-                            "Entregador cadastrado com sucesso!");
-                }
-
-                fecharPopup();
-                carregarEntregadores();
-
-            } catch (Exception e) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Erro",
-                        "Erro ao salvar: " + e.getMessage());
-            }
-        }
-    }
-
-    @FXML
-    private void cancelarCadastro() {
-        fecharPopup();
-    }
-
-    private boolean validarCamposPopup() {
-        if (txtNomeCompletoPopup.getText() == null || txtNomeCompletoPopup.getText().trim().isEmpty()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
-                    "Informe o nome completo do entregador.");
-            txtNomeCompletoPopup.requestFocus();
-            return false;
-        }
-
-        String telefone = txtTelefonePopup.getText().trim();
-        if (telefone.isEmpty()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
-                    "Informe o telefone do entregador.");
-            txtTelefonePopup.requestFocus();
-            return false;
-        }
-
-        String numeros = telefone.replaceAll("\\D", "");
-        if (numeros.length() < 10) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
-                    "Telefone inválido. Deve conter DDD + número (mínimo 10 dígitos).");
-            txtTelefonePopup.requestFocus();
-            return false;
-        }
-
-        return true;
-    }
-
-    private void limparCamposPopup() {
-        if (txtNomeCompletoPopup != null) txtNomeCompletoPopup.clear();
-        if (txtTelefonePopup != null) txtTelefonePopup.clear();
-        entregadorParaEdicao = null;
-    }
-
-    private void fecharPopup() {
-        if (popupStage != null) {
-            popupStage.close();
-            popupStage = null;
-        }
-        limparCamposPopup();
-    }
-
-    @FXML
-    private void abrirTelaVendas() {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaRegistroPedido.fxml", "Registro de Pedidos");
-    }
-
-    @FXML
-    private void abrirTelaEstoque() {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaProdutos.fxml", "Estoque");
-    }
-
-    @FXML
-    private void abrirTelaCaixa() {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml", "Controle de Caixa");
-    }
-
-    @FXML
-    private void sairParaLogin() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
-
-            Parent root = loader.load();
-            ConfirmacaoSaidaController controller = loader.getController();
-
-            Stage popupStage = new Stage();
-            controller.setPopupStage(popupStage);
-
-            popupStage.setScene(new Scene(root));
-            popupStage.setTitle("Confirmação de Saída");
-            popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(tableView.getScene().getWindow());
-            popupStage.setResizable(false);
-            popupStage.centerOnScreen();
-
-            popupStage.showAndWait();
-
-            if (controller.isConfirmado()) {
-                voltarParaTelaLogin();
-            }
-
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmação de Saída");
-            alert.setHeaderText("Deseja realmente sair?");
-            alert.setContentText("Você será redirecionado para a tela de login.");
-
-            Optional<ButtonType> resultado = alert.showAndWait();
-            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                voltarParaTelaLogin();
-            }
-        }
-    }
-
-    private void navegarParaTela(String fxmlPath, String titulo) {
-        try {
-            URL fxmlUrl = getClass().getResource(fxmlPath);
-            if (fxmlUrl == null) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Arquivo " + fxmlPath + " não encontrado!");
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-            if (com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
-
-            Parent root = loader.load();
-
-            Stage stage = (Stage) tableView.getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-            stage.setTitle(titulo);
-            stage.centerOnScreen();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Erro ao abrir tela: " + e.getMessage());
-        }
-    }
-
-    private void voltarParaTelaLogin() {
-        try {
-            Stage stage = (Stage) tableView.getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
-
-            if (com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(com.example.pdv_galeteria.PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
-
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            reiniciarAplicacaoCompleta();
-        }
-    }
-
-    private void reiniciarAplicacaoCompleta() {
-        try {
-            Stage stage = (Stage) tableView.getScene().getWindow();
-            stage.close();
-
-            com.example.pdv_galeteria.PdvGaleteriaApplication.relaunchApplication();
-
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Erro ao reiniciar aplicação");
-            alert.setContentText("Por favor, feche e abra o programa manualmente.");
-            alert.showAndWait();
-
-            javafx.application.Platform.exit();
-        }
-    }
-
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensagem) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensagem);
-        alert.showAndWait();
-    }
-
-    @FXML
-    private void desativarEntregador() {
-        Entregador selecionado = tableView.getSelectionModel().getSelectedItem();
-        if (selecionado == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Atenção",
-                    "Selecione um entregador para desativar.");
-            return;
-        }
-
-        if (selecionado.getStatus() == StatusEntregador.INATIVO) {
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Informação",
-                    "Este entregador já está desativado.");
-            return;
-        }
-
-        Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacao.setTitle("Confirmar Desativação");
-        confirmacao.setHeaderText("Desativar Entregador");
-        confirmacao.setContentText("Tem certeza que deseja desativar o entregador " +
-                selecionado.getNomeCompleto() + "?\n\n" +
-                "Observação: Entregadores desativados não poderão ser atribuídos a novas entregas.");
-
-        confirmacao.showAndWait().ifPresent(resposta -> {
-            if (resposta == ButtonType.OK) {
-                try {
-                    entregadorService.atualizarStatus(selecionado.getId(), StatusEntregador.INATIVO);
-                    mostrarAlerta(Alert.AlertType.INFORMATION, "Sucesso",
-                            "Entregador desativado com sucesso!");
-                    carregarEntregadores();
-                } catch (Exception e) {
-                    mostrarAlerta(Alert.AlertType.ERROR, "Erro",
-                            "Erro ao desativar entregador: " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    @FXML
-    private void abrirTelaRelatorios() {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaRelatorios.fxml", "Relatórios");
-    }
-
-    @FXML
-    private void abrirTelaConfiguracao() {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml", "Configurações");
-    }
-
-    @FXML
-    private void abrirTelaDashboard() {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaDashboard.fxml", "Dashboard");
-    }
-
-    private void carregarEntregadoresNoContainer() {
-        try {
             containerEntregadores.getChildren().clear();
-            List<Entregador> entregadores = entregadorService.listarTodos();
+
+            VBox tituloBox = criarTitulo();
+            containerEntregadores.getChildren().add(tituloBox);
+
+            List<Entregador> entregadores = entregadorRepository.findAllByOrderByNomeAsc();
+            System.out.println("Encontrados " + entregadores.size() + " entregadores");
 
             for (Entregador entregador : entregadores) {
-                HBox cardEntregador = criarCardEntregador(entregador);
-                containerEntregadores.getChildren().add(cardEntregador);
+                HBox card = criarCardEntregador(entregador);
+                containerEntregadores.getChildren().add(card);
             }
+
+            atualizarEstatisticas(entregadores);
+
         } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Erro ao carregar entregadores: " + e.getMessage());
+            System.err.println("ERRO ao carregar entregadores: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    private VBox criarTitulo() {
+        VBox tituloBox = new VBox(5);
+        tituloBox.setPadding(new Insets(0, 0, 20, 0));
+
+        Label titulo = new Label("Entregadores do Dia");
+        titulo.setTextFill(Color.web("#111827"));
+        titulo.setFont(Font.font("System Bold", 22));
+
+        Label subtitulo = new Label("Liste todos os entregadores cadastrados");
+        subtitulo.setTextFill(Color.web("#6b7280"));
+        subtitulo.setFont(Font.font(14));
+
+        tituloBox.getChildren().addAll(titulo, subtitulo);
+        return tituloBox;
     }
 
     private HBox criarCardEntregador(Entregador entregador) {
         HBox card = new HBox(15);
         card.setAlignment(Pos.CENTER_LEFT);
-        card.setStyle("-fx-background-color: #F8FAFC; -fx-background-radius: 8; -fx-padding: 15;");
+        card.setStyle(
+                "-fx-background-color: #F8FAFC;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-border-color: #E5E7EB;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 8;"
+        );
+        card.setPadding(new Insets(15, 20, 15, 20));
 
+        StackPane iconPane = new StackPane();
+        Circle circleBg = new Circle(24, Color.web("#DBEAFE"));
+        SVGPath personIcon = new SVGPath();
+        personIcon.setContent("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z");
+        personIcon.setFill(Color.web("#3B82F6"));
+        iconPane.getChildren().addAll(circleBg, personIcon);
+
+        VBox infoBox = new VBox(2);
+        infoBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label nomeLabel = new Label(entregador.getNome());
+        nomeLabel.setTextFill(Color.web("#111827"));
+        nomeLabel.setFont(Font.font("System Bold", 16));
+
+        Label telefoneLabel = new Label(entregador.getTelefone());
+        telefoneLabel.setTextFill(Color.web("#6B7280"));
+        telefoneLabel.setFont(Font.font(12));
+
+        infoBox.getChildren().addAll(nomeLabel, telefoneLabel);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        VBox entregasBox = new VBox(2);
+        entregasBox.setAlignment(Pos.CENTER_RIGHT);
+
+        Label entregasTexto = new Label("Entregas hoje");
+        entregasTexto.setTextFill(Color.web("#6B7280"));
+        entregasTexto.setFont(Font.font(10));
+
+        HBox contadorBox = new HBox(8);
+        contadorBox.setAlignment(Pos.CENTER);
+
+        Button btnMenos = new Button("-");
+        btnMenos.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: #6B7280;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-padding: 0 0 2 0;"
+        );
+        btnMenos.setOnAction(e -> alterarEntregas(entregador, -1));
+
+        Label entregasCount = new Label(String.valueOf(entregador.getEntregasHoje()));
+        entregasCount.setTextFill(Color.web("#111827"));
+        entregasCount.setFont(Font.font("System Bold", 16));
+        entregasCount.setMinWidth(20);
+        entregasCount.setAlignment(Pos.CENTER);
+
+        Button btnMais = new Button("+");
+        btnMais.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: #6B7280;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-padding: 0 0 2 0;"
+        );
+        btnMais.setOnAction(e -> alterarEntregas(entregador, 1));
+
+        contadorBox.getChildren().addAll(btnMais, entregasCount, btnMenos);
+        entregasBox.getChildren().addAll(entregasTexto, contadorBox);
+
+        Label statusLabel = new Label(entregador.getStatus().getDescricao().toLowerCase());
+        statusLabel.setStyle(
+                "-fx-background-color: #F97316;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 12;" +
+                        "-fx-font-size: 12;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 4 12;" +
+                        "-fx-min-width: 56;" +
+                        "-fx-alignment: center;"
+        );
+
+        switch (entregador.getStatus()) {
+            case DISPONIVEL -> statusLabel.setStyle(
+                    "-fx-background-color: #F97316;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-radius: 12;" +
+                            "-fx-font-size: 12;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-padding: 4 12;" +
+                            "-fx-min-width: 56;" +
+                            "-fx-alignment: center;"
+            );
+            case EM_ENTREGA -> statusLabel.setStyle(
+                    "-fx-background-color: #3B82F6;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-radius: 12;" +
+                            "-fx-font-size: 12;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-padding: 4 12;" +
+                            "-fx-min-width: 56;" +
+                            "-fx-alignment: center;"
+            );
+            case INATIVO -> statusLabel.setStyle(
+                    "-fx-background-color: #6B7280;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-radius: 12;" +
+                            "-fx-font-size: 12;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-padding: 4 12;" +
+                            "-fx-min-width: 56;" +
+                            "-fx-alignment: center;"
+            );
+        }
+
+        Button btnAcao = new Button();
+        btnAcao.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: #374151;" +
+                        "-fx-border-color: #D1D5DB;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 4;" +
+                        "-fx-background-radius: 4;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-size: 12;" +
+                        "-fx-padding: 4 12;" +
+                        "-fx-font-weight: normal;"
+        );
+        btnAcao.setOnAction(e -> alternarStatus(entregador));
+
+        if (entregador.getStatus() == StatusEntregador.INATIVO) {
+            btnAcao.setText("Ativar");
+        } else {
+            btnAcao.setText("Desativar");
+        }
+
+        btnAcao.setOnMouseEntered(e -> btnAcao.setStyle(
+                "-fx-background-color: #F9FAFB;" +
+                        "-fx-text-fill: #1F2937;" +
+                        "-fx-border-color: #9CA3AF;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 4;" +
+                        "-fx-background-radius: 4;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-size: 12;" +
+                        "-fx-padding: 4 12;" +
+                        "-fx-font-weight: normal;"
+        ));
+
+        btnAcao.setOnMouseExited(e -> btnAcao.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: #374151;" +
+                        "-fx-border-color: #D1D5DB;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 4;" +
+                        "-fx-background-radius: 4;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-size: 12;" +
+                        "-fx-padding: 4 12;" +
+                        "-fx-font-weight: normal;"
+        ));
+
+        HBox rightBox = new HBox(15);
+        rightBox.setAlignment(Pos.CENTER_RIGHT);
+        rightBox.getChildren().addAll(entregasBox, statusLabel, btnAcao);
+
+        card.getChildren().addAll(iconPane, infoBox, spacer, rightBox);
         return card;
+    }
+
+    private void alterarEntregas(Entregador entregador, int quantidade) {
+        try {
+            int novasEntregas = entregador.getEntregasHoje() + quantidade;
+            if (novasEntregas >= 0) {
+                entregador.setEntregasHoje(novasEntregas);
+                entregadorRepository.save(entregador);
+                carregarEntregadores();
+                System.out.println("Entregas atualizadas: " + entregador.getNome() + " = " + novasEntregas);
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao alterar entregas: " + e.getMessage());
+        }
+    }
+
+    private void alternarStatus(Entregador entregador) {
+        try {
+            if (entregador.getStatus() == StatusEntregador.INATIVO) {
+                entregador.setStatus(StatusEntregador.DISPONIVEL);
+            } else {
+                entregador.setStatus(StatusEntregador.INATIVO);
+            }
+            entregadorRepository.save(entregador);
+            carregarEntregadores();
+            System.out.println("Status alterado: " + entregador.getNome() + " = " + entregador.getStatus());
+        } catch (Exception e) {
+            System.err.println("Erro ao alterar status: " + e.getMessage());
+        }
+    }
+
+    private void atualizarEstatisticas(List<Entregador> entregadores) {
+        try {
+            long total = entregadores.size();
+            long ativos = entregadores.stream()
+                    .filter(e -> e.getStatus() != StatusEntregador.INATIVO)
+                    .count();
+            long entregas = entregadores.stream()
+                    .filter(e -> e.getStatus() != StatusEntregador.INATIVO)
+                    .mapToInt(Entregador::getEntregasHoje)
+                    .sum();
+
+            Platform.runLater(() -> {
+                labelTotalEntregadores.setText(String.valueOf(total));
+                labelAtivosHoje.setText(String.valueOf(ativos));
+                labelEntregasHoje.setText(String.valueOf(entregas));
+            });
+
+            System.out.println("Estatísticas: Total=" + total + ", Ativos=" + ativos + ", Entregas=" + entregas);
+
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar estatísticas: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void abrirPopupCadastro() {
+        System.out.println("Abrindo popup de cadastro...");
+
+        Dialog<Entregador> dialog = new Dialog<>();
+        dialog.setTitle("Novo Entregador");
+        dialog.setHeaderText("Cadastrar novo entregador");
+
+        ButtonType salvarButton = new ButtonType("Salvar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(salvarButton, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField nomeField = new TextField();
+        nomeField.setPromptText("Nome completo");
+
+        TextField telefoneField = new TextField();
+        telefoneField.setPromptText("(85) 99999-9999");
+
+        grid.add(new Label("Nome:"), 0, 0);
+        grid.add(nomeField, 1, 0);
+        grid.add(new Label("Telefone:"), 0, 1);
+        grid.add(telefoneField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        Platform.runLater(nomeField::requestFocus);
+
+        dialog.setResultConverter(button -> {
+            if (button == salvarButton) {
+                String nome = nomeField.getText().trim();
+                String telefone = telefoneField.getText().trim();
+
+                if (nome.isEmpty() || telefone.isEmpty()) {
+                    mostrarErro("Campos obrigatórios", "Preencha todos os campos.");
+                    return null;
+                }
+
+                Entregador novo = new Entregador();
+                novo.setNome(nome);
+                novo.setTelefone(formatarTelefone(telefone));
+                novo.setStatus(StatusEntregador.DISPONIVEL);
+                novo.setEntregasHoje(0);
+
+                return novo;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(novoEntregador -> {
+            try {
+                System.out.println("Salvando: " + novoEntregador);
+
+                if (entregadorRepository.existsByTelefone(novoEntregador.getTelefone())) {
+                    mostrarErro("Telefone já cadastrado", "Já existe um entregador com este telefone.");
+                    return;
+                }
+
+                Entregador salvo = entregadorRepository.save(novoEntregador);
+                System.out.println("Salvo com ID: " + salvo.getId());
+
+                carregarEntregadores();
+
+                Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
+                sucesso.setTitle("Sucesso");
+                sucesso.setHeaderText(null);
+                sucesso.setContentText("Entregador cadastrado com sucesso!");
+                sucesso.showAndWait();
+
+            } catch (Exception e) {
+                System.err.println("ERRO ao salvar: " + e.getMessage());
+                e.printStackTrace();
+                mostrarErro("Erro ao salvar", e.getMessage());
+            }
+        });
+    }
+
+    private String formatarTelefone(String telefone) {
+        if (telefone == null || telefone.trim().isEmpty()) {
+            return "";
+        }
+
+        String numeros = telefone.replaceAll("\\D", "");
+
+        if (numeros.length() == 11) {
+            return "(" + numeros.substring(0, 2) + ") " +
+                    numeros.substring(2, 7) + "-" +
+                    numeros.substring(7);
+        } else if (numeros.length() == 10) {
+            return "(" + numeros.substring(0, 2) + ") " +
+                    numeros.substring(2, 6) + "-" +
+                    numeros.substring(6);
+        }
+
+        return telefone;
+    }
+
+    private void mostrarErro(String titulo, String mensagem) {
+        Alert erro = new Alert(Alert.AlertType.ERROR);
+        erro.setTitle("Erro");
+        erro.setHeaderText(titulo);
+        erro.setContentText(mensagem);
+        erro.showAndWait();
     }
 }

@@ -5,15 +5,33 @@ import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
+import com.example.pdv_galeteria.dto.EntradaEstoqueRequest;
 
 @Service
 public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private EstoqueEntradaService estoqueEntradaService;
+
+    @Transactional
+    public Produto salvar(Produto produto) {
+        Produto salvo = produtoRepository.save(produto);
+
+        EntradaEstoqueRequest entrada = new EntradaEstoqueRequest();
+        entrada.setProdutoId(salvo.getId());
+        entrada.setQuantidade(salvo.getQuantidade());
+        entrada.setObservacao("Entrada inicial do produto");
+
+        estoqueEntradaService.registrarEntrada(entrada);
+
+        return salvo;
+    }
 
     public Produto buscarPrimeiroPorNome(String nome) {
         List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCase(nome);
@@ -37,19 +55,6 @@ public class ProdutoService {
 
     public List<Produto> listarTodos() {
         return produtoRepository.findAll();
-    }
-
-    public Produto salvar(Produto produto) {
-        
-        Produto salvo = produtoRepository.save(produto);
-
-        EntradaEstoqueRequest entrada = new EntradaEstoqueRequest();
-        entrada.setProdutoId(salvo.getId());
-        entrada.setQuantidade(salvo.getQuantidade());
-
-        estoqueEntradaService.registrarEntrada(entrada);
-
-        return salvo;
     }
 
     public Optional<Produto> buscarPorId(Long id) {

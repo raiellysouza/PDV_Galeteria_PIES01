@@ -6,18 +6,22 @@ import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ComboService;
 import com.example.pdv_galeteria.service.ProdutoService;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 @Component
-public class EditarCombosController {
+public class EditarCombosController implements Initializable {
 
     @Autowired
     private ComboService comboService;
@@ -35,6 +39,10 @@ public class EditarCombosController {
     private Combo comboAtual;
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+    }
+
     public void setCombo(Combo combo) {
         this.comboAtual = combo;
         carregarDadosCombo();
@@ -45,7 +53,9 @@ public class EditarCombosController {
             nomeComboField.setText(comboAtual.getNome());
             precoComboField.setText(String.valueOf(comboAtual.getPrecoTotal()));
             itensDoCombo.clear();
-            itensDoCombo.addAll(comboAtual.getItensDoCombo());
+            if (comboAtual.getItensDoCombo() != null) {
+                itensDoCombo.addAll(comboAtual.getItensDoCombo());
+            }
             atualizarListaDeProdutos();
         }
     }
@@ -68,25 +78,70 @@ public class EditarCombosController {
                 mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
                 return;
             }
-        Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
-        if (produto == null) {
-            mostrarAlerta("Erro", "Produto não encontrado: " + nomeProduto, Alert.AlertType.ERROR);
-            return;
-        }
 
-            ComboItem item = new ComboItem();
-            item.setProduto(produto);
-            item.setQuantidade(quantidade);
+            boolean produtoExistente = false;
+            for (ComboItem item : itensDoCombo) {
+                if (item.getProduto().getId().equals(produto.getId())) {
+                    item.setQuantidade(item.getQuantidade() + quantidade);
+                    produtoExistente = true;
+                    break;
+                }
+            }
 
-            itensDoCombo.add(item);
+            if (!produtoExistente) {
+                ComboItem item = new ComboItem();
+                item.setProduto(produto);
+                item.setQuantidade(quantidade);
+                item.setCombo(comboAtual); // Associa ao combo atual
+                itensDoCombo.add(item);
+            }
+
             atualizarListaDeProdutos();
-
             nomeProdutoField.clear();
             quantidadeField.clear();
 
         } catch (NumberFormatException e) {
             mostrarAlerta("Erro", "Quantidade inválida. Digite um número inteiro.", Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Erro ao adicionar produto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    @FXML
+    private void removerProduto() {
+        try {
+            String nomeProduto = nomeProdutoField.getText().trim();
+
+            if (nomeProduto.isEmpty()) {
+                mostrarAlerta("Aviso", "Digite o nome do produto a ser removido.", Alert.AlertType.WARNING);
+                return;
+            }
+
+            boolean removido = itensDoCombo.removeIf(item ->
+                    item.getProduto().getNome().equalsIgnoreCase(nomeProduto));
+
+            if (removido) {
+                atualizarListaDeProdutos();
+                mostrarAlerta("Sucesso", "Produto removido do combo.", Alert.AlertType.INFORMATION);
+            } else {
+                mostrarAlerta("Aviso", "Produto não encontrado no combo.", Alert.AlertType.WARNING);
+            }
+
+            nomeProdutoField.clear();
+            quantidadeField.clear();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Erro ao remover produto: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void limparItens() {
+        itensDoCombo.clear();
+        atualizarListaDeProdutos();
+        mostrarAlerta("Informação", "Todos os itens foram removidos.", Alert.AlertType.INFORMATION);
     }
 
     @FXML
@@ -105,6 +160,11 @@ public class EditarCombosController {
                 return;
             }
 
+            if (itensDoCombo.isEmpty()) {
+                mostrarAlerta("Aviso", "Adicione ao menos um produto ao combo.", Alert.AlertType.WARNING);
+                return;
+            }
+
             BigDecimal preco = new BigDecimal(precoStr.replace(",", "."));
 
             comboAtual.setNome(nome);
@@ -115,20 +175,76 @@ public class EditarCombosController {
 
             mostrarAlerta("Sucesso", "Combo editado com sucesso!", Alert.AlertType.INFORMATION);
 
+            fecharJanela();
+
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "Preço inválido. Use números com ponto ou vírgula.", Alert.AlertType.ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Erro", "Erro ao editar combo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
+    @FXML
+    private void cancelarEdicao() {
+        try {
+            Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacao.setTitle("Confirmar Cancelamento");
+            confirmacao.setHeaderText(null);
+            confirmacao.setContentText("Deseja cancelar a edição? Todas as alterações serão perdidas.");
+
+            confirmacao.showAndWait().ifPresent(resposta -> {
+                if (resposta.getButtonData().isDefaultButton()) {
+                    fecharJanela();
+                }
+            });
+        } catch (Exception e) {
+            fecharJanela();
+        }
+    }
+
     private void atualizarListaDeProdutos() {
         StringBuilder sb = new StringBuilder();
-        for (ComboItem item : itensDoCombo) {
-            sb.append(item.getProduto().getNome())
-                    .append(" - Quantidade: ").append(item.getQuantidade())
-                    .append("\n");
+        if (itensDoCombo.isEmpty()) {
+            sb.append("Nenhum produto adicionado.");
+        } else {
+            sb.append("Produtos no combo:\n\n");
+            double precoTotal = 0.0;
+
+            for (ComboItem item : itensDoCombo) {
+                Produto produto = item.getProduto();
+                double precoItem = produto.getPreco() * item.getQuantidade();
+                precoTotal += precoItem;
+
+                sb.append("• ").append(produto.getNome())
+                        .append(" - Quantidade: ").append(item.getQuantidade())
+                        .append(" - Preço unitário: R$ ").append(String.format("%.2f", produto.getPreco()))
+                        .append(" - Total: R$ ").append(String.format("%.2f", precoItem))
+                        .append("\n");
+            }
+
+            sb.append("\nPreço total dos itens: R$ ").append(String.format("%.2f", precoTotal));
+
+            if (precoComboField != null && !precoComboField.getText().isEmpty()) {
+                try {
+                    BigDecimal precoAtual = new BigDecimal(precoComboField.getText().replace(",", "."));
+                    if (Math.abs(precoAtual.doubleValue() - precoTotal) > 0.01) {
+                        precoComboField.setText(String.format("%.2f", precoTotal));
+                    }
+                } catch (Exception e) {
+                }
+            }
         }
+
         produtosTextArea.setText(sb.toString());
+    }
+
+    private void fecharJanela() {
+        try {
+            Stage stage = (Stage) nomeComboField.getScene().getWindow();
+            stage.close();
+        } catch (Exception e) {
+        }
     }
 
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {

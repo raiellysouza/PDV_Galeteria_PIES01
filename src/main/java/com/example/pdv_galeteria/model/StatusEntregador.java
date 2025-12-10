@@ -14,4 +14,13 @@ public enum StatusEntregador {
     public String getDescricao() {
         return descricao;
     }
+
+    public static StatusEntregador fromString(String text) {
+        for (StatusEntregador status : StatusEntregador.values()) {
+            if (status.name().equalsIgnoreCase(text)) {
+                return status;
+            }
+        }
+        return DISPONIVEL;
+    }
 }

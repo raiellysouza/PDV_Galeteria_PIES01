@@ -195,36 +195,6 @@ public class TelaRegistroPedidoController implements Initializable {
         }
     }
 
-    @FXML
-    private void abrirDashboard() {
-        System.out.println("Abrindo Dashboard...");
-        mostrarAlerta("Funcionalidade em Desenvolvimento", "Dashboard estará disponível em breve!", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void abrirCaixa() {
-        System.out.println("Abrindo Caixa...");
-        mostrarAlerta("Funcionalidade em Desenvolvimento", "Caixa estará disponível em breve!", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void abrirEntregadores() {
-        System.out.println("Abrindo Entregadores...");
-        mostrarAlerta("Funcionalidade em Desenvolvimento", "Entregadores estará disponível em breve!", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void abrirRelatorios() {
-        System.out.println("Abrindo Relatórios...");
-        mostrarAlerta("Funcionalidade em Desenvolvimento", "Relatórios estará disponível em breve!", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void abrirConfiguracoes() {
-        System.out.println("Abrindo Configurações...");
-        mostrarAlerta("Funcionalidade em Desenvolvimento", "Configurações estará disponível em breve!", Alert.AlertType.INFORMATION);
-    }
-
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
@@ -253,5 +223,194 @@ public class TelaRegistroPedidoController implements Initializable {
 
     private void mostrarErro(String mensagem) {
         System.err.println(mensagem);
+    }
+
+    @FXML
+    private void abrirTelaCaixa() {
+        try {
+            System.out.println("Abrindo tela de caixa...");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml"));
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Caixa");
+            stage.centerOnScreen();
+
+            System.out.println("Tela de caixa aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir tela de caixa: " + e.getMessage());
+            mostrarAlerta("Erro", "Não foi possível abrir a tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void abrirTelaEntregadores() {
+        try {
+            System.out.println("=== ABRINDO TELA ENTREGADORES ===");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("ERRO: Arquivo não encontrado!");
+
+                return;
+            }
+
+            System.out.println("FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            // Configurar Spring se disponível
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+                System.out.println("Spring configurado");
+            }
+
+            System.out.println("Carregando FXML...");
+            Parent root = loader.load();
+            System.out.println("FXML carregado com sucesso!");
+
+            Stage stage = null;
+
+
+            if (contentPane != null && contentPane.getScene() != null) {
+                stage = (Stage) contentPane.getScene().getWindow();
+            }
+
+            if (stage != null) {
+                stage.setScene(new Scene(root));
+                stage.setTitle("Entregadores");
+                stage.centerOnScreen();
+                System.out.println("Tela de entregadores aberta com SUCESSO!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("=== ERRO AO ABRIR TELA ENTREGADORES ===");
+            System.err.println("Mensagem: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void abrirTelaRelatorios() {
+        try {
+            System.out.println("Abrindo tela de relatórios...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorios.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo TelaRelatorios.fxml não encontrado!");
+                mostrarAlerta("Funcionalidade em Desenvolvimento",
+                        "Tela de relatórios será implementada em breve!",
+                        Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Relatórios");
+            stage.centerOnScreen();
+
+            System.out.println("Tela de relatórios aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir tela de relatórios: " + e.getMessage());
+            mostrarAlerta("Funcionalidade em Desenvolvimento",
+                    "Tela de relatórios será implementada em breve!",
+                    Alert.AlertType.INFORMATION);
+        }
+    }
+
+    @FXML
+    private void abrirTelaConfiguracoes() {
+        try {
+            System.out.println("Abrindo tela de configurações...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracoes.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo TelaConfiguracoes.fxml não encontrado!");
+                mostrarAlerta("Funcionalidade em Desenvolvimento",
+                        "Tela de configurações será implementada em breve!",
+                        Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Configurações");
+            stage.centerOnScreen();
+
+            System.out.println("Tela de configurações aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir tela de configurações: " + e.getMessage());
+            mostrarAlerta("Funcionalidade em Desenvolvimento",
+                    "Tela de configurações será implementada em breve!",
+                    Alert.AlertType.INFORMATION);
+        }
+    }
+
+    @FXML
+    private void abrirTelaDashboard() {
+        try {
+            System.out.println("Abrindo tela de dashboard...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashboard.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo TelaDashboard.fxml não encontrado!");
+                mostrarAlerta("Funcionalidade em Desenvolvimento",
+                        "Tela de dashboard será implementada em breve!",
+                        Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dashboard");
+            stage.centerOnScreen();
+
+            System.out.println("Tela de dashboard aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir tela de dashboard: " + e.getMessage());
+            mostrarAlerta("Funcionalidade em Desenvolvimento",
+                    "Tela de dashboard será implementada em breve!",
+                    Alert.AlertType.INFORMATION);
+        }
     }
 }

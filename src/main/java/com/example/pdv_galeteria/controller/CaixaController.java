@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import com.example.pdv_galeteria.model.StatusCaixa;
@@ -40,7 +41,7 @@ public class CaixaController implements Initializable {
     private TextField txtValorInicial;
 
     @FXML
-    private TextArea txtObservacoes;
+    private TextField txtValorFinal;
 
     @FXML
     private Label lblStatus;
@@ -78,7 +79,7 @@ public class CaixaController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("CaixaController.initialize() chamado");
 
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
             atualizarInterface();
         });
     }
@@ -90,7 +91,7 @@ public class CaixaController implements Initializable {
             String statusTexto = caixaService.getStatusTextoBotao();
             btnAcaoCaixa.setText(statusTexto);
 
-            Optional<Caixa> caixaOpt = caixaService.getCaixaDoDia();
+            Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
             if (caixaOpt.isPresent()) {
                 Caixa caixa = caixaOpt.get();
                 StatusCaixa status = caixa.getStatus();
@@ -98,25 +99,19 @@ public class CaixaController implements Initializable {
                 System.out.println("Status atual do caixa: " + status);
 
                 if (lblCaixaStatus != null) {
-                    String titulo = status == StatusCaixa.ABERTO ? "Caixa Aberto" :
-                            status == StatusCaixa.FECHADO ? "Caixa Fechado" :
-                                    "Caixa " + status.toString();
+                    String titulo = status == StatusCaixa.ABERTO ? "Caixa Aberto" : "Caixa Fechado";
                     lblCaixaStatus.setText(titulo);
                     System.out.println("Título atualizado: " + titulo);
                 }
 
                 if (lblDescricaoStatus != null) {
-                    String descricao = status == StatusCaixa.ABERTO ? "O caixa está operando normalmente" :
-                            status == StatusCaixa.FECHADO ? "Caixa Fechado" :
-                                    "Status desconhecido";
+                    String descricao = status == StatusCaixa.ABERTO ? "O caixa está operando normalmente" : "Caixa Fechado";
                     lblDescricaoStatus.setText(descricao);
                     System.out.println("Descrição atualizada: " + descricao);
                 }
 
                 if (paneStatusCaixa != null) {
-                    String corBorda = status == StatusCaixa.ABERTO ? "#009A05" :
-                            status == StatusCaixa.FECHADO ? "#FF0000" :
-                                    "#CCCCCC";
+                    String corBorda = status == StatusCaixa.ABERTO ? "#009A05" : "#FF0000";
                     paneStatusCaixa.setStyle("-fx-border-color: " + corBorda + "; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-border-width: 2px;");
                     System.out.println("Borda atualizada: " + corBorda);
                 }
@@ -406,46 +401,55 @@ public class CaixaController implements Initializable {
 
     private void abrirPopupAberturaCaixa() {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupAberturaCaixa.fxml")
-            );
+            System.out.println("Abrindo popup de abertura...");
 
-            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupAberturaCaixa.fxml");
+
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo popupAberturaCaixa.fxml não encontrado!");
+                abrirCaixaInterfaceFallback();
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+                System.out.println("Controller factory configurado com Spring");
+            }
+
             Parent root = loader.load();
+
             PopupAberturaCaixaController controller = loader.getController();
+
+            if (controller == null) {
+                System.err.println("Controller do popup ainda é null após carregar!");
+                abrirCaixaInterfaceFallback();
+                return;
+            }
+
+            System.out.println("Controller do popup obtido com sucesso!");
 
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
 
             controller.setOnConfirmCallback(valorInicial -> {
-                String observacoes = txtObservacoes != null ? txtObservacoes.getText() : "";
-                try {
-                    Caixa caixa = caixaService.abrirCaixa(valorInicial, observacoes);
-                    mostrarSucesso("Caixa aberto com sucesso! Valor inicial: R$ " + valorInicial);
-                    atualizarInterface();
-                } catch (Exception e) {
-                    mostrarErro("Erro ao abrir caixa: " + e.getMessage());
-                }
-            });
-
-            controller.setOnCancelCallback(() -> {
-                System.out.println("Abertura de caixa cancelada pelo usuário");
+                System.out.println("Valor inicial confirmado: " + valorInicial);
+                abrirCaixa(valorInicial);
             });
 
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Abertura de Caixa");
             popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(getCurrentStage());
             popupStage.setResizable(false);
-            popupStage.centerOnScreen();
 
-            controller.limparCampo();
             controller.focarCampoValor();
+
             popupStage.showAndWait();
 
         } catch (Exception e) {
+            System.err.println("Erro ao abrir popup de abertura: " + e.getMessage());
             e.printStackTrace();
-            mostrarErro("Erro ao abrir popup: " + e.getMessage());
             abrirCaixaInterfaceFallback();
         }
     }
@@ -457,108 +461,69 @@ public class CaixaController implements Initializable {
             }
 
             BigDecimal valorInicial = new BigDecimal(txtValorInicial.getText());
-            Caixa caixa = caixaService.abrirCaixa(valorInicial, "");
+            Caixa caixa = caixaService.abrirCaixa(valorInicial);
             mostrarSucesso("Caixa aberto com sucesso! Valor inicial: R$ " + valorInicial);
+            atualizarInterface();
 
         } catch (NumberFormatException e) {
             throw new RuntimeException("Valor inicial inválido!");
         }
     }
 
-    private void processarAberturaCaixa(BigDecimal valorInicial) {
-        try {
-            Caixa caixa = caixaService.abrirCaixa(valorInicial, "");
-            mostrarSucesso("Caixa aberto com sucesso! Valor inicial: R$ " + valorInicial);
-            atualizarInterface();
-        } catch (Exception e) {
-            mostrarErro("Erro ao abrir caixa: " + e.getMessage());
-        }
-    }
-
     private void abrirPopupFechamentoCaixa() {
-        System.out.println("\n=== TENTANDO ABRIR POPUP FECHAMENTO ===");
-
         try {
-            Optional<Caixa> caixaOpt = caixaService.getCaixaDoDia();
-            System.out.println("Caixa encontrado no banco: " + caixaOpt.isPresent());
+            System.out.println("Abrindo popup de fechamento de caixa...");
 
+            Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
             if (!caixaOpt.isPresent()) {
-                System.err.println("ERRO: Não há caixa para hoje no banco de dados!");
                 mostrarErro("Não há caixa aberto para fechar!");
                 return;
             }
 
             Caixa caixa = caixaOpt.get();
-            System.out.println("Status do caixa: " + caixa.getStatus());
-            System.out.println("É ABERTO? " + (caixa.getStatus() == StatusCaixa.ABERTO));
-
-            if (caixa.getStatus() != StatusCaixa.ABERTO) {
-                System.err.println("ERRO: Caixa não está com status ABERTO!");
-                mostrarErro("O caixa não está aberto!");
-                return;
-            }
+            System.out.println("Caixa encontrado. ID: " + caixa.getId());
 
             URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupFechamentoCaixa.fxml");
-            System.out.println("URL do FXML de fechamento: " + fxmlUrl);
-
             if (fxmlUrl == null) {
-                System.err.println("ERRO: Arquivo FXML não encontrado no caminho especificado!");
-                System.err.println("Procurando em: /com/example/pdv_galeteria/Frontend/views/PopupFechamentoCaixa.fxml");
-
-                try {
-                    System.out.println("Recursos disponíveis:");
-                    java.util.Enumeration<URL> resources = getClass().getClassLoader().getResources("");
-                    while (resources.hasMoreElements()) {
-                        System.out.println("- " + resources.nextElement());
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-
+                System.err.println("Arquivo popupFechamentoCaixa.fxml não encontrado!");
                 mostrarPopupFechamentoCustomizado();
                 return;
             }
 
-            System.out.println("Carregando FXML do popup de fechamento...");
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
-            System.out.println("Contexto Spring disponível: " + (PdvGaleteriaApplication.getSpringContext() != null));
-            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
 
             Parent root = loader.load();
-            System.out.println("FXML carregado com sucesso!");
-
             PopupFechamentoCaixaController controller = loader.getController();
+
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
 
-            controller.setOnConfirmCallback(() -> {
-                System.out.println("Callback de confirmação do popup chamado!");
+            controller.setOnConfirmCallback((BigDecimal valorFinalDigitado) -> {
                 try {
-                    System.out.println("Chamando service para fechar caixa...");
-                    Caixa caixaFechado = caixaService.fecharCaixa("");
+                    System.out.println("=== FECHANDO CAIXA ===");
+                    System.out.println("Valor recebido do popup: R$ " + valorFinalDigitado);
+                    System.out.println("Caixa ID: " + caixa.getId());
+
+                    Caixa caixaFechado = caixaService.fecharCaixa(valorFinalDigitado);
 
                     System.out.println("Caixa fechado com sucesso!");
-                    System.out.println("Novo status: " + caixaFechado.getStatus());
-                    System.out.println("Valor final: " + caixaFechado.getValorFinal());
+                    System.out.println("Valor final salvo: R$ " + caixaFechado.getValorFinal());
+                    System.out.println("======================");
+
+                    atualizarInterface();
 
                     mostrarSucesso("Caixa fechado com sucesso!\n" +
-                            "Valor final para retirada: R$ " + formatarValor(caixaFechado.getValorFinal()));
-
-                    System.out.println("Atualizando interface principal...");
-                    Platform.runLater(() -> {
-                        atualizarInterface();
-                    });
+                            "Valor final: R$ " + formatarValor(valorFinalDigitado));
 
                 } catch (Exception e) {
-                    System.err.println("Erro ao fechar caixa no callback: " + e.getMessage());
+                    System.err.println("Erro ao fechar caixa: " + e.getMessage());
                     e.printStackTrace();
                     mostrarErro("Erro ao fechar caixa: " + e.getMessage());
                 }
-            });
-
-            controller.setOnCancelCallback(() -> {
-                System.out.println("Usuário cancelou o fechamento");
             });
 
             popupStage.setScene(new Scene(root));
@@ -567,23 +532,18 @@ public class CaixaController implements Initializable {
             popupStage.initOwner(getCurrentStage());
             popupStage.setResizable(false);
             popupStage.centerOnScreen();
-
-            System.out.println("Mostrando popup de fechamento...");
             popupStage.showAndWait();
-            System.out.println("Popup de fechamento fechado");
 
         } catch (Exception e) {
-            System.err.println("ERRO ao abrir popup de fechamento: " + e.getMessage());
+            System.err.println("Erro ao abrir popup de fechamento: " + e.getMessage());
             e.printStackTrace();
-            mostrarErro("Erro ao abrir tela de fechamento: " + e.getMessage());
+            mostrarPopupFechamentoCustomizado();
         }
-
-        System.out.println("=== FIM TENTATIVA ABRIR POPUP FECHAMENTO ===\n");
     }
 
     private void mostrarPopupFechamentoCustomizado() {
         try {
-            Optional<Caixa> caixaOpt = caixaService.getCaixaDoDia();
+            Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
             if (!caixaOpt.isPresent()) {
                 mostrarErro("Não há caixa aberto para fechar!");
                 return;
@@ -607,7 +567,8 @@ public class CaixaController implements Initializable {
             Optional<ButtonType> resultado = alert.showAndWait();
 
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                Caixa caixaFechado = caixaService.fecharCaixa("");
+                BigDecimal valorFinal = caixa.getSaldoAtual();
+                Caixa caixaFechado = caixaService.fecharCaixa(valorFinal);
                 mostrarSucesso("Caixa fechado com sucesso!\n" +
                         "Valor final para retirada: R$ " + formatarValor(caixaFechado.getValorFinal()));
                 atualizarInterface();
@@ -626,56 +587,12 @@ public class CaixaController implements Initializable {
 
         try {
             String valorFormatado = String.format("%,.2f", valor);
-
             valorFormatado = valorFormatado.replace(",", "X").replace(".", ",").replace("X", ".");
-
             return valorFormatado;
         } catch (Exception e) {
             System.err.println("Erro ao formatar valor: " + valor + " - " + e.getMessage());
             return "0,00";
         }
-    }
-
-    private void atualizarEstiloCaixa(StatusCaixa status) {
-        if (paneStatusCaixa == null) {
-            System.err.println("paneStatusCaixa é nulo!");
-            return;
-        }
-
-        String estiloBase = "-fx-background-radius: 8px; -fx-border-radius: 8px; -fx-border-width: 2px;";
-
-        if (status == StatusCaixa.ABERTO) {
-            paneStatusCaixa.setStyle(estiloBase + " -fx-border-color: #009A05;");
-
-            if (lblDescricaoStatus != null) {
-                lblDescricaoStatus.setText("O caixa está operando normalmente");
-                lblDescricaoStatus.setStyle("-fx-text-fill: #666666;");
-            }
-
-            System.out.println("Status: CAIXA ABERTO - Borda verde, operando normalmente");
-
-        } else if (status == StatusCaixa.FECHADO) {
-            paneStatusCaixa.setStyle(estiloBase + " -fx-border-color: #FF0000;");
-
-            if (lblDescricaoStatus != null) {
-                lblDescricaoStatus.setText("Caixa Fechado");
-                lblDescricaoStatus.setStyle("-fx-text-fill: #666666;");
-            }
-
-            System.out.println("Status: CAIXA FECHADO - Borda vermelha, Caixa Fechado");
-
-        } else {
-            paneStatusCaixa.setStyle(estiloBase + " -fx-border-color: #CCCCCC;");
-
-            if (lblDescricaoStatus != null) {
-                lblDescricaoStatus.setText("Nenhum caixa disponível");
-                lblDescricaoStatus.setStyle("-fx-text-fill: #666666;");
-            }
-
-            System.out.println("Status: NENHUM CAIXA - Borda cinza");
-        }
-
-        atualizarImagemCadeado(status);
     }
 
     private void atualizarImagemCadeado(StatusCaixa status) {
@@ -719,7 +636,6 @@ public class CaixaController implements Initializable {
 
             if (stream == null) {
                 System.err.println("Método 2 falhou. Tentando método 3...");
-
                 stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("assets/imgs/" + nomeArquivo);
             }
 
@@ -747,6 +663,82 @@ public class CaixaController implements Initializable {
         } catch (Exception e) {
             System.err.println("Erro fatal ao carregar imagem: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void abrirCaixa(BigDecimal valorInicial) {
+        try {
+            if (caixaService == null) {
+                throw new RuntimeException("Serviço de caixa não disponível");
+            }
+
+            if (valorInicial == null || valorInicial.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException("Valor inicial inválido");
+            }
+
+            Caixa caixaAberto = caixaService.abrirCaixa(valorInicial);
+
+            if (caixaAberto == null) {
+                throw new RuntimeException("Falha ao abrir caixa");
+            }
+
+            System.out.println("Caixa aberto com sucesso! ID: " + caixaAberto.getId());
+
+            atualizarInterface();
+
+            mostrarSucesso("Caixa aberto com sucesso!\n" +
+                    "Valor inicial: R$ " + formatarValor(valorInicial));
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir caixa: " + e.getMessage());
+            mostrarErro("Erro ao abrir caixa: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void abrirTelaEntregadores() {
+        try {
+            System.out.println("=== ABRINDO TELA ENTREGADORES ===");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("ERRO: Arquivo não encontrado!");
+                return;
+            }
+
+            System.out.println("FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+                System.out.println("Spring configurado");
+            }
+
+            System.out.println("Carregando FXML...");
+            Parent root = loader.load();
+            System.out.println("FXML carregado com sucesso!");
+
+            Stage stage = null;
+
+
+            if (lblSaldo != null && lblSaldo.getScene() != null) {
+                stage = (Stage) lblSaldo.getScene().getWindow();
+                System.out.println("Usando campoBusca para obter stage");
+            }
+
+            if (stage != null) {
+                stage.setScene(new Scene(root));
+                stage.setTitle("Entregadores");
+                stage.centerOnScreen();
+                System.out.println("Tela de entregadores aberta com SUCESSO!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("=== ERRO AO ABRIR TELA ENTREGADORES ===");
+            System.err.println("Mensagem: " + e.getMessage());
+            e.printStackTrace();
+
         }
     }
 }

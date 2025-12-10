@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="227.0" prefWidth="500.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="227.0" prefWidth="500.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.PopupFechamentoCaixaController">
    <children>
       <Label layoutX="22.0" layoutY="10.0" text="Fechamento de Caixa">
          <font>
@@ -32,13 +32,13 @@
          </font>
       </Label>
 
-      <TextField fx:id="txtValorInicial" layoutX="32.0" layoutY="104.0" prefHeight="40.0" prefWidth="436.0" style="-fx-background-color: white; -fx-border-color: #ced6e0; -fx-border-radius: 5; -fx-background-radius: 5;" text="0,00">
+      <TextField fx:id="txtValorFinal" layoutX="32.0" layoutY="104.0" prefHeight="40.0" prefWidth="436.0" style="-fx-background-color: white; -fx-border-color: #ced6e0; -fx-border-radius: 5; -fx-background-radius: 5;" text="0,00">
          <font>
             <Font size="16.0" />
          </font>
       </TextField>
 
-      <Button fx:id="btnConfirmar" layoutX="32.0" layoutY="159.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="436.0" style="-fx-background-color: #f0932b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Confirmar Fechamento">
+      <Button fx:id="btnConfirmar" layoutX="32.0" layoutY="159.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="436.0" style="-fx-background-color: #f0932b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Confirmar Fechamento" onAction="#confirmarFechamento">
          <font>
             <Font size="16.0" />
          </font>

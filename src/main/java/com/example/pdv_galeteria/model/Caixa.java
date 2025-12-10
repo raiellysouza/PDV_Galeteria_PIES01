@@ -49,6 +49,36 @@ public class Caixa {
     @Column(name = "total_saidas", precision = 10, scale = 2)
     private BigDecimal totalSaidas;
 
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now();
+        }
+        if (dataCaixa == null) {
+            dataCaixa = LocalDate.now();
+        }
+        if (status == null) {
+            status = StatusCaixa.FECHADO;
+        }
+        if (saldoAtual == null) {
+            saldoAtual = BigDecimal.ZERO;
+        }
+        if (totalEntradas == null) {
+            totalEntradas = BigDecimal.ZERO;
+        }
+        if (totalSaidas == null) {
+            totalSaidas = BigDecimal.ZERO;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
     public Caixa() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -59,10 +89,9 @@ public class Caixa {
         this.totalSaidas = BigDecimal.ZERO;
     }
 
-    public Caixa(BigDecimal valorInicial, String observacoes) {
+    public Caixa(BigDecimal valorInicial) {
         this();
         this.valorInicial = valorInicial;
-        this.observacoes = observacoes;
         this.dataAbertura = LocalDateTime.now();
         this.status = StatusCaixa.ABERTO;
         this.saldoAtual = valorInicial;

@@ -6,7 +6,6 @@ import com.example.pdv_galeteria.repository.EntregadorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +22,10 @@ public class EntregadorService {
         }
 
         Entregador entregador = new Entregador();
-        entregador.setNomeCompleto(nome);
+        entregador.setNome(nome);
         entregador.setTelefone(formatarTelefone(telefone));
         entregador.setStatus(StatusEntregador.DISPONIVEL);
+        entregador.setEntregasHoje(0);
 
         return entregadorRepository.save(entregador);
     }
@@ -35,7 +35,7 @@ public class EntregadorService {
     }
 
     public List<Entregador> buscarPorNome(String nome) {
-        return entregadorRepository.findByNomeCompletoContainingIgnoreCase(nome);
+        return entregadorRepository.findByNomeContainingIgnoreCase(nome);
     }
 
     public Optional<Entregador> buscarPorId(Long id) {
@@ -51,8 +51,9 @@ public class EntregadorService {
             throw new RuntimeException("Já existe um entregador com este telefone!");
         }
 
-        existente.setNomeCompleto(entregador.getNomeCompleto());
+        existente.setNome(entregador.getNome());
         existente.setTelefone(formatarTelefone(entregador.getTelefone()));
+        existente.setStatus(entregador.getStatus());
 
         return entregadorRepository.save(existente);
     }
@@ -65,6 +66,20 @@ public class EntregadorService {
         entregadorRepository.save(entregador);
     }
 
+    // Método para alternar entre disponível/inativo
+    public void alternarStatusAtivo(Long id) {
+        Entregador entregador = entregadorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Entregador não encontrado"));
+
+        if (entregador.getStatus() == StatusEntregador.INATIVO) {
+            entregador.setStatus(StatusEntregador.DISPONIVEL);
+        } else {
+            entregador.setStatus(StatusEntregador.INATIVO);
+        }
+
+        entregadorRepository.save(entregador);
+    }
+
     public void excluirEntregador(Long id) {
         if (!entregadorRepository.existsById(id)) {
             throw new RuntimeException("Entregador não encontrado");
@@ -74,6 +89,34 @@ public class EntregadorService {
 
     public List<Entregador> listarDisponiveis() {
         return entregadorRepository.findByStatus(StatusEntregador.DISPONIVEL);
+    }
+
+    public List<Entregador> listarAtivos() {
+        // Usando o método customizado
+        return entregadorRepository.findAtivos();
+    }
+
+    public int contarEntregadoresAtivos() {
+        // Usando o método customizado
+        return (int) entregadorRepository.countAtivos();
+    }
+
+    public int contarTotalEntregasHoje() {
+        // Usando o método customizado
+        return entregadorRepository.sumEntregasHojeAtivos();
+    }
+
+    // Métodos alternativos usando os métodos com @Param
+    public List<Entregador> listarNaoInativos() {
+        return entregadorRepository.findByStatusNot(StatusEntregador.INATIVO);
+    }
+
+    public int contarNaoInativos() {
+        return (int) entregadorRepository.countByStatusNot(StatusEntregador.INATIVO);
+    }
+
+    public int somarEntregasNaoInativos() {
+        return entregadorRepository.sumEntregasHojeByStatusNot(StatusEntregador.INATIVO);
     }
 
     private String formatarTelefone(String telefone) {
