@@ -10,6 +10,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Window;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import com.example.pdv_galeteria.model.Produto;
@@ -94,16 +95,12 @@ public class TelaProdutosController implements Initializable {
         System.out.println("campoBusca: " + (campoBusca != null ? "INJETADO" : "NULO"));
         System.out.println("campoBusca: " + (campoBusca != null ? "INJETADO" : "NULO"));
 
-        verificarCaminhoFXML();
-        testePopupBasico();
-
         PdvGaleteriaApplication.debugSpringContext();
         System.out.println("ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
         timerBusca = new Timer();
 
         carregarProdutos();
-        carregarTelaCombos();
         combosController.setCombosContainer(combosContainer);
         combosController.carregarCombos();
     }
@@ -144,17 +141,25 @@ public class TelaProdutosController implements Initializable {
 
     private void carregarTelaCombos() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/Teladisplaycombo.fxml"));
-            loader.setControllerFactory(context::getBean);
-            Pane combosPane = loader.load();
-            comboContainerPane.getChildren().setAll(combosPane);
-            AnchorPane.setTopAnchor(combosPane, 0.0);
-            AnchorPane.setLeftAnchor(combosPane, 0.0);
-            AnchorPane.setRightAnchor(combosPane, 0.0);
-            AnchorPane.setBottomAnchor(combosPane, 0.0);
+            if (combosContainer == null) {
+                System.err.println("combosContainer é null!");
+                return;
+            }
+
+            combosContainer.getChildren().clear();
+
+            List<Combo> combos = comboService.buscarTodosCombos();
+
+            for (Combo combo : combos) {
+                Pane cardCombo = combosController.criarCardCombo(combo);
+                combosContainer.getChildren().add(cardCombo);
+            }
+
+            System.out.println("Combos carregados: " + combos.size());
+
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao carregar a sub-tela de combos: " + e.getMessage());
+            System.err.println("Erro ao carregar combos: " + e.getMessage());
         }
     }
 
@@ -424,7 +429,6 @@ public class TelaProdutosController implements Initializable {
                     Parent root = loader.load();
 
                     Stage stage = (Stage) contentPane.getScene().getWindow();
-                    Stage stage = new Stage();
                     stage.setScene(new Scene(root));
                     stage.setTitle("Registro de Pedidos");
                     stage.centerOnScreen();
@@ -813,7 +817,7 @@ public class TelaProdutosController implements Initializable {
                         double currentX = baseX - comboXOffset;
                         double currentY = combosStartY + ((comboCount / 2) * (cardHeight + verticalGap));
 
-                        VBox cardCombo = telaCombosController.criarCardCombo(combo);
+                        Pane cardCombo = telaCombosController.criarCardCombo(combo);
                         cardCombo.setLayoutX(currentX);
                         cardCombo.setLayoutY(currentY);
                         cardCombo.setId("card-busca-combo-" + combo.getId());
@@ -948,4 +952,84 @@ public class TelaProdutosController implements Initializable {
             mostrarMensagemErro("Erro ao abrir tela do caixa: " + e.getMessage());
         }
     }
+
+    @FXML
+    private void abrirTelaEntregadores() {
+        try {
+            System.out.println("=== ABRINDO TELA ENTREGADORES ===");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("ERRO: Arquivo não encontrado!");
+
+                mostrarAlerta("Erro", "Tela de entregadores não disponível no momento.");
+                return;
+            }
+
+            System.out.println("FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+                System.out.println("Spring configurado");
+            }
+
+            System.out.println("Carregando FXML...");
+            Parent root = loader.load();
+            System.out.println("FXML carregado com sucesso!");
+
+            Stage stage = null;
+
+
+            if (campoBusca != null && campoBusca.getScene() != null) {
+                stage = (Stage) campoBusca.getScene().getWindow();
+            }
+
+            if (stage != null) {
+                stage.setScene(new Scene(root));
+                stage.setTitle("Entregadores");
+                stage.centerOnScreen();
+                System.out.println("Tela de entregadores aberta com SUCESSO!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("=== ERRO AO ABRIR TELA ENTREGADORES ===");
+            System.err.println("Mensagem: " + e.getMessage());
+            e.printStackTrace();
+
+            mostrarAlerta("Erro", "Não foi possível abrir a tela de entregadores: " + e.getMessage());
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private Stage getCurrentStage() {
+        try {
+            for (Window window : Window.getWindows()) {
+                if (window instanceof Stage && window.isShowing()) {
+                    return (Stage) window;
+                }
+            }
+
+            Stage primaryStage = (Stage) Stage.getWindows().get(0);
+            if (primaryStage != null) {
+                return primaryStage;
+            }
+
+            System.err.println("Nenhum stage encontrado, criando novo...");
+            return new Stage();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao obter stage atual: " + e.getMessage());
+            return new Stage();
+        }
+    }
+
 }

@@ -3,7 +3,6 @@ package com.example.pdv_galeteria.controller;
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.model.ComboItem;
 import com.example.pdv_galeteria.model.Produto;
-import com.example.pdv_galeteria.repository.ComboRepository;
 import com.example.pdv_galeteria.service.ComboService;
 import com.example.pdv_galeteria.service.ProdutoService;
 import javafx.fxml.FXML;
@@ -15,15 +14,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-
+import com.example.pdv_galeteria.model.ComboItem;
+import com.example.pdv_galeteria.model.Produto;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,27 +43,32 @@ public class TelaCombosController {
     @FXML
     private FlowPane combosContainer;
 
-    @FXML private VBox sugestoesContainer;
+    @FXML
+    private VBox sugestoesContainer;
 
-    @FXML private TextArea nomeComboField;
-    @FXML private TextArea precoComboField;
-    @FXML private TextArea nomeProdutoField;
-    @FXML private TextArea quantidadeField;
-    @FXML private TextArea produtosTextArea;
-    @FXML private FlowPane comboContainer;
+    @FXML
+    private TextArea nomeComboField;
+
+    @FXML
+    private TextArea precoComboField;
+
+    @FXML
+    private TextArea nomeProdutoField;
+
+    @FXML
+    private TextArea quantidadeField;
+
+    @FXML
+    private TextArea produtosTextArea;
+
+    @FXML
+    private FlowPane comboContainer;
 
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
-
 
     @FXML
     public void initialize() {
         carregarCombos();
-    }
-
-        List<Produto> encontrados = produtoService.buscarListaPorNome(newValue.trim());
-        mostrarSugestoes(encontrados);
-        });
-
     }
 
     public void setCombosContainer(FlowPane combosContainer) {
@@ -95,7 +97,7 @@ public class TelaCombosController {
             }
 
             for (Combo combo : combos) {
-                VBox card = criarCardCombo(combo);
+                Pane card = criarCardCombo(combo);
                 combosContainer.getChildren().add(card);
             }
 
@@ -111,101 +113,99 @@ public class TelaCombosController {
         }
     }
 
-    public VBox criarCardCombo(Combo combo) {
-        VBox card = new VBox();
-        card.setSpacing(6);
-        card.setPrefWidth(480.0);
-        card.setPrefHeight(120.0);
-        card.setStyle("-fx-padding: 8; -fx-border-color: #ddd; -fx-border-radius: 6; -fx-background-color: white;");
-public Pane criarCardCombo(Combo combo) {
+    public Pane criarCardCombo(Combo combo) {
+        Pane card = new Pane();
+        card.getStyleClass().add("card-produtos");
+        card.setPrefSize(400, 178);
+        card.setMinSize(400, 178);
+        card.setMaxSize(400, 178);
+        card.setStyle("-fx-background-color: white; " +
+                "-fx-background-radius: 5; " +
+                "-fx-border-radius: 5; " +
+                "-fx-border-color: rgba(0,0,0,0.2); " +
+                "-fx-border-width: 1;");
 
-    Pane card = new Pane();
-    card.getStyleClass().add("card-produtos");
-    card.setPrefSize(400, 178);
-    card.setMinSize(400, 178);
-    card.setMaxSize(400, 178);
-    card.setStyle("-fx-background-color: white; " +
-            "-fx-background-radius: 5; " +
-            "-fx-border-radius: 5; " +
-            "-fx-border-color: rgba(0,0,0,0.2); " +
-            "-fx-border-width: 1;");
+        Label labelNome = new Label(combo.getNome() != null ? combo.getNome() : "Sem nome");
+        labelNome.setLayoutX(14);
+        labelNome.setLayoutY(14);
+        labelNome.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
-        Label nome = new Label(combo.getNome() != null ? combo.getNome() : "Sem nome");
-        nome.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        Label labelPreco = new Label(String.format("R$ %.2f", combo.getPrecoTotal()));
+        labelPreco.setLayoutX(14);
+        labelPreco.setLayoutY(82);
+        labelPreco.setStyle("-fx-font-weight: bold; -fx-font-size: 28px; -fx-text-fill: #2a6df4;");
 
-        Label preco = new Label(String.format("Preço: R$ %.2f", combo.getPrecoTotal()));
-        preco.setStyle("-fx-font-size: 14px; -fx-text-fill: #2a6df4;");
-
-        Label qtd = new Label("Itens: " + (combo.getItensDoCombo() != null ? combo.getItensDoCombo().size() : 0));
-
-        HBox botoesContainer = new HBox();
-        botoesContainer.setSpacing(10);
-        botoesContainer.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-    Label labelPreco = new Label(String.format("R$ %.2f", combo.getPrecoTotal()));
-    labelPreco.setLayoutX(14);
-    labelPreco.setLayoutY(82);
-    labelPreco.setStyle("-fx-font-weight: bold; -fx-font-size: 28px; -fx-text-fill: #2a6df4;");
+        int qtdItens = combo.getItensDoCombo() != null ? combo.getItensDoCombo().size() : 0;
+        Label labelQtd = new Label("Itens: " + qtdItens);
+        labelQtd.setLayoutX(14);
+        labelQtd.setLayoutY(120);
+        labelQtd.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
 
         Button btnEditar = new Button("Editar");
-        Button btnExcluir = new Button("Excluir");
-
-        btnExcluir.setOnAction(e -> excluirCombo(combo));
+        btnEditar.setLayoutX(300);
+        btnEditar.setLayoutY(120);
         btnEditar.setOnAction(e -> abrirTelaEditarCombo(combo));
 
-        botoesContainer.getChildren().addAll(btnEditar, btnExcluir);
-        card.getChildren().addAll(nome, preco, qtd, botoesContainer);
+        Button btnExcluir = new Button("Excluir");
+        btnExcluir.setLayoutX(350);
+        btnExcluir.setLayoutY(120);
+        btnExcluir.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
+        btnExcluir.setOnAction(e -> excluirCombo(combo));
+
+        card.getChildren().addAll(labelNome, labelPreco, labelQtd, btnEditar, btnExcluir);
+
         return card;
     }
 
     private void abrirTelaEditarCombo(Combo combo) {
-    try {
-        Combo comboCompleto = comboService.buscarPorIdComItens(combo.getId());
-
-        FXMLLoader loader = new FXMLLoader(
-            getClass().getResource("/com/example/pdv_galeteria/Frontend/views/EditarCombo.fxml")
-        );
-        loader.setControllerFactory(applicationContext::getBean);
-
-        Parent root = loader.load();
-
-        EditarCombosController controller = loader.getController();
-        controller.setCombo(comboCompleto);
-        Stage stage = new Stage();
-        stage.setTitle("Editar Combo");
-        stage.setScene(new Scene(root));
-        stage.setResizable(false);
-        stage.show();
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        mostrarAlerta("Erro", "Erro ao abrir tela de edição: " + e.getMessage(), Alert.AlertType.ERROR);
-    }
-}
-
-    private void excluirCombo(Combo combo) {
-    Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
-    confirmacao.setTitle("Confirmar exclusão");
-    confirmacao.setHeaderText(null);
-    confirmacao.setContentText("Deseja realmente excluir o combo \"" + combo.getNome() + "\"?");
-    var resultado = confirmacao.showAndWait();
-
-    if (resultado.isPresent() && resultado.get().getButtonData().isDefaultButton()) {
         try {
-            comboService.deletarCombo(combo.getId());
-            mostrarAlerta("Sucesso", "Combo excluído com sucesso!", Alert.AlertType.INFORMATION);
-            carregarCombos(); 
+            Combo comboCompleto = comboService.buscarPorIdComItens(combo.getId());
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/EditarCombo.fxml")
+            );
+            loader.setControllerFactory(applicationContext::getBean);
+
+            Parent root = loader.load();
+
+            EditarCombosController controller = loader.getController();
+            controller.setCombo(comboCompleto);
+            Stage stage = new Stage();
+            stage.setTitle("Editar Combo");
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            stage.show();
+
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarAlerta("Erro", "Erro ao excluir combo: " + e.getMessage(), Alert.AlertType.ERROR);
+            mostrarAlerta("Erro", "Erro ao abrir tela de edição: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-}
+
+    private void excluirCombo(Combo combo) {
+        Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacao.setTitle("Confirmar exclusão");
+        confirmacao.setHeaderText(null);
+        confirmacao.setContentText("Deseja realmente excluir o combo \"" + combo.getNome() + "\"?");
+        var resultado = confirmacao.showAndWait();
+
+        if (resultado.isPresent() && resultado.get().getButtonData().isDefaultButton()) {
+            try {
+                comboService.deletarCombo(combo.getId());
+                mostrarAlerta("Sucesso", "Combo excluído com sucesso!", Alert.AlertType.INFORMATION);
+                carregarCombos();
+            } catch (Exception e) {
+                e.printStackTrace();
+                mostrarAlerta("Erro", "Erro ao excluir combo: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
+    }
 
     @FXML
     public void abrirTelaCombo() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("com/example/pdv_galeteria/Frontend/views/telaCombo.fxml")
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/telaCombo.fxml")
             );
 
             loader.setControllerFactory(applicationContext::getBean);
@@ -291,8 +291,8 @@ public Pane criarCardCombo(Combo combo) {
         StringBuilder sb = new StringBuilder();
         for (ComboItem item : itensDoCombo) {
             sb.append(item.getProduto().getNome())
-              .append(" - Quantidade: ").append(item.getQuantidade())
-              .append("\n");
+                    .append(" - Quantidade: ").append(item.getQuantidade())
+                    .append("\n");
         }
         produtosTextArea.setText(sb.toString());
     }

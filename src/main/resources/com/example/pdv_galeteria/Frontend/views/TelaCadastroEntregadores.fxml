@@ -7,78 +7,73 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="363.0" prefWidth="497.0" spacing="25.0" style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-width: 1; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
-   <padding>
-      <Insets bottom="30.0" left="30.0" right="30.0" top="25.0" />
-   </padding>
-   <children>
-      
-      <HBox alignment="TOP_LEFT" spacing="10.0">
-         <children>
-            <VBox spacing="5.0">
-               <children>
-                  <Label text="Cadastrar Entregador" textFill="#111827">
-                     <font>
-                        <Font name="System Bold" size="24.0" />
-                     </font>
-                  </Label>
-                  <Label text="Adicione um novo entregador à equipe" textFill="#6b7280">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
-            <Region HBox.hgrow="ALWAYS" />
-            <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;">
-               <graphic>
-                  <SVGPath content="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#374151" scaleX="1.2" scaleY="1.2" />
-               </graphic>
-            </Button>
-         </children>
-      </HBox>
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="363.0" prefWidth="497.0" spacing="25.0" style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-width: 1; -fx-background-radius: 8; -fx-border-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.EntregadorController">
 
-      <VBox spacing="15.0">
-         <children>
-            <VBox spacing="5.0">
-               <children>
-                  <Label text="Nome completo" textFill="#374151">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField promptText="Ex: João Silva" style="-fx-background-radius: 6; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-color: white; -fx-padding: 10;">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </TextField>
-               </children>
-            </VBox>
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="25.0" />
+    </padding>
 
-            <VBox spacing="5.0">
-               <children>
-                  <Label text="Telefone" textFill="#374151">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField promptText="Ex: (85) 11111-1111" style="-fx-background-radius: 6; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-color: white; -fx-padding: 10;">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </TextField>
-               </children>
-            </VBox>
-         </children>
-      </VBox>
+    <children>
+        <HBox alignment="TOP_LEFT" spacing="10.0">
+            <children>
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Cadastrar Entregador" textFill="#111827">
+                            <font>
+                                <Font name="System Bold" size="24.0" />
+                            </font>
+                        </Label>
+                        <Label text="Adicione um novo entregador à equipe" textFill="#6b7280">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+            </children>
+        </HBox>
 
-      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="53.0" prefWidth="445.0" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Cadastrar Entregador">
-         <font>
-            <Font size="16.0" />
-         </font></Button>
+        <VBox spacing="15.0">
+            <children>
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Nome completo" textFill="#374151">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNomeCompletoPopup" promptText="Ex: João Silva" style="-fx-background-radius: 6; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-color: white; -fx-padding: 10;">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </TextField>
+                    </children>
+                </VBox>
 
-   </children>
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Telefone" textFill="#374151">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtTelefonePopup" promptText="Ex: (85) 11111-1111" style="-fx-background-radius: 6; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-color: white; -fx-padding: 10;">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </TextField>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#salvarEntregador" prefHeight="53.0" prefWidth="445.0" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-cursor: hand; -fx-font-size: 22px;" text="Cadastrar Entregador">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </Button>
+    </children>
 </VBox>
