@@ -5,14 +5,19 @@ import com.example.pdv_galeteria.model.StatusEntregador;
 import com.example.pdv_galeteria.repository.EntregadorRepository;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +30,8 @@ public class EntregadorController {
     @FXML private Label labelTotalEntregadores;
     @FXML private Label labelAtivosHoje;
     @FXML private Label labelEntregasHoje;
+    @FXML private TextField txtNomeCompletoPopup;
+    @FXML private TextField txtTelefonePopup;
 
     @Autowired
     private EntregadorRepository entregadorRepository;
@@ -306,8 +313,71 @@ public class EntregadorController {
     }
 
     @FXML
-    public void abrirPopupCadastro() {
-        System.out.println("Abrindo popup de cadastro...");
+    public void abrirPopupCadastroFXML() {
+        try {
+            System.out.println("Abrindo popup FXML de cadastro...");
+
+            if (txtNomeCompletoPopup == null || txtTelefonePopup == null) {
+                System.out.println("Campos do popup não injetados. Carregando FXML...");
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                        "/com/example/pdv_galeteria/Frontend/views/PopupCadastroEntregador.fxml"
+                ));
+
+                loader.setController(this);
+
+                Parent root = loader.load();
+
+                System.out.println("Campos após load - Nome: " + (txtNomeCompletoPopup != null));
+                System.out.println("Campos após load - Telefone: " + (txtTelefonePopup != null));
+
+                if (txtNomeCompletoPopup != null) txtNomeCompletoPopup.clear();
+                if (txtTelefonePopup != null) txtTelefonePopup.clear();
+
+                Stage popupStage = new Stage();
+                popupStage.setTitle("Cadastrar Entregador");
+                popupStage.setScene(new Scene(root));
+                popupStage.initModality(Modality.APPLICATION_MODAL);
+
+                if (containerEntregadores != null && containerEntregadores.getScene() != null) {
+                    popupStage.initOwner(containerEntregadores.getScene().getWindow());
+                }
+
+                popupStage.setResizable(false);
+
+                Platform.runLater(() -> {
+                    if (txtNomeCompletoPopup != null) {
+                        txtNomeCompletoPopup.requestFocus();
+                    }
+                });
+
+                popupStage.showAndWait();
+
+            } else {
+                System.out.println("Campos já injetados. Reutilizando...");
+
+                txtNomeCompletoPopup.clear();
+                txtTelefonePopup.clear();
+
+                Stage stage = (Stage) txtNomeCompletoPopup.getScene().getWindow();
+
+                if (stage != null) {
+                    stage.requestFocus();
+                    stage.toFront();
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("ERRO ao abrir popup FXML: " + e.getMessage());
+            e.printStackTrace();
+
+            System.out.println("Usando Dialog como fallback...");
+            abrirPopupCadastroDialog();
+        }
+    }
+
+    private void abrirPopupCadastroDialog() {
+        System.out.println("Abrindo popup de cadastro (Dialog)...");
 
         Dialog<Entregador> dialog = new Dialog<>();
         dialog.setTitle("Novo Entregador");
@@ -385,6 +455,12 @@ public class EntregadorController {
         });
     }
 
+    @FXML
+    public void abrirPopupCadastro() {
+        System.out.println("Abrindo popup de cadastro...");
+        abrirPopupCadastroFXML();
+    }
+
     private String formatarTelefone(String telefone) {
         if (telefone == null || telefone.trim().isEmpty()) {
             return "";
@@ -411,5 +487,67 @@ public class EntregadorController {
         erro.setHeaderText(titulo);
         erro.setContentText(mensagem);
         erro.showAndWait();
+    }
+
+    @FXML
+    public void salvarEntregador() {
+        System.out.println("Salvando entregador do popup...");
+
+        try {
+            if (txtNomeCompletoPopup == null || txtTelefonePopup == null) {
+                System.err.println("Campos do popup não encontrados! Usando Dialog...");
+                abrirPopupCadastro();
+                return;
+            }
+
+            String nome = txtNomeCompletoPopup.getText().trim();
+            String telefone = txtTelefonePopup.getText().trim();
+
+            if (nome.isEmpty()) {
+                mostrarErro("Campo obrigatório", "Digite o nome do entregador.");
+                txtNomeCompletoPopup.requestFocus();
+                return;
+            }
+
+            if (telefone.isEmpty()) {
+                mostrarErro("Campo obrigatório", "Digite o telefone do entregador.");
+                txtTelefonePopup.requestFocus();
+                return;
+            }
+
+            String telefoneFormatado = formatarTelefone(telefone);
+
+            if (entregadorRepository.existsByTelefone(telefoneFormatado)) {
+                mostrarErro("Telefone já cadastrado", "Já existe um entregador com este telefone.");
+                txtTelefonePopup.requestFocus();
+                txtTelefonePopup.selectAll();
+                return;
+            }
+
+            Entregador novo = new Entregador();
+            novo.setNome(nome);
+            novo.setTelefone(telefoneFormatado);
+            novo.setStatus(StatusEntregador.DISPONIVEL);
+            novo.setEntregasHoje(0);
+
+            Entregador salvo = entregadorRepository.save(novo);
+            System.out.println("Entregador salvo do popup: " + salvo);
+
+            Stage stage = (Stage) txtNomeCompletoPopup.getScene().getWindow();
+            stage.close();
+
+            carregarEntregadores();
+
+            Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
+            sucesso.setTitle("Sucesso");
+            sucesso.setHeaderText(null);
+            sucesso.setContentText("Entregador cadastrado com sucesso!");
+            sucesso.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar entregador do popup: " + e.getMessage());
+            e.printStackTrace();
+            mostrarErro("Erro ao salvar", "Não foi possível salvar o entregador.");
+        }
     }
 }

@@ -9,7 +9,6 @@ public class EntradaEstoqueResponse {
     private String observacao;
     private LocalDateTime dataEntrada;
 
-    // Getters e Setters MANUAIS
     public Long getId() {
         return id;
     }

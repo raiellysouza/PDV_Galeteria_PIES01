@@ -23,7 +23,6 @@ public class Entregador {
     @Column(name = "entregas_hoje")
     private Integer entregasHoje = 0;
 
-    // Construtores
     public Entregador() {}
 
     public Entregador(String nome, String telefone) {
@@ -33,7 +32,6 @@ public class Entregador {
         this.entregasHoje = 0;
     }
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -74,7 +72,6 @@ public class Entregador {
         this.entregasHoje = entregasHoje;
     }
 
-    // Métodos auxiliares
     public boolean isAtivo() {
         return status != StatusEntregador.INATIVO;
     }

@@ -5,18 +5,15 @@ public class EntradaEstoqueRequest {
     private Integer quantidade;
     private String observacao;
 
-    // Construtor padrão
     public EntradaEstoqueRequest() {
     }
 
-    // Construtor com parâmetros
     public EntradaEstoqueRequest(Long produtoId, Integer quantidade, String observacao) {
         this.produtoId = produtoId;
         this.quantidade = quantidade;
         this.observacao = observacao;
     }
 
-    // Getters e Setters MANUAIS
     public Long getProdutoId() {
         return produtoId;
     }

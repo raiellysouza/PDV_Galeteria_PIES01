@@ -970,7 +970,6 @@ public class TelaProdutosController implements Initializable {
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
-            // Configurar Spring se disponível
             if (PdvGaleteriaApplication.getSpringContext() != null) {
                 loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
                 System.out.println("Spring configurado");

@@ -66,7 +66,6 @@ public class EntregadorService {
         entregadorRepository.save(entregador);
     }
 
-    // Método para alternar entre disponível/inativo
     public void alternarStatusAtivo(Long id) {
         Entregador entregador = entregadorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entregador não encontrado"));
@@ -92,21 +91,17 @@ public class EntregadorService {
     }
 
     public List<Entregador> listarAtivos() {
-        // Usando o método customizado
         return entregadorRepository.findAtivos();
     }
 
     public int contarEntregadoresAtivos() {
-        // Usando o método customizado
         return (int) entregadorRepository.countAtivos();
     }
 
     public int contarTotalEntregasHoje() {
-        // Usando o método customizado
         return entregadorRepository.sumEntregasHojeAtivos();
     }
 
-    // Métodos alternativos usando os métodos com @Param
     public List<Entregador> listarNaoInativos() {
         return entregadorRepository.findByStatusNot(StatusEntregador.INATIVO);
     }
