@@ -25,4 +25,5 @@ public class Combo {
 
     @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ComboItem> itensDoCombo;
+    
 }

@@ -44,9 +44,7 @@ public class EditarCombosController {
     private Combo comboAtual;
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
-    /**
-     * Recebe o combo que será editado
-     */
+
     public void setCombo(Combo combo) {
         this.comboAtual = combo;
         carregarDadosCombo();
@@ -95,7 +93,6 @@ private void adicionarProduto() {
             return;
         }
 
-        // 🔥 NOVO TRECHO: verifica se o produto já existe na lista
         ComboItem existente = null;
         for (ComboItem item : itensDoCombo) {
             if (item.getProduto().getId().equals(produto.getId())) {
@@ -105,10 +102,8 @@ private void adicionarProduto() {
         }
 
         if (existente != null) {
-            // Já existe → soma quantidade
             existente.setQuantidade(existente.getQuantidade() + quantidade);
         } else {
-            // Não existe → cria novo
             ComboItem novoItem = new ComboItem();
             novoItem.setProduto(produto);
             novoItem.setQuantidade(quantidade);
@@ -214,7 +209,7 @@ private void adicionarProduto() {
  private void configurarAutoComplete() {
 
     sugestoesContainer.setVisible(false);
-    sugestoesContainer.setManaged(false); // <--- IMPORTANTE PARA NÃO EMPURRAR A TELA
+    sugestoesContainer.setManaged(false); 
 
     nomeProdutoField.textProperty().addListener((obs, oldValue, newValue) -> {
 
@@ -240,7 +235,7 @@ private void adicionarProduto() {
         for (Produto p : produtos) {
 
             Label opcao = new Label(p.getNome());
-            opcao.setMaxWidth(Double.MAX_VALUE); // ocupa toda a largura
+            opcao.setMaxWidth(Double.MAX_VALUE); 
             opcao.setStyle("""
                     -fx-background-color: white;
                     -fx-padding: 8 12;
@@ -249,14 +244,12 @@ private void adicionarProduto() {
                     -fx-cursor: hand;
                     """);
 
-            // CLICK
             opcao.setOnMouseClicked(e -> {
                 nomeProdutoField.setText(p.getNome());
                 sugestoesContainer.setVisible(false);
                 sugestoesContainer.setManaged(false);
             });
 
-            // HOVER
             opcao.setOnMouseEntered(e -> opcao.setStyle("""
                     -fx-background-color: #efefef;
                     -fx-padding: 8 12;
