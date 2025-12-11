@@ -1,3 +1,4 @@
+/**
 package com.example.pdv_galeteria.model;
 
 import java.math.BigDecimal;
@@ -14,3 +15,4 @@ public class ProductPrice {
     public String getProductId() { return productId; }
     public BigDecimal getPrice() { return price; }
 }
+**/

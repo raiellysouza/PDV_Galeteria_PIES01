@@ -17,9 +17,8 @@ public class EstoqueService {
     private EstoqueRepository estoqueRepository;
 
     public void adicionarAoEstoque(Long produtoId, Integer quantidade) {
-    
         Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
-            .orElse(null);
+                .orElse(null);
 
         if (estoque == null) {
             estoque = new Estoque();
@@ -32,7 +31,6 @@ public class EstoqueService {
         estoqueRepository.save(estoque);
     }
 
-
     @Data
     public static class RemocaoRequest {
         private Long produtoId;
@@ -43,7 +41,6 @@ public class EstoqueService {
             this.quantidade = quantidade;
         }
     }
-
 
     public void removerDoEstoque(Long produtoId, Integer quantidade) {
         Estoque estoque = estoqueRepository.findByProdutoId(produtoId)
@@ -63,9 +60,3 @@ public class EstoqueService {
         }
     }
 }
-
-
-
-
-
-

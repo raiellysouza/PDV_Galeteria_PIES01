@@ -74,7 +74,7 @@
       </Button>
       <ImageView fitHeight="37.0" fitWidth="32.0" layoutX="535.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@lupa.png" />
+            <Image url="@/assets/imgs/lupa.png" />
          </image>
       </ImageView>
    </children>

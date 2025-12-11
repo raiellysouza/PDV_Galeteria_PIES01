@@ -1,10 +1,6 @@
 package com.example.pdv_galeteria.model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
@@ -17,6 +13,13 @@ public class Estoque {
     private Long id;
 
     private Long produtoId;
-
     private Integer quantidade;
+
+    public Estoque() {
+    }
+
+    public Estoque(Long produtoId, Integer quantidade) {
+        this.produtoId = produtoId;
+        this.quantidade = quantidade;
+    }
 }

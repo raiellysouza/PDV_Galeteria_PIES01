@@ -1,39 +1,763 @@
 package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.model.Caixa;
+import com.example.pdv_galeteria.model.MovimentoCaixa;
 import com.example.pdv_galeteria.service.CaixaService;
+import com.example.pdv_galeteria.PdvGaleteriaApplication;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import com.example.pdv_galeteria.model.StatusCaixa;
 
 @Component
-public class CaixaController {
+public class CaixaController implements Initializable {
 
     @Autowired
     private CaixaService caixaService;
 
-    public Caixa abrirCaixa(BigDecimal valorInicial, String observacoes) {
-        return caixaService.abrirCaixa(valorInicial, observacoes);
+    @FXML
+    private Button btnAcaoCaixa;
+
+    @FXML
+    private TextField txtValorInicial;
+
+    @FXML
+    private TextField txtValorFinal;
+
+    @FXML
+    private Label lblStatus;
+
+    @FXML
+    private Label lblSaldo;
+
+    @FXML
+    private Label lblTotalEntradas;
+
+    @FXML
+    private Label lblTotalSaidas;
+
+    @FXML
+    private Label lblCaixaStatus;
+
+    @FXML
+    private Pane paneStatusCaixa;
+
+    @FXML
+    private ImageView imgCadeadoStatus;
+
+    @FXML
+    private Label lblDescricaoStatus;
+
+    public void setCaixaService(CaixaService caixaService) {
+        this.caixaService = caixaService;
     }
 
-    public Caixa fecharCaixa(String observacoes) {
-        return caixaService.fecharCaixa(observacoes);
+    public CaixaController() {
+        System.out.println("CaixaController instanciado!");
     }
 
-    public String getStatusTextoBotao() {
-        return caixaService.getStatusTextoBotao();
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("CaixaController.initialize() chamado");
+
+        Platform.runLater(() -> {
+            atualizarInterface();
+        });
     }
 
-    public boolean podeAbrirCaixa() {
-        return caixaService.podeAbrirCaixa();
+    private void atualizarInterface() {
+        System.out.println("atualizarInterface() chamado");
+
+        try {
+            String statusTexto = caixaService.getStatusTextoBotao();
+            btnAcaoCaixa.setText(statusTexto);
+
+            Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
+            if (caixaOpt.isPresent()) {
+                Caixa caixa = caixaOpt.get();
+                StatusCaixa status = caixa.getStatus();
+
+                System.out.println("Status atual do caixa: " + status);
+
+                if (lblCaixaStatus != null) {
+                    String titulo = status == StatusCaixa.ABERTO ? "Caixa Aberto" : "Caixa Fechado";
+                    lblCaixaStatus.setText(titulo);
+                    System.out.println("Título atualizado: " + titulo);
+                }
+
+                if (lblDescricaoStatus != null) {
+                    String descricao = status == StatusCaixa.ABERTO ? "O caixa está operando normalmente" : "Caixa Fechado";
+                    lblDescricaoStatus.setText(descricao);
+                    System.out.println("Descrição atualizada: " + descricao);
+                }
+
+                if (paneStatusCaixa != null) {
+                    String corBorda = status == StatusCaixa.ABERTO ? "#009A05" : "#FF0000";
+                    paneStatusCaixa.setStyle("-fx-border-color: " + corBorda + "; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-border-width: 2px;");
+                    System.out.println("Borda atualizada: " + corBorda);
+                }
+
+                atualizarImagemCadeado(status);
+
+                if (lblTotalEntradas != null) {
+                    lblTotalEntradas.setText("R$ " + formatarValor(caixa.getTotalEntradas()));
+                }
+                if (lblTotalSaidas != null) {
+                    lblTotalSaidas.setText("R$ " + formatarValor(caixa.getTotalSaidas()));
+                }
+                if (lblSaldo != null) {
+                    lblSaldo.setText("R$ " + formatarValor(caixa.getSaldoAtual()));
+                }
+
+            } else {
+                System.out.println("Nenhum caixa encontrado");
+
+                if (lblCaixaStatus != null) {
+                    lblCaixaStatus.setText("Nenhum Caixa Aberto");
+                }
+                if (lblDescricaoStatus != null) {
+                    lblDescricaoStatus.setText("Abra um caixa para começar");
+                }
+                if (paneStatusCaixa != null) {
+                    paneStatusCaixa.setStyle("-fx-border-color: #CCCCCC; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-border-width: 2px;");
+                }
+
+                atualizarImagemCadeado(null);
+
+                if (lblTotalEntradas != null) lblTotalEntradas.setText("R$ 0,00");
+                if (lblTotalSaidas != null) lblTotalSaidas.setText("R$ 0,00");
+                if (lblSaldo != null) lblSaldo.setText("R$ 0,00");
+            }
+
+            System.out.println("Interface atualizada com sucesso!");
+
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar interface: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    public boolean podeFecharCaixa() {
-        return caixaService.podeFecharCaixa();
+    @FXML
+    private void abrirTelaVendas() {
+        try {
+            System.out.println("Abrindo tela de vendas...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRegistroPedido.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo FXML não encontrado: TelaRegistroPedido.fxml");
+                mostrarMensagemErro("Arquivo da tela de vendas não encontrado!");
+                return;
+            }
+            System.out.println("Arquivo FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() == null) {
+                System.err.println("Contexto do Spring não disponível");
+                try {
+                    Parent root = loader.load();
+                    Stage stage = getCurrentStage();
+                    stage.setScene(new Scene(root));
+                    stage.setTitle("Registro de Pedidos");
+                    stage.centerOnScreen();
+                    System.out.println("Tela de vendas aberta sem Spring");
+                    return;
+                } catch (Exception fallbackException) {
+                    fallbackException.printStackTrace();
+                    mostrarMensagemErro("Erro ao abrir tela: " + fallbackException.getMessage());
+                    return;
+                }
+            }
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            Parent root = loader.load();
+            Stage stage = getCurrentStage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Registro de Pedidos");
+            stage.centerOnScreen();
+            System.out.println("Tela de vendas aberta com sucesso!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir tela de vendas: " + e.getMessage());
+            String errorDetails = "Erro ao abrir tela de vendas:\n";
+            if (e.getCause() != null) {
+                errorDetails += "Causa: " + e.getCause().getMessage();
+            } else {
+                errorDetails += e.getMessage();
+            }
+            mostrarMensagemErro(errorDetails);
+        }
     }
 
-    public Caixa getCaixaDoDia() {
-        return caixaService.getCaixaDoDia().orElse(null);
+    @FXML
+    private void abrirTelaEstoque() {
+        System.out.println("BOTÃO ESTOQUE CLICADO - Iniciando...");
+
+        try {
+            System.out.println("Abrindo tela de estoque...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaProdutos.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo FXML não encontrado: TelaProdutos.fxml");
+                mostrarMensagemErro("Arquivo da tela de estoque não encontrado!");
+                return;
+            }
+            System.out.println("Arquivo FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() == null) {
+                System.err.println("Contexto do Spring não disponível");
+                try {
+                    Parent root = loader.load();
+                    Stage stage = getCurrentStage();
+                    stage.setScene(new Scene(root));
+                    stage.setTitle("Estoque");
+                    stage.centerOnScreen();
+                    System.out.println("Tela de estoque aberta sem Spring");
+                    return;
+                } catch (Exception fallbackException) {
+                    fallbackException.printStackTrace();
+                    mostrarMensagemErro("Erro ao abrir tela: " + fallbackException.getMessage());
+                    return;
+                }
+            }
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            Parent root = loader.load();
+            Stage stage = getCurrentStage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Estoque");
+            stage.centerOnScreen();
+            System.out.println("Tela de estoque aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir tela de estoque: " + e.getMessage());
+            mostrarMensagemErro("Erro ao abrir tela de estoque: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void sairParaLogin() {
+        try {
+            System.out.println("Abrindo pop-up de confirmação de saída...");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            Parent root = loader.load();
+            ConfirmacaoSaidaController controller = loader.getController();
+
+            Stage popupStage = new Stage();
+            controller.setPopupStage(popupStage);
+
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Confirmação de Saída");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(getCurrentStage());
+            popupStage.setResizable(false);
+            popupStage.centerOnScreen();
+
+            popupStage.showAndWait();
+
+            if (controller.isConfirmado()) {
+                System.out.println("Usuário confirmou saída, voltando para login...");
+                voltarParaTelaLogin();
+            } else {
+                System.out.println("Usuário cancelou a saída.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmação de Saída");
+            alert.setHeaderText("Deseja realmente sair?");
+            alert.setContentText("Você será redirecionado para a tela de login.");
+
+            Optional<ButtonType> resultado = alert.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                voltarParaTelaLogin();
+            }
+        }
+    }
+
+    private void voltarParaTelaLogin() {
+        try {
+            System.out.println("Iniciando processo de volta para login...");
+
+            Stage stage = getCurrentStage();
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setTitle("Login");
+            stage.centerOnScreen();
+
+            System.out.println("Tela de login carregada com sucesso!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erro ao voltar para login: " + e.getMessage());
+            reiniciarAplicacaoCompleta();
+        }
+    }
+
+    private Stage getCurrentStage() {
+        try {
+            for (Window window : Window.getWindows()) {
+                if (window instanceof Stage && window.isShowing()) {
+                    return (Stage) window;
+                }
+            }
+
+            Stage primaryStage = (Stage) Stage.getWindows().get(0);
+            if (primaryStage != null) {
+                return primaryStage;
+            }
+
+            System.err.println("Nenhum stage encontrado, criando novo...");
+            return new Stage();
+        } catch (Exception e) {
+            System.err.println("Erro ao obter stage atual: " + e.getMessage());
+            return new Stage();
+        }
+    }
+
+    private void reiniciarAplicacaoCompleta() {
+        try {
+            Stage stage = getCurrentStage();
+            stage.close();
+            PdvGaleteriaApplication.main(new String[]{});
+        } catch (Exception e) {
+            System.err.println("Erro ao reiniciar aplicação: " + e.getMessage());
+            mostrarMensagemErro("Erro crítico. Feche e abra o aplicativo manualmente.");
+        }
+    }
+
+    private void mostrarSucesso(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Sucesso");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private void mostrarErro(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private void mostrarMensagemErro(String mensagem) {
+        mostrarErro(mensagem);
+    }
+
+    @FXML
+    private void handleAcaoCaixa() {
+        try {
+            String acaoAtual = btnAcaoCaixa.getText();
+            System.out.println("Botão clicado: " + acaoAtual);
+
+            if (acaoAtual.equals("Abrir Caixa")) {
+                System.out.println("Abrindo popup de abertura...");
+                abrirPopupAberturaCaixa();
+            } else if (acaoAtual.equals("Fechar Caixa")) {
+                System.out.println("Abrindo popup de fechamento...");
+                abrirPopupFechamentoCaixa();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro em handleAcaoCaixa: " + e.getMessage());
+            e.printStackTrace();
+            mostrarErro(e.getMessage());
+        }
+    }
+
+    private void abrirPopupAberturaCaixa() {
+        try {
+            System.out.println("Abrindo popup de abertura...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupAberturaCaixa.fxml");
+
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo popupAberturaCaixa.fxml não encontrado!");
+                abrirCaixaInterfaceFallback();
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+                System.out.println("Controller factory configurado com Spring");
+            }
+
+            Parent root = loader.load();
+
+            PopupAberturaCaixaController controller = loader.getController();
+
+            if (controller == null) {
+                System.err.println("Controller do popup ainda é null após carregar!");
+                abrirCaixaInterfaceFallback();
+                return;
+            }
+
+            System.out.println("Controller do popup obtido com sucesso!");
+
+            Stage popupStage = new Stage();
+            controller.setPopupStage(popupStage);
+
+            controller.setOnConfirmCallback(valorInicial -> {
+                System.out.println("Valor inicial confirmado: " + valorInicial);
+                abrirCaixa(valorInicial);
+            });
+
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Abertura de Caixa");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setResizable(false);
+
+            controller.focarCampoValor();
+
+            popupStage.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir popup de abertura: " + e.getMessage());
+            e.printStackTrace();
+            abrirCaixaInterfaceFallback();
+        }
+    }
+
+    private void abrirCaixaInterfaceFallback() {
+        try {
+            if (txtValorInicial == null || txtValorInicial.getText().isEmpty()) {
+                throw new RuntimeException("Informe o valor inicial!");
+            }
+
+            BigDecimal valorInicial = new BigDecimal(txtValorInicial.getText());
+            Caixa caixa = caixaService.abrirCaixa(valorInicial);
+            mostrarSucesso("Caixa aberto com sucesso! Valor inicial: R$ " + valorInicial);
+            atualizarInterface();
+
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Valor inicial inválido!");
+        }
+    }
+
+    private void abrirPopupFechamentoCaixa() {
+        try {
+            System.out.println("Abrindo popup de fechamento de caixa...");
+
+            Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
+            if (!caixaOpt.isPresent()) {
+                mostrarErro("Não há caixa aberto para fechar!");
+                return;
+            }
+
+            Caixa caixa = caixaOpt.get();
+            System.out.println("Caixa encontrado. ID: " + caixa.getId());
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupFechamentoCaixa.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("Arquivo popupFechamentoCaixa.fxml não encontrado!");
+                mostrarPopupFechamentoCustomizado();
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+            PopupFechamentoCaixaController controller = loader.getController();
+
+            Stage popupStage = new Stage();
+            controller.setPopupStage(popupStage);
+
+            controller.setOnConfirmCallback((BigDecimal valorFinalDigitado) -> {
+                try {
+                    System.out.println("=== FECHANDO CAIXA ===");
+                    System.out.println("Valor recebido do popup: R$ " + valorFinalDigitado);
+                    System.out.println("Caixa ID: " + caixa.getId());
+
+                    Caixa caixaFechado = caixaService.fecharCaixa(valorFinalDigitado);
+
+                    System.out.println("Caixa fechado com sucesso!");
+                    System.out.println("Valor final salvo: R$ " + caixaFechado.getValorFinal());
+                    System.out.println("======================");
+
+                    atualizarInterface();
+
+                    mostrarSucesso("Caixa fechado com sucesso!\n" +
+                            "Valor final: R$ " + formatarValor(valorFinalDigitado));
+
+                } catch (Exception e) {
+                    System.err.println("Erro ao fechar caixa: " + e.getMessage());
+                    e.printStackTrace();
+                    mostrarErro("Erro ao fechar caixa: " + e.getMessage());
+                }
+            });
+
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Fechamento de Caixa");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(getCurrentStage());
+            popupStage.setResizable(false);
+            popupStage.centerOnScreen();
+            popupStage.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir popup de fechamento: " + e.getMessage());
+            e.printStackTrace();
+            mostrarPopupFechamentoCustomizado();
+        }
+    }
+
+    private void mostrarPopupFechamentoCustomizado() {
+        try {
+            Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
+            if (!caixaOpt.isPresent()) {
+                mostrarErro("Não há caixa aberto para fechar!");
+                return;
+            }
+
+            Caixa caixa = caixaOpt.get();
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Fechamento de Caixa");
+            alert.setHeaderText("Confirmar fechamento do caixa?");
+
+            String contentText = "Resumo do Caixa:\n\n" +
+                    "Valor inicial: R$ " + formatarValor(caixa.getValorInicial()) + "\n" +
+                    "Total de entradas: R$ " + formatarValor(caixa.getTotalEntradas()) + "\n" +
+                    "Total de saídas: R$ " + formatarValor(caixa.getTotalSaidas()) + "\n" +
+                    "Saldo final: R$ " + formatarValor(caixa.getSaldoAtual()) + "\n\n" +
+                    "Deseja realmente fechar o caixa?";
+
+            alert.setContentText(contentText);
+
+            Optional<ButtonType> resultado = alert.showAndWait();
+
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                BigDecimal valorFinal = caixa.getSaldoAtual();
+                Caixa caixaFechado = caixaService.fecharCaixa(valorFinal);
+                mostrarSucesso("Caixa fechado com sucesso!\n" +
+                        "Valor final para retirada: R$ " + formatarValor(caixaFechado.getValorFinal()));
+                atualizarInterface();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarErro("Erro ao fechar caixa: " + e.getMessage());
+        }
+    }
+
+    private String formatarValor(BigDecimal valor) {
+        if (valor == null) {
+            return "0,00";
+        }
+
+        try {
+            String valorFormatado = String.format("%,.2f", valor);
+            valorFormatado = valorFormatado.replace(",", "X").replace(".", ",").replace("X", ".");
+            return valorFormatado;
+        } catch (Exception e) {
+            System.err.println("Erro ao formatar valor: " + valor + " - " + e.getMessage());
+            return "0,00";
+        }
+    }
+
+    private void atualizarImagemCadeado(StatusCaixa status) {
+        if (imgCadeadoStatus == null) {
+            System.err.println("imgCadeadoStatus é nulo!");
+            return;
+        }
+
+        try {
+            String nomeArquivo;
+
+            if (status == StatusCaixa.ABERTO) {
+                nomeArquivo = "cadeado2.png";
+                System.out.println("Carregando imagem para CAIXA ABERTO: " + nomeArquivo);
+            } else if (status == StatusCaixa.FECHADO) {
+                nomeArquivo = "cadeadoFvermelho.png";
+                System.out.println("Carregando imagem para CAIXA FECHADO: " + nomeArquivo);
+            } else {
+                nomeArquivo = "cadeadoFvermelho.png";
+                System.out.println("Carregando imagem DEFAULT (status null): " + nomeArquivo);
+            }
+
+            System.out.println("Tentando carregar imagem: " + nomeArquivo);
+
+            String projectPath = System.getProperty("user.dir");
+            String imagePath = projectPath + "/src/main/resources/assets/imgs/" + nomeArquivo;
+
+            System.out.println("Caminho absoluto: " + imagePath);
+
+            File file = new File(imagePath);
+            if (file.exists()) {
+                Image imagem = new Image(file.toURI().toString());
+                imgCadeadoStatus.setImage(imagem);
+                System.out.println("Imagem carregada via caminho absoluto!");
+                return;
+            } else {
+                System.err.println("Arquivo não encontrado no caminho absoluto: " + imagePath);
+            }
+
+            InputStream stream = getClass().getResourceAsStream("/assets/imgs/" + nomeArquivo);
+
+            if (stream == null) {
+                System.err.println("Método 2 falhou. Tentando método 3...");
+                stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("assets/imgs/" + nomeArquivo);
+            }
+
+            if (stream == null) {
+                System.err.println("Método 3 falhou. Imagem não encontrada: " + nomeArquivo);
+
+                if (status == StatusCaixa.ABERTO) {
+                    imgCadeadoStatus.setStyle("-fx-effect: dropshadow(gaussian, #009A05, 10, 0, 0, 0);");
+                } else if (status == StatusCaixa.FECHADO) {
+                    imgCadeadoStatus.setStyle("-fx-effect: dropshadow(gaussian, #FF0000, 10, 0, 0, 0);");
+                } else {
+                    imgCadeadoStatus.setStyle("-fx-effect: none;");
+                }
+
+                System.out.println("Usando fallback de estilo (sombra colorida)");
+                return;
+            }
+
+            Image imagem = new Image(stream);
+            imgCadeadoStatus.setImage(imagem);
+            imgCadeadoStatus.setStyle("");
+
+            System.out.println("Imagem '" + nomeArquivo + "' carregada com sucesso!");
+
+        } catch (Exception e) {
+            System.err.println("Erro fatal ao carregar imagem: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void abrirCaixa(BigDecimal valorInicial) {
+        try {
+            if (caixaService == null) {
+                throw new RuntimeException("Serviço de caixa não disponível");
+            }
+
+            if (valorInicial == null || valorInicial.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException("Valor inicial inválido");
+            }
+
+            Caixa caixaAberto = caixaService.abrirCaixa(valorInicial);
+
+            if (caixaAberto == null) {
+                throw new RuntimeException("Falha ao abrir caixa");
+            }
+
+            System.out.println("Caixa aberto com sucesso! ID: " + caixaAberto.getId());
+
+            atualizarInterface();
+
+            mostrarSucesso("Caixa aberto com sucesso!\n" +
+                    "Valor inicial: R$ " + formatarValor(valorInicial));
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir caixa: " + e.getMessage());
+            mostrarErro("Erro ao abrir caixa: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void abrirTelaEntregadores() {
+        try {
+            System.out.println("=== ABRINDO TELA ENTREGADORES ===");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("ERRO: Arquivo não encontrado!");
+                return;
+            }
+
+            System.out.println("FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+                System.out.println("Spring configurado");
+            }
+
+            System.out.println("Carregando FXML...");
+            Parent root = loader.load();
+            System.out.println("FXML carregado com sucesso!");
+
+            Stage stage = null;
+
+
+            if (lblSaldo != null && lblSaldo.getScene() != null) {
+                stage = (Stage) lblSaldo.getScene().getWindow();
+                System.out.println("Usando campoBusca para obter stage");
+            }
+
+            if (stage != null) {
+                stage.setScene(new Scene(root));
+                stage.setTitle("Entregadores");
+                stage.centerOnScreen();
+                System.out.println("Tela de entregadores aberta com SUCESSO!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("=== ERRO AO ABRIR TELA ENTREGADORES ===");
+            System.err.println("Mensagem: " + e.getMessage());
+            e.printStackTrace();
+
+        }
+    public MovimentoCaixa registrarEntrada(BigDecimal valor, String descricao, String referenciaExterna) {
+        return caixaService.registrarEntrada(valor, descricao, referenciaExterna);
+    }
+
+    public MovimentoCaixa registrarSaida(BigDecimal valor, String descricao, String referenciaExterna) {
+        return caixaService.registrarSaida(valor, descricao, referenciaExterna);
+    }
+
+    public BigDecimal getSaldoAtualDoDia() {
+        return caixaService.getSaldoAtualDoDia();
+    }
+
+    public BigDecimal getTotalEntradasDoDia() {
+        return caixaService.getTotalEntradasDoDia();
+    }
+
+    public BigDecimal getTotalSaidasDoDia() {
+        return caixaService.getTotalSaidasDoDia();
     }
 }
