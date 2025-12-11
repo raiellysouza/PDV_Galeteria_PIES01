@@ -49,4 +49,5 @@ public class Usuario {
         this.codigoRecuperacao = gerarCodigoRecuperacao();
         return this.codigoRecuperacao;
     }
+    
 }
