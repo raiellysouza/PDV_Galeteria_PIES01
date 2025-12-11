@@ -6,6 +6,8 @@ import com.example.pdv_galeteria.model.EstoqueEntrada;
 import com.example.pdv_galeteria.repository.EstoqueEntradaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 
 @Service
@@ -14,6 +16,10 @@ public class EstoqueEntradaService {
     @Autowired
     private EstoqueEntradaRepository estoqueEntradaRepository;
 
+    @Autowired
+    private EstoqueService estoqueService;
+
+    @Transactional
     public EntradaEstoqueResponse registrarEntrada(EntradaEstoqueRequest request) {
         EstoqueEntrada entrada = new EstoqueEntrada();
         entrada.setProdutoId(request.getProdutoId());
@@ -21,7 +27,14 @@ public class EstoqueEntradaService {
         entrada.setObservacao(request.getObservacao());
         entrada.setDataEntrada(LocalDateTime.now());
 
-        estoqueEntradaRepository.salvar(entrada);
+        estoqueEntradaRepository.save(entrada);
+
+        if (estoqueService != null) {
+            estoqueService.adicionarAoEstoque(
+                    request.getProdutoId(),
+                    request.getQuantidade()
+            );
+        }
 
         EntradaEstoqueResponse response = new EntradaEstoqueResponse();
         response.setId(entrada.getId());

@@ -11,35 +11,29 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
 
     <children>
-        <!-- Container Principal Centralizado -->
         <VBox alignment="CENTER" prefHeight="700.0" prefWidth="1350.0" spacing="40" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
 
             <children>
-                <!-- Logo -->
                 <ImageView fitHeight="180.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
+                        <Image url="@/assets/imgs/logo-pdv.jpg" />
                     </image>
                 </ImageView>
 
-                <!-- Card de Login -->
                 <VBox alignment="CENTER" maxWidth="500.0" prefWidth="500.0" spacing="30" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 40;">
 
                     <children>
-                        <!-- Título Login -->
                         <Label style="-fx-text-fill: black;" text="Login">
                             <font>
                                 <Font name="System Bold" size="32.0" />
                             </font>
                         </Label>
 
-                        <!-- Formulário -->
                         <VBox maxWidth="400.0" prefWidth="400.0" spacing="25">
                             <children>
-                                <!-- Campo Usuário -->
                                 <VBox spacing="8">
                                     <children>
                                         <Label style="-fx-text-fill: black;" text="Usuário">
@@ -55,7 +49,6 @@
                                     </children>
                                 </VBox>
 
-                                <!-- Campo Senha -->
                                 <VBox spacing="8">
                                     <children>
                                         <Label style="-fx-text-fill: black;" text="Senha">
@@ -73,7 +66,6 @@
                             </children>
                         </VBox>
 
-                        <!-- Botão Entrar COM HOVER FUNCIONANDO -->
                         <Button maxWidth="400.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="50.0" prefWidth="400.0" style="-fx-background-color: #f68411; -fx-background-radius: 8px;" styleClass="hover" text="Entrar" textFill="WHITE">
                             <cursor>
                                 <Cursor fx:constant="HAND" />
@@ -85,7 +77,6 @@
                     </children>
                 </VBox>
 
-                <!-- Informações de Acesso (visível apenas em telas maiores) -->
                 <VBox alignment="CENTER" managed="false" spacing="10" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10; -fx-padding: 20;" visible="false">
                     <children>
                         <Label style="-fx-font-weight: bold;" text="Acesso de Teste" textFill="WHITE">
@@ -102,18 +93,15 @@
             </children>
         </VBox>
 
-        <!-- Versão Mobile (visível apenas em telas pequenas) -->
         <VBox alignment="CENTER" managed="false" spacing="30" visible="false" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
 
             <children>
-                <!-- Logo Mobile -->
                 <ImageView fitHeight="120.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@assets/imgs/logo-pdv.jpg" />
+                        <Image url="@/assets/imgs/logo-pdv.jpg" />
                     </image>
                 </ImageView>
 
-                <!-- Card de Login Mobile -->
                 <VBox alignment="CENTER" spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 30;">
 
                     <children>
@@ -143,7 +131,6 @@
                             </VBox>
                         </VBox>
 
-                        <!-- Botão Entrar Mobile COM HOVER FUNCIONANDO -->
                         <Button maxWidth="300.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="45.0" styleClass="hover" text="Entrar">
                             <cursor><Cursor fx:constant="HAND" /></cursor>
                             <font><Font name="System Bold" size="16.0" /></font>

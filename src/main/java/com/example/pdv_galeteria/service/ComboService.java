@@ -42,11 +42,11 @@ public class ComboService {
 
     @Transactional
     public Combo salvarCombo(Combo novoCombo) {
-        System.out.println("iniciando metodo para salvar combo");
+        System.out.println("Método salvarCombo iniciado");
 
         try {
             if (novoCombo == null) {
-                System.err.println("combo é nulo ");
+                System.err.println("Combo é nulo!");
                 throw new IllegalArgumentException("Combo não pode ser nulo");
             }
 
@@ -61,7 +61,7 @@ public class ComboService {
             }
 
             if (novoCombo.getNome() == null || novoCombo.getNome().trim().isEmpty()) {
-                System.err.println("Combo nulo ou vazio");
+                System.err.println("Nome do combo é nulo ou vazio!");
                 throw new IllegalArgumentException("Nome do combo é obrigatório");
             }
 
@@ -92,9 +92,9 @@ public class ComboService {
             return salvado;
 
         } catch (Exception e) {
-            System.err.println("erro em salvarCombo:");
+            System.err.println("Erro no salvarCombo:");
             e.printStackTrace();
-            throw e; 
+            throw e;
         }
     }
     
@@ -135,11 +135,11 @@ public List<Combo> buscarTodosCombos() {
 public Combo buscarPorIdComItens(Long id) {
     Combo combo = entityManager.find(Combo.class, id);
     if (combo != null) {
-        combo.getItensDoCombo().size(); 
+        combo.getItensDoCombo().size();
 
         combo.getItensDoCombo().forEach(item -> {
             if (item.getProduto() != null) {
-                item.getProduto().getNome(); 
+                item.getProduto().getNome();
             }
         });
     }
@@ -155,7 +155,7 @@ public Combo buscarPorIdComItens(Long id) {
 
             combos.forEach(combo -> {
                 if (combo.getItensDoCombo() != null) {
-                    combo.getItensDoCombo().size(); 
+                    combo.getItensDoCombo().size();
                 }
             });
 

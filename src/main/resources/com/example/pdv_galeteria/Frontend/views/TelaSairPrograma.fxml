@@ -13,7 +13,7 @@
     <children>
         <ImageView fitHeight="98.0" fitWidth="95.0" layoutX="115.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/fechar.png" />
+                <Image url="@/assets/imgs/fechar.png" />
             </image>
         </ImageView>
         <Label layoutX="25.0" layoutY="126.0" text="Deseja sair do sistema?">

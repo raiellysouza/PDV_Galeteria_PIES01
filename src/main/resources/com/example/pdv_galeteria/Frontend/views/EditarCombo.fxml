@@ -27,13 +27,11 @@
 
       <Label layoutX="14.0" layoutY="133.0" text="Escreva o nome do Produto:" />
 
-      <!-- CAMPO DO PRODUTO -->
       <TextArea fx:id="nomeProdutoField"
                 layoutX="14.0" layoutY="150.0"
                 prefHeight="39.0" prefWidth="564.0"
                 promptText="Nome produto" />
 
-      <!-- LISTA DE SUGESTÕES (AUTOCOMPLETE) — FICA POR CIMA -->
       <VBox fx:id="sugestoesContainer"
             layoutX="14.0"
             layoutY="189.0"
@@ -76,7 +74,7 @@
       </Button>
       <ImageView fitHeight="37.0" fitWidth="32.0" layoutX="535.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@lupa.png" />
+            <Image url="@/assets/imgs/lupa.png" />
          </image>
       </ImageView>
    </children>

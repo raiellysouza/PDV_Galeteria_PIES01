@@ -15,6 +15,11 @@ public class ItemPedido {
     private Double precoUnitario;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venda_em_lote_id")
+    private VendaEmLote vendaEmLote;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
@@ -26,7 +31,6 @@ public class ItemPedido {
         this.precoUnitario = precoUnitario;
     }
 
-    // getters e setters
     public Long getId(){return id;}
     public void setId(Long id){this.id = id;}
     public String getProduto(){return produto;}
@@ -37,4 +41,8 @@ public class ItemPedido {
     public void setPrecoUnitario(Double precoUnitario){this.precoUnitario = precoUnitario;}
     public Pedido getPedido(){return pedido;}
     public void setPedido(Pedido pedido){this.pedido = pedido;}
+
+    public VendaEmLote getVendaEmLote(){return vendaEmLote;}
+    public void setVendaEmLote(VendaEmLote vendaEmLote){
+        this.vendaEmLote = vendaEmLote;}
 }

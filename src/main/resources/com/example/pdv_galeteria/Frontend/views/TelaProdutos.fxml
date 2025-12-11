@@ -9,11 +9,10 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.layout.FlowPane?>
 <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.TelaProdutosController">
     <children>
         <Pane layoutX="283.0" layoutY="0.0" prefHeight="700.0" prefWidth="1283.0" style="-fx-background-color: white;">
@@ -37,7 +36,6 @@
                     </cursor>
                 </TextField>
 
-                <!-- Botão Novo Produto -->
                 <Button layoutX="576.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirCadastroProduto" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Produto" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="16.0" />
@@ -47,7 +45,6 @@
                     </cursor>
                 </Button>
 
-                <!-- Botão Novo Combo -->
                 <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirTelaCombo" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Combo" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="16.0" />
@@ -59,64 +56,51 @@
 
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="520.0" layoutY="155.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/search-svgrepo-com.png" />
+                        <Image url="@/assets/imgs/search-svgrepo-com.png" />
                     </image>
                 </ImageView>
 
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="606.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+                        <Image url="@/assets/imgs/mais.png" />
                     </image>
                 </ImageView>
                 <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="858.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+                        <Image url="@/assets/imgs/mais.png" />
                     </image>
                 </ImageView>
 
-                <!-- SEÇÃO PRODUTOS -->
                 <Label layoutX="19.0" layoutY="180.0" text="Produtos">
                     <font>
                         <Font name="System Bold" size="35.0" />
                     </font>
                 </Label>
 
-                <!-- SCROLL VERTICAL PARA PRODUTOS - 2 CARDS POR LINHA -->
-                <ScrollPane layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0"
-                            style="-fx-background-color: transparent; -fx-border-color: transparent;"
-                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
                     <content>
-                        <FlowPane fx:id="produtosContainer" orientation="HORIZONTAL"
-                                  hgap="15" vgap="15" prefWrapLength="1000.0"
-                                  style="-fx-padding: 10; -fx-background-color: transparent;" />
+                        <FlowPane fx:id="produtosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
                 </ScrollPane>
 
-                <!-- SEÇÃO COMBOS -->
                 <Label layoutX="24.0" layoutY="449.0" text="Combos">
                     <font>
                         <Font name="System Bold" size="35.0" />
                     </font>
                 </Label>
 
-                <!-- SCROLL VERTICAL PARA COMBOS - 2 CARDS POR LINHA -->
-                <ScrollPane layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0"
-                            style="-fx-background-color: transparent; -fx-border-color: transparent;"
-                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
                     <content>
-                        <FlowPane fx:id="combosContainer" orientation="HORIZONTAL"
-                                  hgap="15" vgap="15" prefWrapLength="1000.0"
-                                  style="-fx-padding: 10; -fx-background-color: transparent;" />
+                        <FlowPane fx:id="combosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
                     </content>
                 </ScrollPane>
 
             </children>
         </Pane>
 
-        <!-- Menu Lateral -->
         <ImageView fitHeight="93.0" fitWidth="113.0" layoutX="99.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
+                <Image url="@/assets/imgs/logo-pdv.jpg" />
             </image>
         </ImageView>
 
@@ -131,7 +115,6 @@
 
         <Separator layoutX="-12.0" layoutY="115.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Dashboard -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="121.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Dashboard" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -143,11 +126,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="132.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/casa.png" />
+                <Image url="@/assets/imgs/casa.png" />
             </image>
         </ImageView>
 
-        <!-- Vendas -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="181.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaVendas" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Vendas     " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -159,11 +141,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/carrinho.png" />
+                <Image url="@/assets/imgs/carrinho.png" />
             </image>
         </ImageView>
 
-        <!-- Estoque -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="241.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Estoque    " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -175,12 +156,11 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/estoque.png" />
+                <Image url="@/assets/imgs/estoque.png" />
             </image>
         </ImageView>
 
-        <!-- Caixa -->
-        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAbrirTelaCaixa" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -191,12 +171,11 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/money.png" />
+                <Image url="@/assets/imgs/money.png" />
             </image>
         </ImageView>
 
-        <!-- Entregadores -->
-        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEntregadores" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -207,11 +186,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="375.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/entregadores.png" />
+                <Image url="@/assets/imgs/entregadores.png" />
             </image>
         </ImageView>
 
-        <!-- Relatórios -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="421.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Relatórios  " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -223,11 +201,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="437.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/relat.png" />
+                <Image url="@/assets/imgs/relat.png" />
             </image>
         </ImageView>
 
-        <!-- Configurações -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="481.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="     Configurações" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -239,13 +216,12 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="497.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/configs.png" />
+                <Image url="@/assets/imgs/configs.png" />
             </image>
         </ImageView>
 
         <Separator layoutX="-1.0" layoutY="540.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Sair -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="553.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#sairParaLogin" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Sair            " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -257,7 +233,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="567.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/sair_.png" />
+                <Image url="@/assets/imgs/sair_.png" />
             </image>
         </ImageView>
     </children>
