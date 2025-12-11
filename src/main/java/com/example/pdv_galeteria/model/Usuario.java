@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
 
+
 @Data
 @Entity
 @Table(name = "usuarios")

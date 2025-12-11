@@ -86,4 +86,5 @@ public class UsuarioService {
         return BCrypt.hashpw(senhaPlain, salt);
     }
     
+    
 }
