@@ -56,7 +56,7 @@ public class ComboService {
             System.out.println("   Itens: " + (novoCombo.getItensDoCombo() != null ? novoCombo.getItensDoCombo().size() : 0));
 
             if (novoCombo.getPrecoTotal() == null) {
-                System.out.println("⚠️  Preço era nulo, definindo para 0.0");
+                System.out.println("Preço era nulo, definindo para 0.0");
                 novoCombo.setPrecoTotal(0.0);
             }
 
@@ -66,7 +66,7 @@ public class ComboService {
             }
 
             if (novoCombo.getItensDoCombo() != null && !novoCombo.getItensDoCombo().isEmpty()) {
-                System.out.println("🛒 Processando " + novoCombo.getItensDoCombo().size() + " itens...");
+                System.out.println("Processando " + novoCombo.getItensDoCombo().size() + " itens...");
 
                 for (ComboItem item : novoCombo.getItensDoCombo()) {
                     item.setCombo(novoCombo);
@@ -81,10 +81,10 @@ public class ComboService {
                     }
                 }
             } else {
-                System.out.println("ℹ️  Combo sem itens - salvando apenas dados básicos");
+                System.out.println("Combo sem itens - salvando apenas dados básicos");
             }
 
-            System.out.println("💾 Chamando comboRepository.save()...");
+            System.out.println("Chamando comboRepository.save()...");
 
             Combo salvado = comboRepository.save(novoCombo);
 
