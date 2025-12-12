@@ -736,39 +736,6 @@ public class EntregadorController {
     }
 
     @FXML
-    private void abrirTelaRelatorios(ActionEvent event) {
-        try {
-            System.out.println("Abrindo tela de relatórios...");
-
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorios.fxml");
-            if (fxmlUrl == null) {
-                System.err.println("Arquivo FXML não encontrado: TelaRelatorios.fxml");
-                mostrarAlerta("Erro", "Tela de relatórios não disponível", Alert.AlertType.ERROR);
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
-
-            Parent root = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Relatórios");
-            stage.centerOnScreen();
-
-            System.out.println("Tela de relatórios aberta com sucesso!");
-        } catch (Exception e) {
-            System.err.println("Erro ao abrir tela de relatórios: " + e.getMessage());
-            e.printStackTrace();
-            mostrarAlerta("Erro", "Erro ao abrir relatórios: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
-
-    @FXML
     private void abrirTelaConfiguracoes(ActionEvent event) {
         try {
             System.out.println("Abrindo tela de configurações...");
@@ -902,5 +869,55 @@ public class EntregadorController {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void abrirTelaRelatorios() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorio.fxml");
+            if (fxmlUrl == null) {
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) labelAtivosHoje.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Relatórios");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+        }
+    }
+
+    @FXML
+    private void abrirTelaConfiguracoes() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml");
+            if (fxmlUrl == null) {
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) labelAtivosHoje.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Configurações");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+        }
     }
 }

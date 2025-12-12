@@ -2,6 +2,7 @@ package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.service.ProdutoService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -9,14 +10,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,7 +22,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -55,6 +52,9 @@ public class TelaRegistroPedidoController implements Initializable {
 
     @Autowired
     private ProdutoService produtoService;
+
+    @Autowired
+    private CaixaService caixaService;
 
     private Map<Produto, Integer> carrinho = new LinkedHashMap<>();
     private List<Produto> todosProdutos = new ArrayList<>();
@@ -255,7 +255,6 @@ public class TelaRegistroPedidoController implements Initializable {
         }, 300);
     }
 
-
     private void executarBusca(String termoBusca) {
         try {
             List<Produto> produtosEncontrados = produtoService.buscarListaPorNome(termoBusca);
@@ -437,7 +436,6 @@ public class TelaRegistroPedidoController implements Initializable {
         return itemPane;
     }
 
-
     @FXML
     private void registrarPedido() {
         if (carrinho.isEmpty()) {
@@ -448,41 +446,96 @@ public class TelaRegistroPedidoController implements Initializable {
         }
 
         try {
-            StringBuilder resumo = new StringBuilder();
-            resumo.append("Resumo do Pedido:\n\n");
-
-            for (Map.Entry<Produto, Integer> entry : carrinho.entrySet()) {
-                Produto produto = entry.getKey();
-                int quantidade = entry.getValue();
-                double subtotal = produto.getPreco() * quantidade;
-                resumo.append(String.format("%s x%d = R$ %.2f\n",
-                        produto.getNome(), quantidade, subtotal));
-            }
-
-            resumo.append("\n");
-            resumo.append(String.format("Total: R$ %.2f", totalPedido));
-
-            Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmacao.setTitle("Confirmar Pedido");
-            confirmacao.setHeaderText("Deseja registrar este pedido?");
-            confirmacao.setContentText(resumo.toString());
-
-            Optional<ButtonType> resultado = confirmacao.showAndWait();
-            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                mostrarAlerta("Pedido Registrado",
-                        String.format("Pedido registrado com sucesso!\nTotal: R$ %.2f", totalPedido),
-                        Alert.AlertType.INFORMATION);
-
-                carrinho.clear();
-                atualizarCarrinho();
-            }
+            abrirPopupRegistroPedido();
 
         } catch (Exception e) {
-            System.err.println("Erro ao registrar pedido: " + e.getMessage());
+            System.err.println("Erro ao abrir pop-up de registro: " + e.getMessage());
             e.printStackTrace();
             mostrarAlerta("Erro",
-                    "Não foi possível registrar o pedido: " + e.getMessage(),
+                    "Não foi possível abrir o formulário de registro: " + e.getMessage(),
                     Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void abrirPopupRegistroPedido() {
+        try {
+            System.out.println("=== ABRINDO POPUP DE REGISTRO DE PEDIDO ===");
+
+            if (carrinho == null || carrinho.isEmpty()) {
+                mostrarErro("Adicione itens ao carrinho antes de registrar o pedido!");
+                return;
+            }
+
+            double totalCarrinho = calcularTotalCarrinho();
+            System.out.println("Total do carrinho: R$ " + totalCarrinho);
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaAdicionarPedidos.fxml")
+            );
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            RegistroPedidoPopupController popupController = loader.getController();
+
+            if (popupController == null) {
+                System.err.println("ERRO: Controller do popup não carregado!");
+                return;
+            }
+
+            if (caixaService != null) {
+                popupController.setCaixaService(caixaService);
+                System.out.println("CaixaService passado para popup: " + (caixaService != null));
+            } else {
+                System.err.println("AVISO: caixaService é nulo no controller principal!");
+            }
+
+            popupController.setDadosPedido(new HashMap<>(carrinho), totalCarrinho);
+
+            Stage popupStage = new Stage();
+            popupController.setPopupStage(popupStage);
+
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Registrar Pedido");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(getCurrentStage());
+            popupStage.setResizable(false);
+            popupStage.centerOnScreen();
+
+            popupStage.setOnHidden(e -> {
+                System.out.println("Popup fechado, atualizando caixa...");
+                atualizarInterfaceCaixa();
+            });
+
+            popupStage.showAndWait();
+
+            carrinho.clear();
+            atualizarCarrinho();
+
+        } catch (Exception e) {
+            System.err.println("ERRO ao abrir popup de registro: " + e.getMessage());
+            e.printStackTrace();
+            mostrarErro("Erro ao abrir formulário de pedido: " + e.getMessage());
+        }
+    }
+
+    private void atualizarInterfaceCaixa() {
+        try {
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                CaixaController caixaController = PdvGaleteriaApplication.getSpringContext()
+                        .getBean(CaixaController.class);
+
+                if (caixaController != null) {
+                    caixaController.atualizarCaixa();
+                    System.out.println("Caixa atualizado após venda");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar caixa: " + e.getMessage());
         }
     }
 
@@ -503,30 +556,6 @@ public class TelaRegistroPedidoController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void handleAbrirTelaCaixa(ActionEvent event) {
-        try {
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml");
-            if (fxmlUrl == null) {
-                mostrarAlerta("Erro", "Arquivo da tela do caixa não encontrado!", Alert.AlertType.ERROR);
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Controle de Caixa");
-            stage.centerOnScreen();
-
-        } catch (Exception e) {
-            System.err.println("Erro ao abrir tela do caixa: " + e.getMessage());
-            e.printStackTrace();
-            mostrarAlerta("Erro", "Erro ao abrir tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -592,11 +621,8 @@ public class TelaRegistroPedidoController implements Initializable {
     @FXML
     private void abrirTelaRelatorios() {
         try {
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorios.fxml");
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorio.fxml");
             if (fxmlUrl == null) {
-                mostrarAlerta("Funcionalidade em Desenvolvimento",
-                        "Tela de relatórios será implementada em breve!",
-                        Alert.AlertType.INFORMATION);
                 return;
             }
 
@@ -608,22 +634,19 @@ public class TelaRegistroPedidoController implements Initializable {
 
             Parent root = loader.load();
 
-            Stage stage = (Stage) contentPane.getScene().getWindow();
+            Stage stage = (Stage) campoBusca.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Relatórios");
             stage.centerOnScreen();
 
         } catch (Exception e) {
-            mostrarAlerta("Funcionalidade em Desenvolvimento",
-                    "Tela de relatórios será implementada em breve!",
-                    Alert.AlertType.INFORMATION);
         }
     }
 
     @FXML
     private void abrirTelaConfiguracoes() {
         try {
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracoes.fxml");
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml");
             if (fxmlUrl == null) {
                 mostrarAlerta("Funcionalidade em Desenvolvimento",
                         "Tela de configurações será implementada em breve!",
@@ -749,5 +772,62 @@ public class TelaRegistroPedidoController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(mensagem);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void abrirTelaCaixa() {
+        try {
+            System.out.println("=== ABRINDO TELA CAIXA ===");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml")
+            );
+
+            Parent root = loader.load();
+
+            CaixaController controller = loader.getController();
+            System.out.println("Controller obtido: " + controller);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
+                controller.setCaixaService(caixaService);
+                System.out.println("CaixaService injetado manualmente!");
+            }
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Caixa");
+            stage.centerOnScreen();
+
+            System.out.println("Tela do caixa aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Não foi possível abrir a tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void mostrarErro(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private Stage getCurrentStage() {
+        return (Stage) contentPane.getScene().getWindow();
+    }
+
+    private double calcularTotalCarrinho() {
+        double total = 0.0;
+        if (carrinho != null && !carrinho.isEmpty()) {
+            for (Map.Entry<Produto, Integer> entry : carrinho.entrySet()) {
+                Produto produto = entry.getKey();
+                int quantidade = entry.getValue();
+                total += produto.getPreco() * quantidade;
+            }
+        }
+        return total;
     }
 }

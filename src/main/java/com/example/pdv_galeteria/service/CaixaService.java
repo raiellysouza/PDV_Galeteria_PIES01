@@ -6,14 +6,18 @@ import com.example.pdv_galeteria.model.MovimentoCaixa;
 import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
 import com.example.pdv_galeteria.repository.CaixaRepository;
 
+import com.example.pdv_galeteria.repository.MovimentoCaixaRepository;
 import jakarta.transaction.Transactional;
 
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,7 +28,12 @@ public class CaixaService {
     private CaixaRepository caixaRepository;
 
     @Autowired
+    private MovimentoCaixaRepository movimentoCaixaRepository;
+
+    @Autowired
+    @Lazy
     private MovimentoCaixaService movimentoCaixaService;
+
 
     public Optional<Caixa> getCaixaDoDia() {
         return caixaRepository.findCaixaDoDia();
@@ -128,9 +137,36 @@ public class CaixaService {
         return movimentoCaixaService.registrarEntrada(valor, descricao, referenciaExterna);
     }
 
-    @Transactional
     public MovimentoCaixa registrarSaida(BigDecimal valor, String descricao, String referenciaExterna) {
-        return movimentoCaixaService.registrarSaida(valor, descricao, referenciaExterna);
+        try {
+            Optional<Caixa> caixaOpt = getCaixaAbertoDoDia();
+            if (!caixaOpt.isPresent()) {
+                throw new RuntimeException("Não há caixa aberto para registrar saída");
+            }
+
+            Caixa caixa = caixaOpt.get();
+
+            MovimentoCaixa movimento = new MovimentoCaixa();
+            movimento.setTipo(TipoMovimentoCaixa.valueOf("SAIDA"));
+            movimento.setValor(valor);
+            movimento.setDescricao(descricao);
+            movimento.setReferenciaExterna(referenciaExterna);
+            movimento.setCaixa(caixa);
+            movimento.setDataHora(LocalDateTime.now());
+
+            movimento = movimentoCaixaRepository.save(movimento);
+
+            caixa.setTotalSaidas(caixa.getTotalSaidas().add(valor));
+            caixa.setSaldoAtual(caixa.getSaldoAtual().subtract(valor));
+            caixaRepository.save(caixa);
+
+            return movimento;
+
+        } catch (Exception e) {
+            System.err.println("Erro ao registrar saída: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao registrar saída: " + e.getMessage());
+        }
     }
 
     public BigDecimal getSaldoAtualDoDia() {
@@ -223,4 +259,42 @@ public class CaixaService {
 
         return caixaRepository.save(caixa);
     }
+
+    public List<MovimentoCaixa> getMovimentacoesDoCaixa(Long caixaId) {
+        return movimentoCaixaRepository.findByCaixaIdOrderByDataHoraDesc(caixaId);
+    }
+
+    public List<MovimentoCaixa> getMovimentacoesDoDia() {
+        try {
+            Optional<Caixa> caixaOpt = caixaRepository.findCaixaDoDia();
+
+            if (!caixaOpt.isPresent()) {
+                caixaOpt = caixaRepository.findByDataCaixa(LocalDate.now());
+            }
+
+            if (caixaOpt.isPresent()) {
+                Caixa caixa = caixaOpt.get();
+                System.out.println("Caixa encontrado para hoje. ID: " + caixa.getId());
+
+                List<MovimentoCaixa> movimentacoes = movimentoCaixaRepository.findByCaixaIdOrderByDataHoraDesc(caixa.getId());
+                System.out.println("Número de movimentações encontradas: " + movimentacoes.size());
+
+                return movimentacoes;
+            } else {
+                System.out.println("Nenhum caixa encontrado para hoje");
+                return Collections.emptyList();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar movimentações do dia: " + e.getMessage());
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    @Autowired
+    public void setMovimentoCaixaService(MovimentoCaixaService movimentoCaixaService) {
+        this.movimentoCaixaService = movimentoCaixaService;
+    }
+
 }

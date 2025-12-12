@@ -3,29 +3,48 @@ package com.example.pdv_galeteria.controller;
 import com.example.pdv_galeteria.model.Caixa;
 import com.example.pdv_galeteria.model.MovimentoCaixa;
 import com.example.pdv_galeteria.model.StatusCaixa;
+import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
 import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
+import com.example.pdv_galeteria.service.MovimentoCaixaService;
+import jakarta.annotation.PostConstruct;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.example.pdv_galeteria.service.MovimentoCaixaService;
 
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -33,7 +52,11 @@ import java.util.ResourceBundle;
 public class CaixaController implements Initializable {
 
     @Autowired
+    @Lazy
     private CaixaService caixaService;
+
+    @Autowired
+    private MovimentoCaixaService movimentoCaixaService;
 
     @FXML
     private Button btnAcaoCaixa;
@@ -68,116 +91,174 @@ public class CaixaController implements Initializable {
     @FXML
     private Label lblDescricaoStatus;
 
+    @FXML
+    private Pane movimentacoesContainer;
+
+    @FXML
+    private ScrollPane scrollMovimentacoes;
+
+    @FXML
+    private VBox vboxMovimentacoes;
+
+    private Image graficoVerde;
+    private Image graficoVermelho;
+
+    private static Long contadorVendas = 1L;
+
     public CaixaController() {
         System.out.println("CaixaController instanciado!");
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("CaixaController.initialize() chamado");
+        System.out.println("=== CaixaController.initialize() INICIADO ===");
 
-        if (caixaService == null) {
-            System.err.println("ERRO CRÍTICO: caixaService é nulo!");
-            System.err.println("Spring não injetou o CaixaService no controller!");
+        System.out.println("caixaService: " + (caixaService != null ? "INJETADO" : "NULO"));
+        System.out.println("movimentoCaixaService: " + (movimentoCaixaService != null ? "INJETADO" : "NULO"));
 
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                System.out.println("Tentando obter CaixaService do contexto Spring...");
-                try {
-                    caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
-                    if (caixaService != null) {
-                        System.out.println("CaixaService obtido do contexto Spring com sucesso!");
-                    } else {
-                        System.err.println("Não foi possível obter CaixaService do contexto Spring!");
-                    }
-                } catch (Exception e) {
-                    System.err.println("Erro ao obter CaixaService: " + e.getMessage());
-                }
-            }
-        } else {
-            System.out.println("CaixaService injetado com sucesso!");
+        if (btnAcaoCaixa == null) {
+            System.err.println("ERRO: btnAcaoCaixa é NULL! Verifique o FXML.");
+            return;
         }
+
+        if (caixaService == null && PdvGaleteriaApplication.getSpringContext() != null) {
+            caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
+            System.out.println("CaixaService obtido manualmente: " + (caixaService != null));
+        }
+
+        if (movimentoCaixaService == null && PdvGaleteriaApplication.getSpringContext() != null) {
+            movimentoCaixaService = PdvGaleteriaApplication.getSpringContext().getBean(MovimentoCaixaService.class);
+            System.out.println("MovimentoCaixaService obtido manualmente: " + (movimentoCaixaService != null));
+        }
+
+        carregarImagens();
 
         Platform.runLater(() -> {
             atualizarInterface();
+            configurarAtualizacaoAutomatica();
         });
     }
 
+    private void carregarImagens() {
+        try {
+            InputStream streamVerde = getClass().getResourceAsStream("/assets/imgs/graficoVerde.png");
+            if (streamVerde == null) {
+                System.err.println("graficoVerde.png não encontrado no classpath");
+                String caminho = System.getProperty("user.dir") + "/src/main/resources/assets/imgs/graficoVerde.png";
+                File file = new File(caminho);
+                if (file.exists()) {
+                    graficoVerde = new Image(file.toURI().toString());
+                    System.out.println("graficoVerde carregado do caminho absoluto");
+                }
+            } else {
+                graficoVerde = new Image(streamVerde);
+                streamVerde.close();
+                System.out.println("graficoVerde carregado do classpath");
+            }
+
+            InputStream streamVermelho = getClass().getResourceAsStream("/assets/imgs/graficoVermelho.png");
+            if (streamVermelho == null) {
+                System.err.println("graficoVermelho.png não encontrado no classpath");
+                String caminho = System.getProperty("user.dir") + "/src/main/resources/assets/imgs/graficoVermelho.png";
+                File file = new File(caminho);
+                if (file.exists()) {
+                    graficoVermelho = new Image(file.toURI().toString());
+                    System.out.println("graficoVermelho carregado do caminho absoluto");
+                }
+            } else {
+                graficoVermelho = new Image(streamVermelho);
+                streamVermelho.close();
+                System.out.println("graficoVermelho carregado do classpath");
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar imagens: " + e.getMessage());
+        }
+    }
+
     private void atualizarInterface() {
-        System.out.println("atualizarInterface() chamado");
+        System.out.println("=== atualizarInterface() ===");
 
         try {
             if (caixaService == null) {
-                System.err.println("ERRO: caixaService ainda é nulo! Verifique a injeção de dependências.");
-                btnAcaoCaixa.setText("Abrir Caixa");
-                lblCaixaStatus.setText("Nenhum Caixa Aberto");
-                lblDescricaoStatus.setText("Abra um caixa para começar");
-                lblTotalEntradas.setText("R$ 0,00");
-                lblTotalSaidas.setText("R$ 0,00");
-                lblSaldo.setText("R$ 0,00");
+                System.err.println("ERRO: caixaService é nulo!");
                 return;
             }
 
-            String statusTexto = caixaService.getStatusTextoBotao();
-            System.out.println("Texto do botão obtido do serviço: '" + statusTexto + "'");
-
-            statusTexto = statusTexto.trim();
-            btnAcaoCaixa.setText(statusTexto);
+            if (btnAcaoCaixa != null) {
+                String statusTexto = caixaService.getStatusTextoBotao();
+                System.out.println("Texto do botão: " + statusTexto);
+                btnAcaoCaixa.setText(statusTexto.trim());
+            }
 
             Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
+
             if (caixaOpt.isPresent()) {
                 Caixa caixa = caixaOpt.get();
                 StatusCaixa status = caixa.getStatus();
 
-                System.out.println("Status atual do caixa: " + status);
+                System.out.println("Caixa encontrado - ID: " + caixa.getId() + ", Status: " + status);
 
                 if (lblCaixaStatus != null) {
-                    String titulo = status == StatusCaixa.ABERTO ? "Caixa Aberto" : "Caixa Fechado";
-                    lblCaixaStatus.setText(titulo);
-                    System.out.println("Título atualizado: " + titulo);
+                    lblCaixaStatus.setText(status == StatusCaixa.ABERTO ? "Caixa Aberto" : "Caixa Fechado");
+                }
+                if (lblDescricaoStatus != null) {
+                    lblDescricaoStatus.setText(status == StatusCaixa.ABERTO ? "O caixa está operando normalmente" : "Caixa Fechado");
                 }
 
-                if (lblDescricaoStatus != null) {
-                    String descricao = status == StatusCaixa.ABERTO ? "O caixa está operando normalmente" : "Caixa Fechado";
-                    lblDescricaoStatus.setText(descricao);
-                    System.out.println("Descrição atualizada: " + descricao);
+                System.out.println("Valores do Caixa:");
+                System.out.println("  Valor Inicial: " + caixa.getValorInicial());
+                System.out.println("  Total Entradas: " + caixa.getTotalEntradas());
+                System.out.println("  Total Saídas: " + caixa.getTotalSaidas());
+                System.out.println("  Saldo Atual: " + caixa.getSaldoAtual());
+
+                if (lblTotalEntradas != null) {
+                    BigDecimal totalEntradas = caixa.getTotalEntradas() != null ? caixa.getTotalEntradas() : BigDecimal.ZERO;
+                    lblTotalEntradas.setText("R$ " + formatarValor(totalEntradas));
+                    System.out.println("Total Entradas atualizado: R$ " + totalEntradas);
+                }
+
+                if (lblTotalSaidas != null) {
+                    BigDecimal totalSaidas = caixa.getTotalSaidas() != null ? caixa.getTotalSaidas() : BigDecimal.ZERO;
+                    lblTotalSaidas.setText("R$ " + formatarValor(totalSaidas));
+                    System.out.println("Total Saídas atualizado: R$ " + totalSaidas);
+                }
+
+                if (lblSaldo != null) {
+                    BigDecimal saldo = caixa.getSaldoAtual() != null ? caixa.getSaldoAtual() : BigDecimal.ZERO;
+                    lblSaldo.setText("R$ " + formatarValor(saldo));
+                    System.out.println("Saldo atualizado: R$ " + saldo);
                 }
 
                 if (paneStatusCaixa != null) {
                     String corBorda = status == StatusCaixa.ABERTO ? "#009A05" : "#FF0000";
                     paneStatusCaixa.setStyle("-fx-border-color: " + corBorda + "; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-border-width: 2px;");
-                    System.out.println("Borda atualizada: " + corBorda);
                 }
 
                 atualizarImagemCadeado(status);
 
-                if (lblTotalEntradas != null) {
-                    lblTotalEntradas.setText("R$ " + formatarValor(caixa.getTotalEntradas()));
-                }
-                if (lblTotalSaidas != null) {
-                    lblTotalSaidas.setText("R$ " + formatarValor(caixa.getTotalSaidas()));
-                }
-                if (lblSaldo != null) {
-                    lblSaldo.setText("R$ " + formatarValor(caixa.getSaldoAtual()));
-                }
+                carregarMovimentacoesDoDia();
 
             } else {
-                System.out.println("Nenhum caixa encontrado");
+                System.out.println("Nenhum caixa aberto encontrado");
 
-                if (lblCaixaStatus != null) {
-                    lblCaixaStatus.setText("Nenhum Caixa Aberto");
-                }
-                if (lblDescricaoStatus != null) {
-                    lblDescricaoStatus.setText("Abra um caixa para começar");
-                }
+                if (lblCaixaStatus != null) lblCaixaStatus.setText("Nenhum Caixa Aberto");
+                if (lblDescricaoStatus != null) lblDescricaoStatus.setText("Abra um caixa para começar");
+                if (lblTotalEntradas != null) lblTotalEntradas.setText("R$ 0,00");
+                if (lblTotalSaidas != null) lblTotalSaidas.setText("R$ 0,00");
+                if (lblSaldo != null) lblSaldo.setText("R$ 0,00");
+
                 if (paneStatusCaixa != null) {
                     paneStatusCaixa.setStyle("-fx-border-color: #CCCCCC; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-border-width: 2px;");
                 }
 
                 atualizarImagemCadeado(null);
 
-                if (lblTotalEntradas != null) lblTotalEntradas.setText("R$ 0,00");
-                if (lblTotalSaidas != null) lblTotalSaidas.setText("R$ 0,00");
-                if (lblSaldo != null) lblSaldo.setText("R$ 0,00");
+                if (vboxMovimentacoes != null) {
+                    vboxMovimentacoes.getChildren().clear();
+                    Label lblVazio = new Label("Nenhuma movimentação hoje");
+                    lblVazio.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 20;");
+                    vboxMovimentacoes.getChildren().add(lblVazio);
+                }
             }
 
             System.out.println("Interface atualizada com sucesso!");
@@ -185,13 +266,6 @@ public class CaixaController implements Initializable {
         } catch (Exception e) {
             System.err.println("Erro ao atualizar interface: " + e.getMessage());
             e.printStackTrace();
-
-            btnAcaoCaixa.setText("Abrir Caixa");
-            lblCaixaStatus.setText("Nenhum Caixa Aberto");
-            lblDescricaoStatus.setText("Abra um caixa para começar");
-            lblTotalEntradas.setText("R$ 0,00");
-            lblTotalSaidas.setText("R$ 0,00");
-            lblSaldo.setText("R$ 0,00");
         }
     }
 
@@ -666,13 +740,11 @@ public class CaixaController implements Initializable {
         if (valor == null) {
             return "0,00";
         }
-
         try {
-            String valorFormatado = String.format("%,.2f", valor);
-            valorFormatado = valorFormatado.replace(",", "X").replace(".", ",").replace("X", ".");
-            return valorFormatado;
+            DecimalFormat df = new DecimalFormat("#,##0.00",
+                    new DecimalFormatSymbols(new Locale("pt", "BR")));
+            return df.format(valor);
         } catch (Exception e) {
-            System.err.println("Erro ao formatar valor: " + valor + " - " + e.getMessage());
             return "0,00";
         }
     }
@@ -835,4 +907,258 @@ public class CaixaController implements Initializable {
         System.out.println("setCaixaService() chamado: " + (caixaService != null ? "OK" : "NULL"));
         this.caixaService = caixaService;
     }
+
+    private void carregarMovimentacoesDoDia() {
+        try {
+            if (vboxMovimentacoes == null) {
+                System.err.println("vboxMovimentacoes é nulo!");
+                return;
+            }
+
+            vboxMovimentacoes.getChildren().clear();
+
+            Label lblTitulo = new Label("Movimentações do Dia");
+            lblTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10 0 15 10;");
+            vboxMovimentacoes.getChildren().add(lblTitulo);
+
+            Label lblSubtitulo = new Label("Histórico de entradas e saídas");
+            lblSubtitulo.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-padding: 0 0 20 10;");
+            vboxMovimentacoes.getChildren().add(lblSubtitulo);
+
+            Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
+            if (!caixaOpt.isPresent()) {
+                System.out.println("Nenhum caixa para carregar movimentações");
+                return;
+            }
+
+            Caixa caixa = caixaOpt.get();
+            System.out.println("Carregando movimentações para caixa ID: " + caixa.getId());
+
+            List<MovimentoCaixa> movimentacoes = movimentoCaixaService.listarMovimentosDoCaixa(caixa.getId());
+            System.out.println("Movimentações encontradas: " + movimentacoes.size());
+
+            if (movimentacoes.isEmpty()) {
+                Label lblVazio = new Label("Nenhuma movimentação hoje");
+                lblVazio.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 40px;");
+                vboxMovimentacoes.getChildren().add(lblVazio);
+            } else {
+                for (MovimentoCaixa movimento : movimentacoes) {
+                    Pane itemMovimentacao = criarItemMovimentacao(movimento);
+                    vboxMovimentacoes.getChildren().add(itemMovimentacao);
+
+                    Pane espacamento = new Pane();
+                    espacamento.setPrefHeight(15);
+                    vboxMovimentacoes.getChildren().add(espacamento);
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar movimentações: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private Pane criarItemMovimentacao(MovimentoCaixa movimento) {
+        Pane itemPane = new Pane();
+        itemPane.setPrefSize(925, 80);
+        itemPane.setStyle("-fx-background-color: white; -fx-background-radius: 8px; " +
+                "-fx-border-color: #E5E7EB; -fx-border-radius: 8px; -fx-border-width: 1px;");
+
+        String descricao = movimento.getDescricao() != null ? movimento.getDescricao() : "Movimentação";
+        String descricaoLower = descricao.toLowerCase();
+        TipoMovimentoCaixa tipo = movimento.getTipo();
+
+        System.out.println("Criando item para: " + descricao + " | Tipo: " + tipo);
+
+        boolean isTroco = descricaoLower.contains("troco");
+        boolean isEntrada = tipo == TipoMovimentoCaixa.ENTRADA;
+
+        String corFundo, corTexto, prefixoValor, titulo;
+        Image imagemGrafico;
+
+        if (isEntrada && !isTroco) {
+            corFundo = "#E3F0DF";
+            corTexto = "#009A05";
+            prefixoValor = "+R$ ";
+            titulo = extrairTituloVenda(descricao);
+            imagemGrafico = graficoVerde;
+        } else if (!isEntrada || isTroco) {
+            corFundo = "#FFE0E0";
+            corTexto = "#E02525";
+            prefixoValor = "-R$ ";
+            titulo = isTroco ? "Troco" : "Saída";
+            imagemGrafico = graficoVermelho;
+        } else {
+            corFundo = "#E5E7EB";
+            corTexto = "#6B7280";
+            prefixoValor = "";
+            titulo = descricao;
+            imagemGrafico = null;
+        }
+
+        Pane iconContainer = new Pane();
+        iconContainer.setPrefSize(40, 40);
+        iconContainer.setLayoutX(15);
+        iconContainer.setLayoutY(20);
+        iconContainer.setStyle("-fx-background-color: " + corFundo + "; -fx-background-radius: 20px;");
+
+        if (imagemGrafico != null) {
+            ImageView imageView = new ImageView(imagemGrafico);
+            imageView.setFitWidth(24);
+            imageView.setFitHeight(24);
+            imageView.setLayoutX(8);
+            imageView.setLayoutY(8);
+            iconContainer.getChildren().add(imageView);
+        } else {
+            String simbolo = isEntrada ? "↑" : "↓";
+            Label lblSimbolo = new Label(simbolo);
+            lblSimbolo.setStyle("-fx-text-fill: " + corTexto + "; -fx-font-size: 18px; -fx-font-weight: bold;");
+            lblSimbolo.setPrefSize(40, 40);
+            lblSimbolo.setAlignment(Pos.CENTER);
+            iconContainer.getChildren().add(lblSimbolo);
+        }
+
+        Label lblTitulo = new Label(titulo);
+        lblTitulo.setLayoutX(70);
+        lblTitulo.setLayoutY(15);
+        lblTitulo.setFont(Font.font("System", FontWeight.BOLD, 16));
+        lblTitulo.setStyle("-fx-text-fill: #111827;");
+        lblTitulo.setPrefWidth(500);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String horaFormatada = movimento.getDataHora().format(formatter);
+
+        Label lblHora = new Label(horaFormatada);
+        lblHora.setLayoutX(70);
+        lblHora.setLayoutY(40);
+        lblHora.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 13px;");
+
+        Label lblValor = new Label();
+        lblValor.setLayoutX(760);
+        lblValor.setLayoutY(25);
+        lblValor.setFont(Font.font("System", FontWeight.BOLD, 20));
+        lblValor.setPrefWidth(150);
+        lblValor.setAlignment(Pos.CENTER_RIGHT);
+
+        String valorFormatado = formatarValor(movimento.getValor());
+        String textoCompleto = prefixoValor + valorFormatado;
+        lblValor.setText(textoCompleto);
+        lblValor.setStyle("-fx-text-fill: " + corTexto + ";");
+
+        itemPane.getChildren().addAll(iconContainer, lblTitulo, lblHora, lblValor);
+
+        return itemPane;
+    }
+
+    private String extrairTituloVenda(String descricao) {
+        if (descricao == null) return "Venda";
+
+        if (descricao.toLowerCase().contains("troco")) {
+            return "Troco";
+        }
+
+        if (descricao.contains(" - ")) {
+            String[] partes = descricao.split(" - ");
+            if (partes.length > 0) {
+                return partes[0].trim();
+            }
+        }
+
+        if (descricao.contains("#")) {
+            return descricao;
+        }
+
+        return "Venda";
+    }
+
+    private ImageView criarImageViewIcone(Image image) {
+        ImageView imageView = new ImageView(image);
+        imageView.setFitHeight(20);
+        imageView.setFitWidth(20);
+        imageView.setLayoutX(10);
+        imageView.setLayoutY(10);
+        return imageView;
+    }
+
+    private String formatarValorSimples(java.math.BigDecimal valor) {
+        if (valor == null) {
+            return "0,00";
+        }
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+
+        DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+
+        return df.format(valor.abs());
+    }
+
+    private void configurarAtualizacaoAutomatica() {
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.seconds(10),
+                ae -> {
+                    System.out.println("Atualização automática do caixa");
+                    atualizarInterface();
+                }
+        ));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    public void atualizarCaixa() {
+        Platform.runLater(() -> {
+            atualizarInterface();
+        });
+    }
+
+    @FXML
+    private void abrirTelaRelatorios() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorio.fxml");
+            if (fxmlUrl == null) {
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblDescricaoStatus.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Relatórios");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+        }
+    }
+
+    @FXML
+    private void abrirTelaConfiguracoes() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml");
+            if (fxmlUrl == null) {
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblDescricaoStatus.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Configurações");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+        }
+    }
 }
+

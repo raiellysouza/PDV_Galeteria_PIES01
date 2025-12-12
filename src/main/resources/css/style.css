@@ -409,4 +409,42 @@
     -fx-text-fill: white;
 }
 
+.card-caixa {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.card-caixa:hover {
+    -fx-border-color: #f68411;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.3), 10, 0, 0, 4);
+}
+
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: #f1f1f1;
+    -fx-border-radius: 5px;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #c1c1c1;
+    -fx-background-radius: 5px;
+}
+
 

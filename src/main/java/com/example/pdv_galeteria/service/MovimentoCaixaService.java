@@ -6,6 +6,7 @@ import com.example.pdv_galeteria.model.StatusCaixa;
 import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
 import com.example.pdv_galeteria.repository.CaixaRepository;
 import com.example.pdv_galeteria.repository.MovimentoCaixaRepository;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -93,9 +95,37 @@ public class MovimentoCaixaService {
         movimento.setReferenciaExterna(referenciaExterna);
         movimento.setDataHora(LocalDateTime.now());
 
+        if (tipo == TipoMovimentoCaixa.ENTRADA) {
+            caixa.setTotalEntradas(caixa.getTotalEntradas().add(valor));
+            caixa.setSaldoAtual(caixa.getSaldoAtual().add(valor));
+        } else if (tipo == TipoMovimentoCaixa.SAIDA) {
+            caixa.setTotalSaidas(caixa.getTotalSaidas().add(valor));
+            caixa.setSaldoAtual(caixa.getSaldoAtual().subtract(valor));
+        }
+
         caixa.setUpdatedAt(LocalDateTime.now());
 
-        return movimentoCaixaRepository.save(movimento);
+        MovimentoCaixa movimentoSalvo = movimentoCaixaRepository.save(movimento);
+
+        caixaRepository.save(caixa);
+
+        return movimentoSalvo;
+    }
+
+    public MovimentoCaixa registrarVenda(BigDecimal valor, String numeroVenda) {
+        return registrarEntrada(
+                valor,
+                "Venda #" + numeroVenda,
+                "VENDA_" + numeroVenda
+        );
+    }
+
+    public MovimentoCaixa registrarTroco(BigDecimal valor) {
+        return registrarSaida(
+                valor,
+                "Troco",
+                "TROCO_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+        );
     }
 }
 

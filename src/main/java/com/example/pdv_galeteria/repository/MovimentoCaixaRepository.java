@@ -12,9 +12,13 @@ import java.util.List;
 @Repository
 public interface MovimentoCaixaRepository extends JpaRepository<MovimentoCaixa, Long> {
 
+    List<MovimentoCaixa> findByCaixaIdOrderByDataHoraDesc(Long caixaId);
+
     List<MovimentoCaixa> findByCaixaIdOrderByDataHoraAsc(Long caixaId);
 
     @Query("SELECT COALESCE(SUM(m.valor), 0) FROM MovimentoCaixa m WHERE m.caixa.id = :caixaId AND m.tipo = :tipo")
     BigDecimal somarPorTipo(Long caixaId, TipoMovimentoCaixa tipo);
-}
 
+    List<MovimentoCaixa> findByCaixaId(Long caixaId);
+
+}
