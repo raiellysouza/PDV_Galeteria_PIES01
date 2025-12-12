@@ -1,3 +1,4 @@
+/**
 package com.example.pdv_galeteria.service;
 
 import com.example.pdv_galeteria.model.PaymentResult;
@@ -9,7 +10,6 @@ import java.util.Map;
 
 public class ChangeCalculator {
 
-    // moedas / notas em reais (ordem decrescente para breakdown)
     private static final BigDecimal[] DENOMINATIONS = new BigDecimal[] {
         new BigDecimal("100.00"),
         new BigDecimal("50.00"),
@@ -56,3 +56,4 @@ public class ChangeCalculator {
         return new PaymentResult(totalDue, paid, change, breakdown);
     }
 }
+ **/

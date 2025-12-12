@@ -3,17 +3,14 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.TelaProdutosController">
+<AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.CaixaController">
     <children>
         <Pane layoutX="283.0" layoutY="0.0" prefHeight="700.0" prefWidth="1283.0" style="-fx-background-color: white;">
             <children>
@@ -24,84 +21,215 @@
                 </Label>
                 <Label layoutX="14.0" layoutY="90.0" text="Controle de abertura, fechamento e movimentações">
                     <font>
-                        <Font size="25.0" />
+                        <Font size="24.0" />
                     </font>
                 </Label>
-                <TextField fx:id="campoBusca" layoutX="19.0" layoutY="144.0" onKeyReleased="#onBuscaKeyReleased" prefHeight="36.0" prefWidth="526.0" promptText="Buscar produto, combo..." style="-fx-background-color: white;" styleClass="text-field">
-                    <font>
-                        <Font size="15.0" />
-                    </font>
-                    <cursor>
-                        <Cursor fx:constant="TEXT" />
-                    </cursor>
-                </TextField>
 
-                <Button layoutX="576.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirCadastroProduto" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Produto" textFill="WHITE">
+                <Button fx:id="btnAcaoCaixa" layoutX="800.0" layoutY="61.0" mnemonicParsing="false" onAction="#handleAcaoCaixa" prefHeight="59.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="     Abrir Caixa" textFill="WHITE">
                     <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="System Bold" size="24.0" />
                     </font>
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
                 </Button>
 
-                <Button layoutX="824.0" layoutY="144.0" mnemonicParsing="false" onAction="#abrirTelaCombo" prefHeight="36.0" prefWidth="225.0" style="-fx-background-radius: 8px;" styleClass="hover" text="Novo Combo" textFill="WHITE">
-                    <font>
-                        <Font name="System Bold" size="16.0" />
-                    </font>
-                    <cursor>
-                        <Cursor fx:constant="HAND" />
-                    </cursor>
-                </Button>
-
-                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="520.0" layoutY="155.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="822.0" layoutY="80.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/search-svgrepo-com.png" />
+                        <Image url="@/assets/imgs/cadeado.png" />
                     </image>
                 </ImageView>
-
-                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="606.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="867.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
+                        <Image url="@/assets/imgs/mais.png" />
                     </image>
                 </ImageView>
-                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="858.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/mais.png" />
-                    </image>
-                </ImageView>
-
-                <Label layoutX="19.0" layoutY="180.0" text="Produtos">
-                    <font>
-                        <Font name="System Bold" size="35.0" />
-                    </font>
-                </Label>
-
-                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="219.0" prefHeight="220.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
-                    <content>
-                        <FlowPane fx:id="produtosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
-                    </content>
-                </ScrollPane>
-
-                <Label layoutX="24.0" layoutY="449.0" text="Combos">
-                    <font>
-                        <Font name="System Bold" size="35.0" />
-                    </font>
-                </Label>
-
-                <ScrollPane hbarPolicy="NEVER" layoutX="24.0" layoutY="490.0" prefHeight="199.0" prefWidth="1027.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
-                    <content>
-                        <FlowPane fx:id="combosContainer" hgap="15" orientation="HORIZONTAL" prefWrapLength="1000.0" style="-fx-padding: 10; -fx-background-color: transparent;" vgap="15" />
-                    </content>
-                </ScrollPane>
-
+                <Pane fx:id="paneStatusCaixa" layoutX="14.0" layoutY="125.0" prefHeight="80.0" prefWidth="1011.0" style="-fx-border-color: #009A05; -fx-background-radius: 8px; -fx-border-radius: 8px;" stylesheets="@/css/style.css">
+                    <children>
+                        <ImageView fx:id="imgCadeadoStatus" fitHeight="35.0" fitWidth="40.0" layoutX="31.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/cadeado2.png" />
+                            </image>
+                        </ImageView>
+                        <Label fx:id="lblCaixaStatus" layoutX="79.0" layoutY="8.0" text="Caixa Aberto">
+                            <font>
+                                <Font name="System Bold" size="36.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblDescricaoStatus" layoutX="31.0" layoutY="51.0" text="O caixa está operando normalmente">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </Pane>
+                <Pane layoutX="14.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
+                    <children>
+                        <Label layoutX="25.0" layoutY="14.0" text="Total Entradas">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblTotalEntradas" layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #009A05;" text="R$ 0,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="25.0" layoutY="100.0" text="Hoje">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/graficoverde.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </Pane>
+                <Pane layoutX="360.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
+                    <children>
+                        <Label layoutX="25.0" layoutY="14.0" text="Total Saídas">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblTotalSaidas" layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #F42A2A;" text="R$ 0,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="25.0" layoutY="100.0" text="Hoje">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/graficovermelho.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </Pane>
+                <Pane layoutX="707.0" layoutY="219.0" prefHeight="153.0" prefWidth="320.0" styleClass="card-produtos">
+                    <children>
+                        <Label layoutX="25.0" layoutY="14.0" text="Saldo Atual">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblSaldo" layoutX="25.0" layoutY="57.0" style="-fx-text-fill: #2A6DF4;" text="R$ 0,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="25.0" layoutY="100.0" text="No Caixa">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="271.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/assets/imgs/moneyazul.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </Pane>
+                <Pane layoutX="14.0" layoutY="386.0" prefHeight="320.0" prefWidth="1011.0" styleClass="card-produtos">
+                    <children>
+                        <Pane layoutX="53.0" layoutY="246.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
+                        <Pane layoutX="53.0" layoutY="179.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
+                        <Pane layoutX="53.0" layoutY="113.0" prefHeight="59.0" prefWidth="945.0" style="-fx-background-color: #F8F8F8; -fx-border-radius: 8px; -fx-background-radius: 8px;" />
+                        <Label layoutX="26.0" layoutY="29.0" text="Movimentações do dia">
+                            <font>
+                                <Font name="System Bold" size="31.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="26.0" layoutY="65.0" text="Histórico de Entradas e Saídas">
+                            <font>
+                                <Font size="20.0" />
+                            </font>
+                        </Label>
+                        <Pane layoutX="67.0" layoutY="125.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #E3F0DF; -fx-background-radius: 20px;">
+                            <children>
+                                <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/assets/imgs/graficoverde.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Pane layoutX="67.0" layoutY="259.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #E3F0DF; -fx-background-radius: 20px;">
+                            <children>
+                                <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/assets/imgs/graficoverde.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Pane layoutX="67.0" layoutY="191.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #FFE0E0; -fx-background-radius: 20px;">
+                            <children>
+                                <ImageView fitHeight="28.0" fitWidth="26.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/assets/imgs/graficovermelho.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label layoutX="111.0" layoutY="117.0" text="Venda #001">
+                            <font>
+                                <Font name="System Bold" size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="135.0" opacity="0.5" text="14:32">
+                            <font>
+                                <Font size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="184.0" text="Troco">
+                            <font>
+                                <Font name="System Bold" size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="202.0" opacity="0.5" text="14:00">
+                            <font>
+                                <Font size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="108.0" layoutY="251.0" text="Venda #002">
+                            <font>
+                                <Font name="System Bold" size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="111.0" layoutY="268.0" opacity="0.5" text="14:32">
+                            <font>
+                                <Font size="17.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="848.0" layoutY="122.0" style="-fx-text-fill: #009A05;" text="+R$ 34,50">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="848.0" layoutY="258.0" style="-fx-text-fill: #009A05;" text="+R$ 34,50">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                        <Label layoutX="852.0" layoutY="189.0" style="-fx-text-fill: #E02525;" text="-R$ 25,00">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </Pane>
             </children>
         </Pane>
 
-        <!-- Menu Lateral -->
         <ImageView fitHeight="93.0" fitWidth="113.0" layoutX="99.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/logo-pdv.jpg" />
+                <Image url="@/assets/imgs/logo-pdv.jpg" />
             </image>
         </ImageView>
 
@@ -116,7 +244,6 @@
 
         <Separator layoutX="-12.0" layoutY="115.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Dashboard -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="121.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Dashboard" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -128,11 +255,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="132.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/casa.png" />
+                <Image url="@/assets/imgs/casa.png" />
             </image>
         </ImageView>
 
-        <!-- Vendas -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="181.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaVendas" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Vendas     " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -144,12 +270,11 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/carrinho.png" />
+                <Image url="@/assets/imgs/carrinho.png" />
             </image>
         </ImageView>
 
-        <!-- Estoque -->
-        <Button alignment="CENTER" layoutX="12.0" layoutY="241.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Estoque    " textFill="WHITE">
+        <Button fx:id="btnEstoque" alignment="CENTER" layoutX="12.0" layoutY="241.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEstoque" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Estoque    " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -160,12 +285,11 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/estoque.png" />
+                <Image url="@/assets/imgs/estoque.png" />
             </image>
         </ImageView>
 
-        <!-- Caixa -->
-        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="301.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEstoque" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Caixa         " textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -176,12 +300,11 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/money.png" />
+                <Image url="@/assets/imgs/money.png" />
             </image>
         </ImageView>
 
-        <!-- Entregadores -->
-        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaEntregadores" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>
@@ -192,11 +315,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="375.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/entregadores.png" />
+                <Image url="@/assets/imgs/entregadores.png" />
             </image>
         </ImageView>
 
-        <!-- Relatórios -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="421.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Relatórios  " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -208,11 +330,10 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="437.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/relat.png" />
+                <Image url="@/assets/imgs/relat.png" />
             </image>
         </ImageView>
 
-        <!-- Configurações -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="481.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="     Configurações" textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -224,13 +345,12 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="21.0" layoutY="497.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/configs.png" />
+                <Image url="@/assets/imgs/configs.png" />
             </image>
         </ImageView>
 
         <Separator layoutX="-1.0" layoutY="540.0" opacity="0.19" prefWidth="295.0" />
 
-        <!-- Sair -->
         <Button alignment="CENTER" layoutX="12.0" layoutY="553.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#sairParaLogin" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Sair            " textFill="WHITE">
             <font>
                 <Font size="27.0" />
@@ -242,7 +362,7 @@
 
         <ImageView fitHeight="28.0" fitWidth="28.0" layoutX="23.0" layoutY="567.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../../../../../../../../../../../PDV_Galeteria/PDV_Galeteria_PIES01/src/main/resources/assets/imgs/sair_.png" />
+                <Image url="@/assets/imgs/sair_.png" />
             </image>
         </ImageView>
     </children>

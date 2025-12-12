@@ -1,15 +1,18 @@
 package com.example.pdv_galeteria.controller;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-
 import com.example.pdv_galeteria.model.Combo;
+import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.service.ComboService;
+import javafx.event.ActionEvent;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Window;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ProdutoService;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
@@ -26,9 +29,12 @@ import javafx.stage.Modality;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.ContentDisplay;
+import org.springframework.stereotype.Controller;
 import java.util.*;
+import com.example.pdv_galeteria.controller.CaixaController;
 
-@Component
+
+@Controller
 public class TelaProdutosController implements Initializable {
 
     @Autowired
@@ -87,9 +93,7 @@ public class TelaProdutosController implements Initializable {
         System.out.println("MainContentPane: " + (mainContentPane != null ? "ENCONTRADO" : "NULO"));
 
         System.out.println("campoBusca: " + (campoBusca != null ? "INJETADO" : "NULO"));
-
-        verificarCaminhoFXML();
-        testePopupBasico();
+        System.out.println("campoBusca: " + (campoBusca != null ? "INJETADO" : "NULO"));
 
         PdvGaleteriaApplication.debugSpringContext();
         System.out.println("ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
@@ -97,7 +101,6 @@ public class TelaProdutosController implements Initializable {
         timerBusca = new Timer();
 
         carregarProdutos();
-        carregarTelaCombos();
         combosController.setCombosContainer(combosContainer);
         combosController.carregarCombos();
     }
@@ -138,17 +141,25 @@ public class TelaProdutosController implements Initializable {
 
     private void carregarTelaCombos() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/Teladisplaycombo.fxml"));
-            loader.setControllerFactory(context::getBean);
-            Pane combosPane = loader.load();
-            comboContainerPane.getChildren().setAll(combosPane);
-            AnchorPane.setTopAnchor(combosPane, 0.0);
-            AnchorPane.setLeftAnchor(combosPane, 0.0);
-            AnchorPane.setRightAnchor(combosPane, 0.0);
-            AnchorPane.setBottomAnchor(combosPane, 0.0);
+            if (combosContainer == null) {
+                System.err.println("combosContainer é null!");
+                return;
+            }
+
+            combosContainer.getChildren().clear();
+
+            List<Combo> combos = comboService.buscarTodosCombos();
+
+            for (Combo combo : combos) {
+                Pane cardCombo = combosController.criarCardCombo(combo);
+                combosContainer.getChildren().add(cardCombo);
+            }
+
+            System.out.println("Combos carregados: " + combos.size());
+
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao carregar a sub-tela de combos: " + e.getMessage());
+            System.err.println("Erro ao carregar combos: " + e.getMessage());
         }
     }
 
@@ -286,6 +297,8 @@ public class TelaProdutosController implements Initializable {
         btnApagar.setOnAction(e -> {
             System.out.println("Clicou para apagar produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
             executarExclusaoProduto(produto);
+            System.out.println("Clicou para apagar produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
+            executarExclusaoProduto(produto);
         });
 
         card.getChildren().addAll(
@@ -316,6 +329,7 @@ public class TelaProdutosController implements Initializable {
             botao.setGraphic(icone);
             botao.setContentDisplay(ContentDisplay.LEFT);
             botao.setGraphicTextGap(8);
+            botao.setCursor(Cursor.HAND);
         } catch (Exception e) {
             System.out.println("Ícone não encontrado: " + iconePath);
         }
@@ -333,6 +347,7 @@ public class TelaProdutosController implements Initializable {
                 "-fx-border-width: 1; " +
                 "-fx-border-radius: 6; " +
                 "-fx-background-radius: 6;");
+        botao.setCursor(Cursor.HAND);
         try {
             ImageView icone = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
             icone.setFitWidth(16);
@@ -409,12 +424,15 @@ public class TelaProdutosController implements Initializable {
 
             if (PdvGaleteriaApplication.getSpringContext() == null) {
                 System.err.println("Contexto do Spring não disponível");
+                System.err.println("Contexto do Spring não disponível");
                 try {
                     Parent root = loader.load();
-                    Stage stage = new Stage();
+
+                    Stage stage = (Stage) contentPane.getScene().getWindow();
                     stage.setScene(new Scene(root));
                     stage.setTitle("Registro de Pedidos");
-                    stage.show();
+                    stage.centerOnScreen();
+
                     System.out.println("Tela de vendas aberta sem Spring");
                     return;
                 } catch (Exception fallbackException) {
@@ -428,12 +446,11 @@ public class TelaProdutosController implements Initializable {
 
             Parent root = loader.load();
 
-            Stage stage = new Stage();
+            Stage stage = (Stage) contentPane.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Registro de Pedidos");
-            stage.setMaximized(true);
+            stage.centerOnScreen();
 
-            stage.show();
             System.out.println("Tela de vendas aberta com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -573,7 +590,7 @@ public class TelaProdutosController implements Initializable {
                 URL url = getClass().getResource(caminho);
                 System.out.println(caminho + " → " + (url != null ? "ENCONTRADO" : "NÃO ENCONTRADO"));
                 if (url != null) {
-                    System.out.println("   " + url);
+                    System.out.println(url);
                 }
             } catch (Exception e) {
                 System.out.println(caminho + " → ERRO: " + e.getMessage());
@@ -898,6 +915,121 @@ public class TelaProdutosController implements Initializable {
                 System.err.println("Erro ao mostrar mensagem sem produtos: " + e.getMessage());
             }
         });
+    }
+
+    @FXML
+    private void handleAbrirTelaCaixa(ActionEvent event) {
+        try {
+            System.out.println("Abrindo tela do caixa...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml");
+            if (fxmlUrl == null) {
+                mostrarMensagemErro("Arquivo da tela do caixa não encontrado!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            Parent root = loader.load();
+
+            CaixaController controller = loader.getController();
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
+                controller.setCaixaService(caixaService);
+                System.out.println("CaixaService injetado manualmente");
+            }
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Controle de Caixa");
+            stage.centerOnScreen();
+
+            System.out.println("Tela do caixa aberta com sucesso!");
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir tela do caixa: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensagemErro("Erro ao abrir tela do caixa: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void abrirTelaEntregadores() {
+        try {
+            System.out.println("=== ABRINDO TELA ENTREGADORES ===");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml");
+            if (fxmlUrl == null) {
+                System.err.println("ERRO: Arquivo não encontrado!");
+
+                mostrarAlerta("Erro", "Tela de entregadores não disponível no momento.");
+                return;
+            }
+
+            System.out.println("FXML encontrado: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+                System.out.println("Spring configurado");
+            }
+
+            System.out.println("Carregando FXML...");
+            Parent root = loader.load();
+            System.out.println("FXML carregado com sucesso!");
+
+            Stage stage = null;
+
+
+            if (campoBusca != null && campoBusca.getScene() != null) {
+                stage = (Stage) campoBusca.getScene().getWindow();
+            }
+
+            if (stage != null) {
+                stage.setScene(new Scene(root));
+                stage.setTitle("Entregadores");
+                stage.centerOnScreen();
+                System.out.println("Tela de entregadores aberta com SUCESSO!");
+            }
+
+        } catch (Exception e) {
+            System.err.println("=== ERRO AO ABRIR TELA ENTREGADORES ===");
+            System.err.println("Mensagem: " + e.getMessage());
+            e.printStackTrace();
+
+            mostrarAlerta("Erro", "Não foi possível abrir a tela de entregadores: " + e.getMessage());
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private Stage getCurrentStage() {
+        try {
+            for (Window window : Window.getWindows()) {
+                if (window instanceof Stage && window.isShowing()) {
+                    return (Stage) window;
+                }
+            }
+
+            Stage primaryStage = (Stage) Stage.getWindows().get(0);
+            if (primaryStage != null) {
+                return primaryStage;
+            }
+
+            System.err.println("Nenhum stage encontrado, criando novo...");
+            return new Stage();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao obter stage atual: " + e.getMessage());
+            return new Stage();
+        }
     }
 
 }
