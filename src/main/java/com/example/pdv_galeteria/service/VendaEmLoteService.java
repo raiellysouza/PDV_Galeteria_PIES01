@@ -17,34 +17,29 @@ public class VendaEmLoteService {
     private final ProdutoService produtoService;
     private final EstoqueService estoqueService;
 
-
     public VendaEmLoteService(
-        VendaEmLoteRepository vendaEmLoteRepository,
-        EstoqueService estoqueService,
-        ProdutoService produtoService
-    ) {
+            VendaEmLoteRepository vendaEmLoteRepository,
+            EstoqueService estoqueService,
+            ProdutoService produtoService) {
         this.vendaEmLoteRepository = vendaEmLoteRepository;
         this.estoqueService = estoqueService;
         this.produtoService = produtoService;
-}
-
-    
+    }
 
     @Transactional
     public VendaEmLote criarVendaEmLote(VendaEmLote venda) {
         venda.recalcularTotal();
 
         List<EstoqueService.RemocaoRequest> itensParaRemover = venda.getItens().stream()
-        .map(item -> {
-            Produto produto = produtoService.buscarPorNome(item.getProduto());
-            return new EstoqueService.RemocaoRequest(
-                    produto.getId(),
-                    item.getQuantidade()
-            );
-        })
-        .toList();
+                .map(item -> {
+                    Produto produto = produtoService.buscarPorNome(item.getProduto());
+                    return new EstoqueService.RemocaoRequest(
+                            produto.getId(),
+                            item.getQuantidade());
+                })
+                .toList();
 
-    estoqueService.removerMultiplosItens(itensParaRemover);
+        estoqueService.removerMultiplosItens(itensParaRemover);
 
         return vendaEmLoteRepository.save(venda);
     }
@@ -55,11 +50,23 @@ public class VendaEmLoteService {
     }
 
     public List<VendaEmLote> buscarPorHorario(LocalDateTime inicio, LocalDateTime fim) {
+        if (inicio == null && fim == null) {
+            return vendaEmLoteRepository.findAll();
+        }
+
+        if (inicio == null) {
+            inicio = LocalDateTime.MIN;
+        }
+
+        if (fim == null) {
+            fim = LocalDateTime.MAX;
+        }
+
         return vendaEmLoteRepository.findByCriadoEmBetween(inicio, fim);
     }
 
     public List<VendaEmLote> buscarPorOrigem(String origem) {
-    return vendaEmLoteRepository.findByOrigemIgnoreCase(origem);
+        return vendaEmLoteRepository.findByOrigemIgnoreCase(origem);
     }
 
     @Transactional
@@ -71,19 +78,17 @@ public class VendaEmLoteService {
     }
 
     public Double calcularLucroTotal() {
-    return vendaEmLoteRepository.findAll()
-            .stream()
-            .mapToDouble(VendaEmLote::getTotal)
-            .sum();
+        return vendaEmLoteRepository.findAll()
+                .stream()
+                .mapToDouble(VendaEmLote::getTotal)
+                .sum();
     }
 
     public Double calcularLucroPorOrigem(String origem) {
-    return vendaEmLoteRepository.findByOrigemIgnoreCase(origem)
-            .stream()
-            .mapToDouble(VendaEmLote::getTotal)
-            .sum();
+        return vendaEmLoteRepository.findByOrigemIgnoreCase(origem)
+                .stream()
+                .mapToDouble(VendaEmLote::getTotal)
+                .sum();
     }
 
-
 }
-
