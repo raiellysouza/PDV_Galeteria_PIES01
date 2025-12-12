@@ -1,7 +1,9 @@
 package com.example.pdv_galeteria.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "estoque")
 public class Estoque {
@@ -20,8 +22,7 @@ public class Estoque {
         this.produtoId = produtoId;
         this.quantidade = quantidade;
     }
-
-    public Long getId() {
+     public Long getId() {
         return id;
     }
 
