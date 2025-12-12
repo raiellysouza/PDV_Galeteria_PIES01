@@ -1032,4 +1032,53 @@ public class TelaProdutosController implements Initializable {
         }
     }
 
+    @FXML
+    private void abrirTelaRelatorios() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorio.fxml");
+            if (fxmlUrl == null) {
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) produtosContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Relatórios");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+        }
+    }
+
+    @FXML
+    private void abrirTelaConfiguracoes() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml");
+            if (fxmlUrl == null) {
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Configurações");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+        }
+    }
 }

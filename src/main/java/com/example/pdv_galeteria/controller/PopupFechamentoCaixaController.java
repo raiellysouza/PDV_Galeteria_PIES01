@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 @Component
@@ -28,6 +31,8 @@ public class PopupFechamentoCaixaController {
     private Consumer<BigDecimal> onConfirmCallback;
     private Caixa caixaAtual;
 
+    private DecimalFormat df;
+
     public void setPopupStage(Stage popupStage) {
         this.popupStage = popupStage;
     }
@@ -39,6 +44,9 @@ public class PopupFechamentoCaixaController {
     @FXML
     public void initialize() {
         System.out.println("PopupFechamentoCaixaController inicializado");
+
+        df = new DecimalFormat("#,##0.00", new DecimalFormatSymbols(new Locale("pt", "BR")));
+
         carregarDadosCaixa();
 
         Platform.runLater(() -> {
@@ -61,7 +69,7 @@ public class PopupFechamentoCaixaController {
 
             BigDecimal saldoCalculado = valorInicial.add(totalEntradas).subtract(totalSaidas);
 
-            txtValorFinal.setText(formatarValorParaInput(saldoCalculado));
+            txtValorFinal.setText(df.format(saldoCalculado));
 
             System.out.println("=== DADOS PARA FECHAMENTO ===");
             System.out.println("Valor Inicial: R$ " + formatarValor(valorInicial));
@@ -80,12 +88,12 @@ public class PopupFechamentoCaixaController {
 
     private String formatarValor(BigDecimal valor) {
         if (valor == null) return "0,00";
-        return String.format("%,.2f", valor).replace(",", "X").replace(".", ",").replace("X", ".");
+        return df.format(valor);
     }
 
     private String formatarValorParaInput(BigDecimal valor) {
         if (valor == null) return "0,00";
-        return String.format("%,.2f", valor).replace(",", "X").replace(".", ",").replace("X", ".");
+        return df.format(valor);
     }
 
     private BigDecimal parseValorDoTextField(String texto) {
@@ -95,6 +103,7 @@ public class PopupFechamentoCaixaController {
             }
             texto = texto.trim();
             texto = texto.replace(".", "").replace(",", ".");
+
             return new BigDecimal(texto);
         } catch (Exception e) {
             System.err.println("Erro ao converter valor: '" + texto + "' - " + e.getMessage());

@@ -5,11 +5,14 @@ import com.example.pdv_galeteria.model.ComboItem;
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ComboService;
 import com.example.pdv_galeteria.service.ProdutoService;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,40 +32,191 @@ public class EditarCombosController implements Initializable {
     @Autowired
     private ProdutoService produtoService;
 
-    @FXML
-    private TextArea nomeComboField;
-    @FXML
-    private TextArea precoComboField;
-    @FXML
-    private TextArea nomeProdutoField;
-    @FXML
-    private TextArea quantidadeField;
-    @FXML
-    private TextArea produtosTextArea;
-    @FXML
-    private Button btnEditarCombo;
+    @FXML private TextArea nomeComboField;
+    @FXML private TextArea precoComboField;
+    @FXML private TextArea nomeProdutoField;
+    @FXML private TextArea quantidadeField;
+    @FXML private VBox produtosListContainer;
+    @FXML private Button btnEditarCombo;
+    @FXML private Button btnAdicionar;
 
     private Combo comboAtual;
     private final List<ComboItem> itensDoCombo = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("=== INICIALIZANDO EDITAR COMBOS CONTROLLER ===");
+        System.out.println("produtosListContainer: " + produtosListContainer);
+        System.out.println("nomeComboField: " + nomeComboField);
+        System.out.println("precoComboField: " + precoComboField);
+        System.out.println("btnEditarCombo: " + btnEditarCombo);
+        System.out.println("btnAdicionar: " + btnAdicionar);
+        System.out.println("===============================================");
     }
 
     public void setCombo(Combo combo) {
         this.comboAtual = combo;
-        carregarDadosCombo();
+        System.out.println("Combo definido: " + (combo != null ? combo.getNome() : "null"));
+
+        Platform.runLater(() -> {
+            carregarDadosCombo();
+        });
     }
 
     private void carregarDadosCombo() {
-        if (comboAtual != null) {
-            nomeComboField.setText(comboAtual.getNome());
-            precoComboField.setText(String.valueOf(comboAtual.getPrecoTotal()));
-            itensDoCombo.clear();
-            if (comboAtual.getItensDoCombo() != null) {
-                itensDoCombo.addAll(comboAtual.getItensDoCombo());
+        try {
+            if (comboAtual != null) {
+                System.out.println("Carregando dados do combo: " + comboAtual.getNome());
+
+                if (nomeComboField == null) {
+                    System.err.println("ERRO: nomeComboField é nulo!");
+                    return;
+                }
+                if (precoComboField == null) {
+                    System.err.println("ERRO: precoComboField é nulo!");
+                    return;
+                }
+                if (produtosListContainer == null) {
+                    System.err.println("ERRO: produtosListContainer é nulo! Verifique o FXML.");
+                    return;
+                }
+
+                nomeComboField.setText(comboAtual.getNome());
+                precoComboField.setText(String.valueOf(comboAtual.getPrecoTotal()));
+
+                itensDoCombo.clear();
+                if (comboAtual.getItensDoCombo() != null) {
+                    itensDoCombo.addAll(comboAtual.getItensDoCombo());
+                    System.out.println("Itens carregados: " + itensDoCombo.size());
+                }
+
+                atualizarListaDeProdutos();
+            } else {
+                System.err.println("Combo atual é nulo!");
             }
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar dados do combo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void atualizarListaDeProdutos() {
+        try {
+            if (produtosListContainer == null) {
+                System.err.println("produtosListContainer é nulo!");
+                return;
+            }
+
+            produtosListContainer.getChildren().clear();
+
+            if (itensDoCombo.isEmpty()) {
+                Label labelVazio = new Label("Nenhum produto adicionado ao combo.");
+                labelVazio.setStyle("-fx-text-fill: #666; -fx-font-style: italic;");
+                produtosListContainer.getChildren().add(labelVazio);
+                return;
+            }
+
+            double precoTotalItens = 0.0;
+
+            for (ComboItem item : itensDoCombo) {
+                Produto produto = item.getProduto();
+                double precoItem = produto.getPreco() * item.getQuantidade();
+                precoTotalItens += precoItem;
+
+                Pane cardProduto = criarCardProduto(item, produto, precoItem);
+                produtosListContainer.getChildren().add(cardProduto);
+            }
+
+            Pane cardTotal = criarCardTotal(precoTotalItens);
+            produtosListContainer.getChildren().add(cardTotal);
+
+            if (precoComboField != null) {
+                try {
+                    String textoPreco = precoComboField.getText();
+                    if (textoPreco != null && !textoPreco.trim().isEmpty()) {
+                        BigDecimal precoAtual = new BigDecimal(textoPreco.replace(",", "."));
+                        if (Math.abs(precoAtual.doubleValue() - precoTotalItens) > 0.01) {
+                            precoComboField.setText(String.format("%.2f", precoTotalItens));
+                        }
+                    }
+                } catch (Exception e) {
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar lista de produtos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private Pane criarCardProduto(ComboItem item, Produto produto, double precoItem) {
+        HBox card = new HBox(10);
+        card.setStyle(
+                "-fx-background-color: #f8f9fa;" +
+                        "-fx-border-color: #dee2e6;" +
+                        "-fx-border-radius: 6;" +
+                        "-fx-padding: 10;" +
+                        "-fx-spacing: 10;"
+        );
+        card.setPrefWidth(540);
+
+        Label nomeLabel = new Label(produto.getNome());
+        nomeLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        nomeLabel.setPrefWidth(200);
+
+        Label quantidadeLabel = new Label("Qtd: " + item.getQuantidade() + " un.");
+        quantidadeLabel.setStyle("-fx-font-size: 14px;");
+
+        Label precoUnitLabel = new Label(String.format("R$ %.2f/un.", produto.getPreco()));
+        precoUnitLabel.setStyle("-fx-font-size: 14px;");
+
+        Label totalLabel = new Label(String.format("Total: R$ %.2f", precoItem));
+        totalLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #28a745; -fx-font-size: 14px;");
+
+        Button btnRemover = new Button("Remover");
+        btnRemover.setStyle(
+                "-fx-background-color: #dc3545;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
+        btnRemover.setOnAction(e -> removerProdutoEspecifico(item));
+
+        card.getChildren().addAll(nomeLabel, quantidadeLabel, precoUnitLabel, totalLabel, btnRemover);
+
+        return card;
+    }
+
+    private Pane criarCardTotal(double precoTotalItens) {
+        HBox card = new HBox(10);
+        card.setStyle(
+                "-fx-background-color: #e9ecef;" +
+                        "-fx-border-color: #ced4da;" +
+                        "-fx-border-radius: 6;" +
+                        "-fx-padding: 10;" +
+                        "-fx-spacing: 10;"
+        );
+        card.setPrefWidth(540);
+
+        Label labelTotal = new Label("TOTAL DOS ITENS:");
+        labelTotal.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+
+        Label valorTotal = new Label(String.format("R$ %.2f", precoTotalItens));
+        valorTotal.setStyle("-fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: #28a745;");
+
+        card.getChildren().addAll(labelTotal, valorTotal);
+
+        return card;
+    }
+
+    private void removerProdutoEspecifico(ComboItem itemParaRemover) {
+        try {
+            itensDoCombo.remove(itemParaRemover);
             atualizarListaDeProdutos();
+            mostrarAlerta("Sucesso", "Produto removido do combo.", Alert.AlertType.INFORMATION);
+        } catch (Exception e) {
+            System.err.println("Erro ao remover produto específico: " + e.getMessage());
+            mostrarAlerta("Erro", "Erro ao remover produto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -78,6 +232,10 @@ public class EditarCombosController implements Initializable {
             }
 
             int quantidade = Integer.parseInt(qtdStr);
+            if (quantidade <= 0) {
+                mostrarAlerta("Erro", "Quantidade deve ser maior que zero.", Alert.AlertType.ERROR);
+                return;
+            }
 
             Produto produto = produtoService.buscarPrimeiroPorNome(nomeProduto);
             if (produto == null) {
@@ -174,7 +332,7 @@ public class EditarCombosController implements Initializable {
 
             comboAtual.setNome(nome);
             comboAtual.setPrecoTotal(preco.doubleValue());
-            comboAtual.setItensDoCombo(itensDoCombo);
+            comboAtual.setItensDoCombo(new ArrayList<>(itensDoCombo));
 
             comboService.salvarCombo(comboAtual);
 
@@ -190,65 +348,12 @@ public class EditarCombosController implements Initializable {
         }
     }
 
-    @FXML
-    private void cancelarEdicao() {
-        try {
-            Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmacao.setTitle("Confirmar Cancelamento");
-            confirmacao.setHeaderText(null);
-            confirmacao.setContentText("Deseja cancelar a edição? Todas as alterações serão perdidas.");
-
-            confirmacao.showAndWait().ifPresent(resposta -> {
-                if (resposta.getButtonData().isDefaultButton()) {
-                    fecharJanela();
-                }
-            });
-        } catch (Exception e) {
-            fecharJanela();
-        }
-    }
-
-    private void atualizarListaDeProdutos() {
-        StringBuilder sb = new StringBuilder();
-        if (itensDoCombo.isEmpty()) {
-            sb.append("Nenhum produto adicionado.");
-        } else {
-            sb.append("Produtos no combo:\n\n");
-            double precoTotal = 0.0;
-
-            for (ComboItem item : itensDoCombo) {
-                Produto produto = item.getProduto();
-                double precoItem = produto.getPreco() * item.getQuantidade();
-                precoTotal += precoItem;
-
-                sb.append("• ").append(produto.getNome())
-                        .append(" - Quantidade: ").append(item.getQuantidade())
-                        .append(" - Preço unitário: R$ ").append(String.format("%.2f", produto.getPreco()))
-                        .append(" - Total: R$ ").append(String.format("%.2f", precoItem))
-                        .append("\n");
-            }
-
-            sb.append("\nPreço total dos itens: R$ ").append(String.format("%.2f", precoTotal));
-
-            if (precoComboField != null && !precoComboField.getText().isEmpty()) {
-                try {
-                    BigDecimal precoAtual = new BigDecimal(precoComboField.getText().replace(",", "."));
-                    if (Math.abs(precoAtual.doubleValue() - precoTotal) > 0.01) {
-                        precoComboField.setText(String.format("%.2f", precoTotal));
-                    }
-                } catch (Exception e) {
-                }
-            }
-        }
-
-        produtosTextArea.setText(sb.toString());
-    }
-
     private void fecharJanela() {
         try {
             Stage stage = (Stage) nomeComboField.getScene().getWindow();
             stage.close();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

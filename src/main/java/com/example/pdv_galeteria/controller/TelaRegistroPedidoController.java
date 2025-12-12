@@ -1,24 +1,30 @@
 package com.example.pdv_galeteria.controller;
 
+import com.example.pdv_galeteria.PdvGaleteriaApplication;
+import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.service.CaixaService;
+import com.example.pdv_galeteria.service.ProdutoService;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Optional;
-
+import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.example.pdv_galeteria.PdvGaleteriaApplication;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.util.*;
 
 @Component
 public class TelaRegistroPedidoController implements Initializable {
@@ -26,17 +32,516 @@ public class TelaRegistroPedidoController implements Initializable {
     @FXML
     private AnchorPane contentPane;
 
+    @FXML
+    private FlowPane produtosContainer;
+
+    @FXML
+    private ScrollPane scrollProdutos;
+
+    @FXML
+    private TextField campoBusca;
+
+    @FXML
+    private VBox carrinhoContainer;
+
+    @FXML
+    private Label labelTotal;
+
+    @FXML
+    private Button btnRegistrarPedido;
+
+    @Autowired
+    private ProdutoService produtoService;
+
+    @Autowired
+    private CaixaService caixaService;
+
+    private Map<Produto, Integer> carrinho = new LinkedHashMap<>();
+    private List<Produto> todosProdutos = new ArrayList<>();
+    private List<Produto> produtosFiltrados = new ArrayList<>();
+    private double totalPedido = 0.0;
+    private DecimalFormat df = new DecimalFormat("#,##0.00");
+    private Timer timerBusca;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Inicializando TelaRegistroPedidoController...");
-        System.out.println("Tela de Nova Venda carregada com sucesso");
+        timerBusca = new Timer();
+
+        campoBusca.setPromptText("Buscar produto...");
+        campoBusca.setStyle("-fx-background-color: white; " +
+                "-fx-background-radius: 8; " +
+                "-fx-border-color: #d1d5db; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 8; " +
+                "-fx-padding: 10 12; " +
+                "-fx-font-size: 14px;");
+
+        if (scrollProdutos != null) {
+            scrollProdutos.setFitToWidth(true);
+            scrollProdutos.setFitToHeight(true);
+            scrollProdutos.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            scrollProdutos.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollProdutos.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        }
+
+        if (produtosContainer != null) {
+            produtosContainer.setHgap(15);
+            produtosContainer.setVgap(15);
+            produtosContainer.setPadding(new Insets(15));
+            produtosContainer.setStyle("-fx-background-color: transparent;");
+        }
+        if (carrinhoContainer != null) {
+            carrinhoContainer.setSpacing(8);
+        }
+
+        if (btnRegistrarPedido != null) {
+            btnRegistrarPedido.setOnAction(e -> registrarPedido());
+            btnRegistrarPedido.setDisable(true);
+        }
+
+        produtosContainer.prefWrapLengthProperty().bind(
+                scrollProdutos.widthProperty().subtract(25)
+        );
+
+        carregarProdutos();
+        atualizarCarrinho();
+    }
+
+    private void carregarProdutos() {
+        try {
+            todosProdutos = produtoService.listarTodos();
+            produtosFiltrados = new ArrayList<>(todosProdutos);
+            renderizarProdutos(produtosFiltrados);
+
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar produtos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void renderizarProdutos(List<Produto> produtos) {
+        if (produtosContainer == null) {
+            System.err.println("produtosContainer é nulo!");
+            return;
+        }
+
+        Platform.runLater(() -> {
+            try {
+                produtosContainer.getChildren().clear();
+
+                if (produtos.isEmpty()) {
+                    Label vazio = new Label("Nenhum produto encontrado");
+                    vazio.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 20;");
+                    produtosContainer.getChildren().add(vazio);
+                    return;
+                }
+
+                for (Produto produto : produtos) {
+                    Pane card = criarCardProduto(produto);
+                    produtosContainer.getChildren().add(card);
+                }
+
+            } catch (Exception e) {
+                System.err.println("Erro ao renderizar produtos: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private Pane criarCardProduto(Produto produto) {
+        Pane card = new Pane();
+        card.setMinSize(300, 180);
+        card.setMaxSize(300, 180);
+        card.setPrefSize(300, 180);
+
+        card.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #e5e7eb; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 12; " +
+                "-fx-background-radius: 12; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        card.getStyleClass().add("card-produtos");
+
+        Label labelNome = new Label(produto.getNome());
+        labelNome.setLayoutX(20);
+        labelNome.setLayoutY(30);
+        labelNome.setFont(Font.font("System", FontWeight.BOLD, 25));
+        labelNome.setStyle("-fx-text-fill: #111827;");
+        labelNome.setWrapText(true);
+        labelNome.setMaxWidth(260);
+
+        Label labelPreco = new Label(String.format("R$ %.2f", produto.getPreco()));
+        labelPreco.setLayoutX(40);
+        labelPreco.setLayoutY(100);
+        labelPreco.setFont(Font.font("System", FontWeight.BOLD, 28));
+        labelPreco.setStyle("-fx-text-fill: #2a6df4;");
+
+        String categoria = determinarCategoria(produto);
+        Label labelCategoria = new Label(categoria);
+
+        double categoriaWidth = categoria.length() * 8 + 24;
+        double categoriaX = 300 - categoriaWidth - 20;
+
+        labelCategoria.setLayoutX(categoriaX);
+        labelCategoria.setLayoutY(70);
+        labelCategoria.setFont(Font.font("System", FontWeight.BOLD, 12));
+        labelCategoria.setStyle("-fx-text-fill: #374151; " +
+                "-fx-background-color: #F3F4F6; " +
+                "-fx-padding: 4 12; " +
+                "-fx-background-radius: 20;");
+
+        card.getChildren().addAll(labelNome, labelPreco, labelCategoria);
+
+        card.setCursor(Cursor.HAND);
+        card.setOnMouseEntered(e -> {
+            card.setStyle("-fx-background-color: #f8fafc; " +
+                    "-fx-border-color: #f68411; " +
+                    "-fx-border-width: 2; " +
+                    "-fx-border-radius: 12; " +
+                    "-fx-background-radius: 12; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.3), 10, 0, 0, 4);");
+        });
+
+        card.setOnMouseExited(e -> {
+            card.setStyle("-fx-background-color: white; " +
+                    "-fx-border-color: #e5e7eb; " +
+                    "-fx-border-width: 1; " +
+                    "-fx-border-radius: 12; " +
+                    "-fx-background-radius: 12; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        });
+
+        card.setOnMouseClicked(e -> adicionarProduto(produto));
+
+        return card;
+    }
+
+    private String determinarCategoria(Produto produto) {
+        String nome = produto.getNome().toLowerCase();
+        if (nome.contains("galeto")) return "Principal";
+        if (nome.contains("refrigerante") || nome.contains("bebida")) return "Bebida";
+        if (nome.contains("batata") || nome.contains("frita")) return "Acompanhamento";
+        if (nome.contains("combo")) return "Combo";
+        if (nome.contains("maminha")) return "Principal";
+        return "Produto";
+    }
+
+    @FXML
+    private void onBuscaKeyReleased() {
+        String termoBusca = campoBusca.getText().trim();
+
+        if (timerBusca != null) {
+            timerBusca.cancel();
+            timerBusca.purge();
+        }
+
+        if (termoBusca.isEmpty()) {
+            timerBusca = new Timer();
+            timerBusca.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    restaurarTelaOriginal();
+                }
+            }, 100);
+            return;
+        }
+
+        timerBusca = new Timer();
+        timerBusca.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> executarBusca(termoBusca));
+            }
+        }, 300);
+    }
+
+    private void executarBusca(String termoBusca) {
+        try {
+            List<Produto> produtosEncontrados = produtoService.buscarListaPorNome(termoBusca);
+
+            if (produtosEncontrados.isEmpty()) {
+                produtosFiltrados = new ArrayList<>();
+            } else {
+                produtosFiltrados = produtosEncontrados;
+            }
+
+            renderizarProdutos(produtosFiltrados);
+
+        } catch (Exception e) {
+            System.err.println("Erro na busca: " + e.getMessage());
+            produtosFiltrados = todosProdutos.stream()
+                    .filter(p -> p.getNome().toLowerCase().contains(termoBusca.toLowerCase()))
+                    .toList();
+            renderizarProdutos(produtosFiltrados);
+        }
+    }
+
+    private void restaurarTelaOriginal() {
+        Platform.runLater(() -> {
+            produtosFiltrados = new ArrayList<>(todosProdutos);
+            renderizarProdutos(produtosFiltrados);
+        });
+    }
+
+    public void adicionarProduto(Produto produto) {
+        if (produto == null) return;
+
+        int quantidadeAtual = carrinho.getOrDefault(produto, 0);
+        carrinho.put(produto, quantidadeAtual + 1);
+        atualizarCarrinho();
+    }
+
+    public void incrementarQuantidade(Produto produto) {
+        if (produto == null || !carrinho.containsKey(produto)) return;
+
+        int quantidadeAtual = carrinho.get(produto);
+        carrinho.put(produto, quantidadeAtual + 1);
+        atualizarCarrinho();
+    }
+
+    public void decrementarQuantidade(Produto produto) {
+        if (produto == null || !carrinho.containsKey(produto)) return;
+
+        int quantidadeAtual = carrinho.get(produto);
+        if (quantidadeAtual > 1) {
+            carrinho.put(produto, quantidadeAtual - 1);
+        } else {
+            carrinho.remove(produto);
+        }
+        atualizarCarrinho();
+    }
+
+    public void removerProduto(Produto produto) {
+        if (produto == null || !carrinho.containsKey(produto)) return;
+
+        carrinho.remove(produto);
+        atualizarCarrinho();
+    }
+
+    private void atualizarCarrinho() {
+        if (carrinhoContainer == null) return;
+
+        Platform.runLater(() -> {
+            try {
+                carrinhoContainer.getChildren().clear();
+                totalPedido = 0.0;
+
+                if (carrinho.isEmpty()) {
+                    Label labelVazio = new Label("Carrinho vazio");
+                    labelVazio.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 20;");
+                    carrinhoContainer.getChildren().add(labelVazio);
+                } else {
+                    for (Map.Entry<Produto, Integer> entry : carrinho.entrySet()) {
+                        Produto produto = entry.getKey();
+                        int quantidade = entry.getValue();
+                        double subtotal = produto.getPreco() * quantidade;
+                        totalPedido += subtotal;
+
+                        Pane itemPane = criarItemCarrinhoEstatico(produto, quantidade, subtotal);
+                        carrinhoContainer.getChildren().add(itemPane);
+
+                        Separator separator = new Separator();
+                        separator.setPrefWidth(240);
+                        separator.setStyle("-fx-padding: 8 0; -fx-opacity: 0.3;");
+                        carrinhoContainer.getChildren().add(separator);
+                    }
+
+                    if (!carrinhoContainer.getChildren().isEmpty()) {
+                        carrinhoContainer.getChildren().remove(carrinhoContainer.getChildren().size() - 1);
+                    }
+                }
+
+                if (labelTotal != null) {
+                    labelTotal.setText("R$ " + df.format(totalPedido));
+                    labelTotal.setStyle("-fx-text-fill: #2a6df4;");
+                }
+
+                if (btnRegistrarPedido != null) {
+                    btnRegistrarPedido.setDisable(carrinho.isEmpty());
+                }
+
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar carrinho: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private Pane criarItemCarrinhoEstatico(Produto produto, int quantidade, double subtotal) {
+        Pane itemPane = new Pane();
+        itemPane.setPrefSize(240, 60);
+        itemPane.setStyle("-fx-background-color: transparent;");
+
+        Label labelNome = new Label(produto.getNome());
+        labelNome.setLayoutX(0);
+        labelNome.setLayoutY(0);
+        labelNome.setFont(Font.font("System", FontWeight.BOLD, 14));
+        labelNome.setStyle("-fx-text-fill: #111827;");
+        labelNome.setWrapText(true);
+        labelNome.setMaxWidth(140);
+
+        Label labelDetalhes = new Label(
+                String.format("R$ %.2f x %d", produto.getPreco(), quantidade)
+        );
+        labelDetalhes.setLayoutX(0);
+        labelDetalhes.setLayoutY(22);
+        labelDetalhes.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 12px;");
+
+        Button btnMenos = new Button("-");
+        btnMenos.setLayoutX(140);
+        btnMenos.setLayoutY(15);
+        btnMenos.setPrefSize(25, 25);
+        btnMenos.setStyle("-fx-background-color: #f3f4f6; " +
+                "-fx-background-radius: 4; " +
+                "-fx-border-color: #d1d5db; " +
+                "-fx-border-radius: 4; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 12px; " +
+                "-fx-cursor: hand;");
+        btnMenos.setOnAction(e -> decrementarQuantidade(produto));
+
+        Label labelQuantidade = new Label(String.valueOf(quantidade));
+        labelQuantidade.setLayoutX(170);
+        labelQuantidade.setLayoutY(15);
+        labelQuantidade.setFont(Font.font("System", FontWeight.BOLD, 16));
+        labelQuantidade.setStyle("-fx-text-fill: #111827;");
+
+        Button btnMais = new Button("+");
+        btnMais.setLayoutX(195);
+        btnMais.setLayoutY(15);
+        btnMais.setPrefSize(25, 25);
+        btnMais.setStyle("-fx-background-color: #f3f4f6; " +
+                "-fx-background-radius: 4; " +
+                "-fx-border-color: #d1d5db; " +
+                "-fx-border-radius: 4; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 12px; " +
+                "-fx-cursor: hand;");
+        btnMais.setOnAction(e -> incrementarQuantidade(produto));
+
+        Button btnDeletar = new Button("×");
+        btnDeletar.setLayoutX(225);
+        btnDeletar.setLayoutY(15);
+        btnDeletar.setPrefSize(25, 25);
+        btnDeletar.setStyle("-fx-background-color: #fecaca; " +
+                "-fx-text-fill: #dc2626; " +
+                "-fx-background-radius: 4; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 12px; " +
+                "-fx-cursor: hand;");
+        btnDeletar.setOnAction(e -> removerProduto(produto));
+
+        itemPane.getChildren().addAll(labelNome, labelDetalhes, btnMenos, labelQuantidade, btnMais, btnDeletar);
+
+        return itemPane;
+    }
+
+    @FXML
+    private void registrarPedido() {
+        if (carrinho.isEmpty()) {
+            mostrarAlerta("Carrinho Vazio",
+                    "Adicione produtos ao carrinho antes de registrar o pedido.",
+                    Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            abrirPopupRegistroPedido();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir pop-up de registro: " + e.getMessage());
+            e.printStackTrace();
+            mostrarAlerta("Erro",
+                    "Não foi possível abrir o formulário de registro: " + e.getMessage(),
+                    Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void abrirPopupRegistroPedido() {
+        try {
+            System.out.println("=== ABRINDO POPUP DE REGISTRO DE PEDIDO ===");
+
+            if (carrinho == null || carrinho.isEmpty()) {
+                mostrarErro("Adicione itens ao carrinho antes de registrar o pedido!");
+                return;
+            }
+
+            double totalCarrinho = calcularTotalCarrinho();
+            System.out.println("Total do carrinho: R$ " + totalCarrinho);
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaAdicionarPedidos.fxml")
+            );
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            RegistroPedidoPopupController popupController = loader.getController();
+
+            if (popupController == null) {
+                System.err.println("ERRO: Controller do popup não carregado!");
+                return;
+            }
+
+            if (caixaService != null) {
+                popupController.setCaixaService(caixaService);
+                System.out.println("CaixaService passado para popup: " + (caixaService != null));
+            } else {
+                System.err.println("AVISO: caixaService é nulo no controller principal!");
+            }
+
+            popupController.setDadosPedido(new HashMap<>(carrinho), totalCarrinho);
+
+            Stage popupStage = new Stage();
+            popupController.setPopupStage(popupStage);
+
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Registrar Pedido");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(getCurrentStage());
+            popupStage.setResizable(false);
+            popupStage.centerOnScreen();
+
+            popupStage.setOnHidden(e -> {
+                System.out.println("Popup fechado, atualizando caixa...");
+                atualizarInterfaceCaixa();
+            });
+
+            popupStage.showAndWait();
+
+            carrinho.clear();
+            atualizarCarrinho();
+
+        } catch (Exception e) {
+            System.err.println("ERRO ao abrir popup de registro: " + e.getMessage());
+            e.printStackTrace();
+            mostrarErro("Erro ao abrir formulário de pedido: " + e.getMessage());
+        }
+    }
+
+    private void atualizarInterfaceCaixa() {
+        try {
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                CaixaController caixaController = PdvGaleteriaApplication.getSpringContext()
+                        .getBean(CaixaController.class);
+
+                if (caixaController != null) {
+                    caixaController.atualizarCaixa();
+                    System.out.println("Caixa atualizado após venda");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar caixa: " + e.getMessage());
+        }
     }
 
     @FXML
     private void abrirTelaEstoque() {
         try {
-            System.out.println("Abrindo tela de estoque...");
-
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaProdutos.fxml"));
 
@@ -49,267 +554,17 @@ public class TelaRegistroPedidoController implements Initializable {
             stage.setTitle("Estoque");
             stage.centerOnScreen();
 
-            System.out.println("Tela de estoque aberta com sucesso!");
-
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao abrir tela de estoque: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void registrarPedido() {
-        System.out.println("Registrando pedido...");
-        mostrarAlerta("Pedido Registrado",
-                "Pedido registrado com sucesso! Total: R$ 119,00",
-                Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void buscarProdutos() {
-        System.out.println("Buscando produtos...");
-    }
-
-    @FXML
-    private void adicionarProdutoAoCarrinho() {
-        System.out.println("Adicionando produto ao carrinho...");
-    }
-
-    @FXML
-    private void incrementarQuantidade() {
-        System.out.println("Incrementando quantidade...");
-    }
-
-    @FXML
-    private void decrementarQuantidade() {
-        System.out.println("Decrementando quantidade...");
-    }
-
-    @FXML
-    private void sairParaLogin() {
-        try {
-            System.out.println("Iniciando processo de saída para login...");
-
-            System.out.println("Iniciando processo de saída para login...");
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
-
-            Parent root = loader.load();
-            ConfirmacaoSaidaController controller = loader.getController();
-
-            Stage popupStage = new Stage();
-            controller.setPopupStage(popupStage);
-
-            popupStage.setScene(new Scene(root));
-            popupStage.setTitle("Confirmação de Saída");
-            popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(contentPane.getScene().getWindow());
-            popupStage.setResizable(false);
-            popupStage.centerOnScreen();
-
-            popupStage.showAndWait();
-
-            if (controller.isConfirmado()) {
-                System.out.println("Usuário confirmou saída, voltando para login...");
-                voltarParaTelaLogin();
-            } else {
-                System.out.println("Usuário cancelou a saída.");
-            }
-
-        } catch (Exception e) {
-            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
-            e.printStackTrace();
-
-            usarFallbackConfirmacao();
-        }
-    }
-
-    private void usarFallbackConfirmacao() {
-        System.out.println("Usando fallback de confirmação...");
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmação de Saída");
-        alert.setHeaderText("Deseja realmente sair?");
-        alert.setContentText("Você será redirecionado para a tela de login.");
-
-        ButtonType btnSim = new ButtonType("Sim, Sair", ButtonBar.ButtonData.YES);
-        ButtonType btnNao = new ButtonType("Cancelar", ButtonBar.ButtonData.NO);
-        alert.getButtonTypes().setAll(btnSim, btnNao);
-
-        Optional<ButtonType> resultado = alert.showAndWait();
-        if (resultado.isPresent() && resultado.get() == btnSim) {
-            System.out.println("Usuário confirmou saída no fallback");
-            voltarParaTelaLogin();
-        } else {
-            System.out.println("Usuário cancelou saída no fallback");
-        }
-    }
-
-    private void voltarParaTelaLogin() {
-        try {
-            System.out.println("Iniciando volta para tela de login...");
-
-            Stage stage = (Stage) contentPane.getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
-
-            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
-
-            System.out.println("Tela de login carregada com sucesso!");
-
-        } catch (Exception e) {
-            System.err.println("Erro ao voltar para login: " + e.getMessage());
-            e.printStackTrace();
-
-            reiniciarAplicacaoCompleta();
-        }
-    }
-
-    private void reiniciarAplicacaoCompleta() {
-        try {
-            System.out.println("Tentando reiniciar aplicação completamente...");
-
-            Stage stage = (Stage) contentPane.getScene().getWindow();
-            stage.close();
-
-            PdvGaleteriaApplication.relaunchApplication();
-
-        } catch (Exception e) {
-            System.err.println("Erro ao reiniciar aplicação: " + e.getMessage());
-
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Erro ao reiniciar aplicação");
-            alert.setContentText("Por favor, feche e abra o programa manualmente.");
-            alert.showAndWait();
-
-            javafx.application.Platform.exit();
-        }
-    }
-
-    private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensagem);
-        alert.showAndWait();
-    }
-
-    @FXML
-    private void handleAbrirTelaCaixa(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Controle de Caixa");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            mostrarErro("Erro ao abrir tela do caixa: " + e.getMessage());
-        }
-    }
-
-    private void mostrarErro(String mensagem) {
-        System.err.println(mensagem);
-    }
-
-    @FXML
-    private void abrirTelaCaixa() {
-        try {
-            System.out.println("Abrindo tela de caixa...");
-
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml"));
-
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
-
-            Parent root = loader.load();
-
-            Stage stage = (Stage) contentPane.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Caixa");
-            stage.centerOnScreen();
-
-            System.out.println("Tela de caixa aberta com sucesso!");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Erro ao abrir tela de caixa: " + e.getMessage());
-            mostrarAlerta("Erro", "Não foi possível abrir a tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     @FXML
     private void abrirTelaEntregadores() {
         try {
-            System.out.println("=== ABRINDO TELA ENTREGADORES ===");
-
             URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEntregadores.fxml");
             if (fxmlUrl == null) {
                 System.err.println("ERRO: Arquivo não encontrado!");
-
-                return;
-            }
-
-            System.out.println("FXML encontrado: " + fxmlUrl);
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-                System.out.println("Spring configurado");
-            }
-
-            System.out.println("Carregando FXML...");
-            Parent root = loader.load();
-            System.out.println("FXML carregado com sucesso!");
-
-            Stage stage = null;
-
-
-            if (contentPane != null && contentPane.getScene() != null) {
-                stage = (Stage) contentPane.getScene().getWindow();
-            }
-
-            if (stage != null) {
-                stage.setScene(new Scene(root));
-                stage.setTitle("Entregadores");
-                stage.centerOnScreen();
-                System.out.println("Tela de entregadores aberta com SUCESSO!");
-            }
-
-        } catch (Exception e) {
-            System.err.println("=== ERRO AO ABRIR TELA ENTREGADORES ===");
-            System.err.println("Mensagem: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void abrirTelaRelatorios() {
-        try {
-            System.out.println("Abrindo tela de relatórios...");
-
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorios.fxml");
-            if (fxmlUrl == null) {
-                System.err.println("Arquivo TelaRelatorios.fxml não encontrado!");
-                mostrarAlerta("Funcionalidade em Desenvolvimento",
-                        "Tela de relatórios será implementada em breve!",
-                        Alert.AlertType.INFORMATION);
                 return;
             }
 
@@ -323,66 +578,20 @@ public class TelaRegistroPedidoController implements Initializable {
 
             Stage stage = (Stage) contentPane.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Relatórios");
+            stage.setTitle("Entregadores");
             stage.centerOnScreen();
 
-            System.out.println("Tela de relatórios aberta com sucesso!");
-
         } catch (Exception e) {
+            System.err.println("Erro ao abrir tela de entregadores: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("Erro ao abrir tela de relatórios: " + e.getMessage());
-            mostrarAlerta("Funcionalidade em Desenvolvimento",
-                    "Tela de relatórios será implementada em breve!",
-                    Alert.AlertType.INFORMATION);
-        }
-    }
-
-    @FXML
-    private void abrirTelaConfiguracoes() {
-        try {
-            System.out.println("Abrindo tela de configurações...");
-
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracoes.fxml");
-            if (fxmlUrl == null) {
-                System.err.println("Arquivo TelaConfiguracoes.fxml não encontrado!");
-                mostrarAlerta("Funcionalidade em Desenvolvimento",
-                        "Tela de configurações será implementada em breve!",
-                        Alert.AlertType.INFORMATION);
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
-
-            Parent root = loader.load();
-
-            Stage stage = (Stage) contentPane.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Configurações");
-            stage.centerOnScreen();
-
-            System.out.println("Tela de configurações aberta com sucesso!");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Erro ao abrir tela de configurações: " + e.getMessage());
-            mostrarAlerta("Funcionalidade em Desenvolvimento",
-                    "Tela de configurações será implementada em breve!",
-                    Alert.AlertType.INFORMATION);
         }
     }
 
     @FXML
     private void abrirTelaDashboard() {
         try {
-            System.out.println("Abrindo tela de dashboard...");
-
             URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashboard.fxml");
             if (fxmlUrl == null) {
-                System.err.println("Arquivo TelaDashboard.fxml não encontrado!");
                 mostrarAlerta("Funcionalidade em Desenvolvimento",
                         "Tela de dashboard será implementada em breve!",
                         Alert.AlertType.INFORMATION);
@@ -402,14 +611,223 @@ public class TelaRegistroPedidoController implements Initializable {
             stage.setTitle("Dashboard");
             stage.centerOnScreen();
 
-            System.out.println("Tela de dashboard aberta com sucesso!");
-
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Erro ao abrir tela de dashboard: " + e.getMessage());
             mostrarAlerta("Funcionalidade em Desenvolvimento",
                     "Tela de dashboard será implementada em breve!",
                     Alert.AlertType.INFORMATION);
         }
+    }
+
+    @FXML
+    private void abrirTelaRelatorios() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorio.fxml");
+            if (fxmlUrl == null) {
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) campoBusca.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Relatórios");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+        }
+    }
+
+    @FXML
+    private void abrirTelaConfiguracoes() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml");
+            if (fxmlUrl == null) {
+                mostrarAlerta("Funcionalidade em Desenvolvimento",
+                        "Tela de configurações será implementada em breve!",
+                        Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Configurações");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+            mostrarAlerta("Funcionalidade em Desenvolvimento",
+                    "Tela de configurações será implementada em breve!",
+                    Alert.AlertType.INFORMATION);
+        }
+    }
+
+    @FXML
+    private void sairParaLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            Parent root = loader.load();
+            ConfirmacaoSaidaController controller = loader.getController();
+
+            Stage popupStage = new Stage();
+            controller.setPopupStage(popupStage);
+
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Confirmação de Saída");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(contentPane.getScene().getWindow());
+            popupStage.setResizable(false);
+            popupStage.centerOnScreen();
+
+            popupStage.showAndWait();
+
+            if (controller.isConfirmado()) {
+                voltarParaTelaLogin();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
+            e.printStackTrace();
+
+            usarFallbackConfirmacao();
+        }
+    }
+
+    private void usarFallbackConfirmacao() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmação de Saída");
+        alert.setHeaderText("Deseja realmente sair?");
+        alert.setContentText("Você será redirecionado para a tela de login.");
+
+        ButtonType btnSim = new ButtonType("Sim, Sair", ButtonBar.ButtonData.YES);
+        ButtonType btnNao = new ButtonType("Cancelar", ButtonBar.ButtonData.NO);
+        alert.getButtonTypes().setAll(btnSim, btnNao);
+
+        Optional<ButtonType> resultado = alert.showAndWait();
+        if (resultado.isPresent() && resultado.get() == btnSim) {
+            voltarParaTelaLogin();
+        }
+    }
+
+    private void voltarParaTelaLogin() {
+        try {
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setTitle("Login");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao voltar para login: " + e.getMessage());
+            e.printStackTrace();
+            reiniciarAplicacaoCompleta();
+        }
+    }
+
+    private void reiniciarAplicacaoCompleta() {
+        try {
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.close();
+
+            PdvGaleteriaApplication.relaunchApplication();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao reiniciar aplicação: " + e.getMessage());
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Erro ao reiniciar aplicação");
+            alert.setContentText("Por favor, feche e abra o programa manualmente.");
+            alert.showAndWait();
+
+            Platform.exit();
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void abrirTelaCaixa() {
+        try {
+            System.out.println("=== ABRINDO TELA CAIXA ===");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml")
+            );
+
+            Parent root = loader.load();
+
+            CaixaController controller = loader.getController();
+            System.out.println("Controller obtido: " + controller);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
+                controller.setCaixaService(caixaService);
+                System.out.println("CaixaService injetado manualmente!");
+            }
+
+            Stage stage = (Stage) contentPane.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Caixa");
+            stage.centerOnScreen();
+
+            System.out.println("Tela do caixa aberta com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Não foi possível abrir a tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void mostrarErro(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private Stage getCurrentStage() {
+        return (Stage) contentPane.getScene().getWindow();
+    }
+
+    private double calcularTotalCarrinho() {
+        double total = 0.0;
+        if (carrinho != null && !carrinho.isEmpty()) {
+            for (Map.Entry<Produto, Integer> entry : carrinho.entrySet()) {
+                Produto produto = entry.getKey();
+                int quantidade = entry.getValue();
+                total += produto.getPreco() * quantidade;
+            }
+        }
+        return total;
     }
 }

@@ -1,11 +1,13 @@
 package com.example.pdv_galeteria.repository;
 
 import com.example.pdv_galeteria.model.Caixa;
+import com.example.pdv_galeteria.model.StatusCaixa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,11 +16,15 @@ public interface CaixaRepository extends JpaRepository<Caixa, Long> {
     @Query("SELECT c FROM Caixa c WHERE c.dataCaixa = CURRENT_DATE")
     Optional<Caixa> findCaixaDoDia();
 
-    Optional<Caixa> findByDataCaixa(LocalDate dataCaixa);
+    @Query("SELECT c FROM Caixa c WHERE c.dataCaixa = CURRENT_DATE AND c.status = 'ABERTO'")
+    Optional<Caixa> findCaixaAbertoDoDia();
 
     @Query("SELECT COUNT(c) > 0 FROM Caixa c WHERE c.dataCaixa = CURRENT_DATE")
     boolean existsCaixaDoDia();
 
-    @Query("SELECT c FROM Caixa c WHERE c.dataCaixa = CURRENT_DATE AND c.status = 'ABERTO'")
-    Optional<Caixa> findCaixaAbertoDoDia();
+    Optional<Caixa> findByDataCaixa(LocalDate dataCaixa);
+
+    Optional<Caixa> findByDataCaixaAndStatus(LocalDate dataCaixa, StatusCaixa status);
+
+    List<Caixa> findByStatus(StatusCaixa status);
 }
