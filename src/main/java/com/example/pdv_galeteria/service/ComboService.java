@@ -36,9 +36,8 @@ public class ComboService {
     }
 
     /**
-     * Salva um novo Combo no banco de dados.
-     * @param novoCombo
-     * @return
+     * @param novoCombo 
+     * @return 
      */
 
     @Transactional
@@ -120,7 +119,6 @@ public List<Combo> buscarTodosCombos() {
     }
 
     /**
-     * Deleta um Combo por ID.
      * @param id 
      */
 
