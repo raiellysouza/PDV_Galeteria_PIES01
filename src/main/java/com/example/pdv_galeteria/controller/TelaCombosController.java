@@ -51,6 +51,13 @@ public class TelaCombosController {
     @FXML
     private VBox sugestoesContainer;
 
+    @FXML private TextArea nomeComboField;
+    @FXML private TextArea precoComboField;
+    @FXML private TextArea nomeProdutoField;
+    @FXML private TextArea quantidadeField;
+    @FXML private FlowPane comboContainer;
+
+    private final List<ComboItem> itensDoCombo = new ArrayList<>();
     @FXML
     private TextArea nomeComboField;
 
@@ -300,6 +307,7 @@ public class TelaCombosController {
         }
     }
 
+
     @FXML
     public void abrirTelaCombo() {
         try {
@@ -386,15 +394,77 @@ public class TelaCombosController {
         carregarCombos();
     }
 
-    private void atualizarListaDeProdutos() {
-        StringBuilder sb = new StringBuilder();
-        for (ComboItem item : itensDoCombo) {
-            sb.append(item.getProduto().getNome())
-                    .append(" - Quantidade: ").append(item.getQuantidade())
-                    .append("\n");
-        }
-        produtosTextArea.setText(sb.toString());
+
+private void atualizarListaDeProdutos() {
+
+    produtosListContainer.getChildren().clear(); 
+    for (int i = 0; i < itensDoCombo.size(); i++) {
+
+        ComboItem item = itensDoCombo.get(i);
+
+        HBox linha = new HBox();
+        linha.setSpacing(10);
+        linha.setStyle("""
+                -fx-background-color: #f7f7f7;
+                -fx-padding: 10;
+                -fx-background-radius: 8;
+                -fx-border-radius: 8;
+                -fx-border-color: #ddd;
+                """);
+
+        Label nome = new Label(item.getQuantidade() + "x  " + item.getProduto().getNome());
+        nome.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+
+        Region espaco = new Region();
+        HBox.setHgrow(espaco, Priority.ALWAYS);
+
+        Button btnExcluir = new Button("🗑");
+        btnExcluir.setStyle("""
+                -fx-background-color: transparent;
+                -fx-font-size: 16px;
+                -fx-cursor: hand;
+                """);
+
+        final int index = i;
+
+        btnExcluir.setOnAction(e -> {
+            itensDoCombo.remove(index);
+            atualizarListaDeProdutos();
+        });
+
+        linha.getChildren().addAll(nome, espaco, btnExcluir);
+        produtosListContainer.getChildren().add(linha);
     }
+}
+
+private void mostrarSugestoes(List<Produto> produtos) {
+    sugestoesContainer.getChildren().clear();
+
+    if (produtos == null || produtos.isEmpty()) {
+        sugestoesContainer.setVisible(false);
+        return;
+    }
+
+    for (Produto p : produtos) {
+
+        Label opcao = new Label(p.getNome());
+        opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;");
+        opcao.setMaxWidth(Double.MAX_VALUE);
+
+        opcao.setOnMouseEntered(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: #e6e6e6; -fx-font-size: 14;"));
+        opcao.setOnMouseExited(e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;"));
+
+        opcao.setOnMouseClicked(e -> {
+            nomeProdutoField.setText(p.getNome());
+            sugestoesContainer.setVisible(false);
+        });
+
+        sugestoesContainer.getChildren().add(opcao);
+    }
+
+    sugestoesContainer.setVisible(true);
+}
+
 
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);

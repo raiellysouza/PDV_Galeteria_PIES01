@@ -256,7 +256,7 @@ public class EditarCombosController implements Initializable {
                 ComboItem item = new ComboItem();
                 item.setProduto(produto);
                 item.setQuantidade(quantidade);
-                item.setCombo(comboAtual);
+                item.setCombo(comboAtual); 
                 itensDoCombo.add(item);
             }
 
@@ -270,6 +270,54 @@ public class EditarCombosController implements Initializable {
             e.printStackTrace();
             mostrarAlerta("Erro", "Erro ao adicionar produto: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    @FXML
+    private void removerProduto() {
+        try {
+            String nomeProduto = nomeProdutoField.getText().trim();
+
+            if (nomeProduto.isEmpty()) {
+                mostrarAlerta("Aviso", "Digite o nome do produto a ser removido.", Alert.AlertType.WARNING);
+                return;
+            }
+
+        ComboItem existente = null;
+        for (ComboItem item : itensDoCombo) {
+            if (item.getProduto().getId().equals(produto.getId())) {
+                existente = item;
+                break;
+            boolean removido = itensDoCombo.removeIf(item ->
+                    item.getProduto().getNome().equalsIgnoreCase(nomeProduto));
+
+            if (removido) {
+                atualizarListaDeProdutos();
+                mostrarAlerta("Sucesso", "Produto removido do combo.", Alert.AlertType.INFORMATION);
+            } else {
+                mostrarAlerta("Aviso", "Produto não encontrado no combo.", Alert.AlertType.WARNING);
+            }
+
+        if (existente != null) {
+            existente.setQuantidade(existente.getQuantidade() + quantidade);
+        } else {
+            ComboItem novoItem = new ComboItem();
+            novoItem.setProduto(produto);
+            novoItem.setQuantidade(quantidade);
+            itensDoCombo.add(novoItem);
+            nomeProdutoField.clear();
+            quantidadeField.clear();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro", "Erro ao remover produto: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void limparItens() {
+        itensDoCombo.clear();
+        atualizarListaDeProdutos();
+        mostrarAlerta("Informação", "Todos os itens foram removidos.", Alert.AlertType.INFORMATION);
     }
 
     @FXML
@@ -329,4 +377,70 @@ public class EditarCombosController implements Initializable {
         alert.setContentText(mensagem);
         alert.showAndWait();
     }
+
+ private void configurarAutoComplete() {
+
+    sugestoesContainer.setVisible(false);
+    sugestoesContainer.setManaged(false); 
+
+    nomeProdutoField.textProperty().addListener((obs, oldValue, newValue) -> {
+
+        sugestoesContainer.getChildren().clear();
+
+        if (newValue == null || newValue.trim().isEmpty()) {
+            sugestoesContainer.setVisible(false);
+            sugestoesContainer.setManaged(false);
+            return;
+        }
+
+        List<Produto> produtos = produtoService.buscarListaPorNome(newValue);
+
+        if (produtos.isEmpty()) {
+            sugestoesContainer.setVisible(false);
+            sugestoesContainer.setManaged(false);
+            return;
+        }
+
+        sugestoesContainer.setVisible(true);
+        sugestoesContainer.setManaged(true);
+
+        for (Produto p : produtos) {
+
+            Label opcao = new Label(p.getNome());
+            opcao.setMaxWidth(Double.MAX_VALUE); 
+            opcao.setStyle("""
+                    -fx-background-color: white;
+                    -fx-padding: 8 12;
+                    -fx-font-size: 14px;
+                    -fx-border-width: 0;   /* SEM BORDA */
+                    -fx-cursor: hand;
+                    """);
+
+            opcao.setOnMouseClicked(e -> {
+                nomeProdutoField.setText(p.getNome());
+                sugestoesContainer.setVisible(false);
+                sugestoesContainer.setManaged(false);
+            });
+
+            opcao.setOnMouseEntered(e -> opcao.setStyle("""
+                    -fx-background-color: #efefef;
+                    -fx-padding: 8 12;
+                    -fx-font-size: 14px;
+                    -fx-border-width: 0;
+                    -fx-cursor: hand;
+                    """));
+
+            opcao.setOnMouseExited(e -> opcao.setStyle("""
+                    -fx-background-color: white;
+                    -fx-padding: 8 12;
+                    -fx-font-size: 14px;
+                    -fx-border-width: 0;
+                    -fx-cursor: hand;
+                    """));
+
+            sugestoesContainer.getChildren().add(opcao);
+        }
+    });
+}
+
 }
