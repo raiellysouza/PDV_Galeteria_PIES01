@@ -19,14 +19,11 @@ public class VendaEmLote {
 
     private Double total = 0.0;
 
-    @OneToMany(
-        mappedBy = "vendaEmLote",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "vendaEmLote", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> itens = new ArrayList<>();
 
-    public VendaEmLote() {}
+    public VendaEmLote() {
+    }
 
     public VendaEmLote(String origem) {
         this.origem = origem;
@@ -50,15 +47,43 @@ public class VendaEmLote {
                 .sum();
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getOrigem() { return origem; }
-    public void setOrigem(String origem) { this.origem = origem; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public LocalDateTime getCriadoEm() { return criadoEm; }
+    public String getOrigem() {
+        return origem;
+    }
 
-    public Double getTotal() { return total; }
+    public void setOrigem(String origem) {
+        this.origem = origem;
+    }
 
-    public List<ItemPedido> getItens() { return itens; }
+    public void setCriadoEm(LocalDateTime criadoEm) {
+        this.criadoEm = criadoEm;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setItens(List<ItemPedido> itens) {
+        this.itens = itens;
+    }
+
+    public List<ItemPedido> getItens() {
+        return itens;
+    }
 }
