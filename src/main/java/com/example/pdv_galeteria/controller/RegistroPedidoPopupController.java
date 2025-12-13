@@ -1,9 +1,8 @@
 package com.example.pdv_galeteria.controller;
 
-import com.example.pdv_galeteria.model.Caixa;
-import com.example.pdv_galeteria.model.MovimentoCaixa;
-import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.model.*;
 import com.example.pdv_galeteria.service.CaixaService;
+import com.example.pdv_galeteria.service.PedidoService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -26,6 +25,9 @@ public class RegistroPedidoPopupController implements Initializable {
 
     @Autowired
     private CaixaService caixaService;
+
+    @Autowired
+    private PedidoService pedidoService;
 
     @FXML
     private TextArea campoNomeCliente;
@@ -343,6 +345,12 @@ public class RegistroPedidoPopupController implements Initializable {
                 return;
             }
 
+            if (pedidoService == null) {
+                System.err.println("ERRO: pedidoService é nulo!");
+                mostrarErro("Serviço de pedidos não disponível");
+                return;
+            }
+
             Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
             if (!caixaOpt.isPresent()) {
                 System.err.println("ERRO: Nenhum caixa aberto encontrado");
@@ -358,6 +366,10 @@ public class RegistroPedidoPopupController implements Initializable {
             String canalVenda = getCanalVendaSelecionado();
             String tipoEntrega = getTipoEntregaSelecionado();
             String valorPagoStr = campoValorPago.getText();
+            String enderecoEntrega = campoEndereco != null ? campoEndereco.getText().trim() : "";
+            String telefone = campoTelefone != null ? campoTelefone.getText().trim() : "";
+            String observacoes = campoObservacoes != null ? campoObservacoes.getText().trim() : "";
+            String pontoReferencia = campoPontoReferencia != null ? campoPontoReferencia.getText().trim() : "";
 
             BigDecimal valorTroco = BigDecimal.ZERO;
             if (formaPagamento.equals("Dinheiro") && valorPagoStr != null && !valorPagoStr.trim().isEmpty()) {
@@ -386,7 +398,6 @@ public class RegistroPedidoPopupController implements Initializable {
             System.out.println("Número da venda: " + numeroVenda);
 
             String descricaoVenda = "Venda #" + String.format("%03d", numeroVenda);
-
             if (!canalVenda.equals("Não informado")) {
                 descricaoVenda += " - " + canalVenda;
             }
@@ -396,6 +407,52 @@ public class RegistroPedidoPopupController implements Initializable {
 
             System.out.println("Registrando entrada no caixa: R$ " + valorVenda);
             System.out.println("Descrição: " + descricaoVenda);
+
+            System.out.println("=== SALVANDO PEDIDO NO BANCO ===");
+
+            Pedido pedido = new Pedido(nomeCliente);
+            pedido.setFormaPagamento(formaPagamento);
+            pedido.setTipoEntrega(tipoEntrega);
+            pedido.setStatus(StatusPedido.REGISTRADO);
+
+            if (checkEntrega != null && checkEntrega.isSelected()) {
+                String enderecoCompleto = enderecoEntrega;
+                if (!pontoReferencia.isEmpty()) {
+                    enderecoCompleto += " - " + pontoReferencia;
+                }
+                pedido.setTipoEntrega("Entrega - " + enderecoCompleto);
+
+                if (!observacoes.isEmpty()) {
+                }
+            }
+
+            System.out.println("Adicionando itens ao pedido...");
+            for (Map.Entry<Produto, Integer> entry : carrinho.entrySet()) {
+                Produto produto = entry.getKey();
+                int quantidade = entry.getValue();
+
+                System.out.println("  - " + quantidade + "x " + produto.getNome() +
+                        " (R$ " + produto.getPreco() + " cada)");
+
+                ItemPedido item = new ItemPedido(
+                        produto.getNome(),
+                        quantidade,
+                        produto.getPreco()
+                );
+                item.setPedido(pedido);
+                pedido.addItem(item);
+            }
+
+            pedido.recalcularTotal();
+
+            System.out.println("Total do pedido: R$ " + pedido.getTotal());
+            System.out.println("Status: " + pedido.getStatus());
+            System.out.println("Cliente: " + pedido.getCliente());
+
+            Pedido pedidoSalvo = pedidoService.criarPedido(pedido);
+
+            System.out.println("SUCESSO: Pedido salvo no banco com ID: " + pedidoSalvo.getId());
+            System.out.println("=== PEDIDO SALVO NO BANCO ===");
 
             MovimentoCaixa movimentoVenda = caixaService.registrarEntrada(
                     valorVenda,
@@ -409,7 +466,7 @@ public class RegistroPedidoPopupController implements Initializable {
                 return;
             }
 
-            System.out.println("SUCESSO: Venda registrada com ID: " + movimentoVenda.getId());
+            System.out.println("SUCESSO: Venda registrada no caixa com ID: " + movimentoVenda.getId());
 
             MovimentoCaixa movimentoTroco = null;
             if (valorTroco.compareTo(BigDecimal.ZERO) > 0) {
@@ -438,6 +495,7 @@ public class RegistroPedidoPopupController implements Initializable {
             mensagemSucesso.append("Forma de Pagamento: ").append(formaPagamento).append("\n");
             mensagemSucesso.append("Canal: ").append(canalVenda).append("\n");
             mensagemSucesso.append("Tipo de Entrega: ").append(tipoEntrega).append("\n");
+            mensagemSucesso.append("Número do Pedido: #").append(pedidoSalvo.getId()).append("\n");
 
             if (valorTroco.compareTo(BigDecimal.ZERO) > 0) {
                 mensagemSucesso.append("Troco: R$ ").append(String.format("%.2f", valorTroco)).append("\n");

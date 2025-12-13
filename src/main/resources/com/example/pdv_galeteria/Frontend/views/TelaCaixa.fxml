@@ -180,7 +180,7 @@
 
         <Separator layoutX="-12.0" layoutY="115.0" opacity="0.19" prefWidth="295.0" />
 
-        <Button alignment="CENTER" layoutX="12.0" layoutY="121.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Dashboard" textFill="WHITE">
+        <Button alignment="CENTER" layoutX="12.0" layoutY="121.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#abrirTelaDashboard" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Dashboard" textFill="WHITE">
             <font>
                 <Font size="27.0" />
             </font>

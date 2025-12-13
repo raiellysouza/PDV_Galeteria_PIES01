@@ -562,7 +562,7 @@ public class EntregadorController {
         try {
             System.out.println("Abrindo tela de dashboard...");
 
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/Dashboard.fxml");
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashBoard.fxml");
             if (fxmlUrl == null) {
                 System.err.println("Arquivo não encontrado: Dashboard.fxml");
                 mostrarAlerta("Erro", "Tela de dashboard não disponível", Alert.AlertType.ERROR);
@@ -700,38 +700,6 @@ public class EntregadorController {
             System.err.println("Erro ao abrir tela do caixa: " + e.getMessage());
             e.printStackTrace();
             mostrarAlerta("Erro", "Erro ao abrir tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
-
-    @FXML
-    private void abrirTelaCombos(ActionEvent event) {
-        try {
-            System.out.println("Abrindo tela de combos...");
-
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/telaCombo.fxml");
-            if (fxmlUrl == null) {
-                mostrarAlerta("Erro", "Arquivo da tela de combos não encontrado!", Alert.AlertType.ERROR);
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
-
-            Parent root = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Combos");
-            stage.centerOnScreen();
-
-            System.out.println("Tela de combos aberta com sucesso!");
-        } catch (Exception e) {
-            System.err.println("Erro ao abrir tela de combos: " + e.getMessage());
-            e.printStackTrace();
-            mostrarAlerta("Erro", "Erro ao abrir tela de combos: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

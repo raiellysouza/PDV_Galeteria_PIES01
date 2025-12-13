@@ -917,44 +917,71 @@ public class CaixaController implements Initializable {
 
             vboxMovimentacoes.getChildren().clear();
 
-            Label lblTitulo = new Label("Movimentações do Dia");
-            lblTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10 0 15 10;");
-            vboxMovimentacoes.getChildren().add(lblTitulo);
-
-            Label lblSubtitulo = new Label("Histórico de entradas e saídas");
-            lblSubtitulo.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-padding: 0 0 20 10;");
-            vboxMovimentacoes.getChildren().add(lblSubtitulo);
-
             Optional<Caixa> caixaOpt = caixaService.getCaixaAbertoDoDia();
+
             if (!caixaOpt.isPresent()) {
-                System.out.println("Nenhum caixa para carregar movimentações");
-                return;
-            }
+                Optional<Caixa> caixaFechadoOpt = caixaService.getUltimoCaixaFechadoDoDia();
 
-            Caixa caixa = caixaOpt.get();
-            System.out.println("Carregando movimentações para caixa ID: " + caixa.getId());
+                Label lblTitulo = new Label("Histórico de Movimentações");
+                lblTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10 0 15 10;");
+                vboxMovimentacoes.getChildren().add(lblTitulo);
 
-            List<MovimentoCaixa> movimentacoes = movimentoCaixaService.listarMovimentosDoCaixa(caixa.getId());
-            System.out.println("Movimentações encontradas: " + movimentacoes.size());
+                if (caixaFechadoOpt.isPresent()) {
+                    Caixa caixaFechado = caixaFechadoOpt.get();
+                    Label lblSubtitulo = new Label("Caixa fechado em: " +
+                            caixaFechado.getDataFechamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                    lblSubtitulo.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-padding: 0 0 20 10;");
+                    vboxMovimentacoes.getChildren().add(lblSubtitulo);
 
-            if (movimentacoes.isEmpty()) {
-                Label lblVazio = new Label("Nenhuma movimentação hoje");
-                lblVazio.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 40px;");
-                vboxMovimentacoes.getChildren().add(lblVazio);
-            } else {
-                for (MovimentoCaixa movimento : movimentacoes) {
-                    Pane itemMovimentacao = criarItemMovimentacao(movimento);
-                    vboxMovimentacoes.getChildren().add(itemMovimentacao);
+                    List<MovimentoCaixa> movimentacoes = movimentoCaixaService.listarMovimentosDoCaixa(caixaFechado.getId());
+                    adicionarMovimentacoesNaTela(movimentacoes);
+                } else {
+                    Label lblSubtitulo = new Label("Nenhum caixa aberto hoje");
+                    lblSubtitulo.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-padding: 0 0 20 10;");
+                    vboxMovimentacoes.getChildren().add(lblSubtitulo);
 
-                    Pane espacamento = new Pane();
-                    espacamento.setPrefHeight(15);
-                    vboxMovimentacoes.getChildren().add(espacamento);
+                    Label lblVazio = new Label("Abra um caixa para ver as movimentações");
+                    lblVazio.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 40px;");
+                    vboxMovimentacoes.getChildren().add(lblVazio);
                 }
+            } else {
+                Caixa caixa = caixaOpt.get();
+
+                Label lblTitulo = new Label("Movimentações do Caixa Atual");
+                lblTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10 0 15 10;");
+                vboxMovimentacoes.getChildren().add(lblTitulo);
+
+                Label lblSubtitulo = new Label("Aberto em: " +
+                        caixa.getDataAbertura().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                lblSubtitulo.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-padding: 0 0 20 10;");
+                vboxMovimentacoes.getChildren().add(lblSubtitulo);
+
+                System.out.println("Carregando movimentações do caixa atual ID: " + caixa.getId());
+
+                List<MovimentoCaixa> movimentacoes = movimentoCaixaService.listarMovimentosDoCaixa(caixa.getId());
+                adicionarMovimentacoesNaTela(movimentacoes);
             }
 
         } catch (Exception e) {
             System.err.println("Erro ao carregar movimentações: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void adicionarMovimentacoesNaTela(List<MovimentoCaixa> movimentacoes) {
+        if (movimentacoes.isEmpty()) {
+            Label lblVazio = new Label("Nenhuma movimentação registrada");
+            lblVazio.setStyle("-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 40px;");
+            vboxMovimentacoes.getChildren().add(lblVazio);
+        } else {
+            for (MovimentoCaixa movimento : movimentacoes) {
+                Pane itemMovimentacao = criarItemMovimentacao(movimento);
+                vboxMovimentacoes.getChildren().add(itemMovimentacao);
+
+                Pane espacamento = new Pane();
+                espacamento.setPrefHeight(15);
+                vboxMovimentacoes.getChildren().add(espacamento);
+            }
         }
     }
 
@@ -1158,6 +1185,30 @@ public class CaixaController implements Initializable {
             stage.centerOnScreen();
 
         } catch (Exception e) {
+        }
+    }
+
+    @FXML
+    private void abrirTelaDashboard() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashBoard.fxml");
+            if (fxmlUrl == null) {
+                mostrarErro("Arquivo da tela de dashboard não encontrado!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+            Stage stage = getCurrentStage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dashboard");
+            stage.centerOnScreen();
+        } catch (Exception e) {
+            mostrarErro("Erro ao abrir tela de dashboard: " + e.getMessage());
         }
     }
 }

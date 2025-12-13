@@ -161,7 +161,7 @@
             <children>
                 <ScrollPane fitToWidth="true" prefHeight="700.0" prefWidth="1090.0" style="-fx-background-color: transparent; -fx-border-color: transparent;">
                     <content>
-                        <VBox spacing="30.0" style="-fx-background-color: #F9FAFB;">
+                        <VBox fx:id="mainContainer" spacing="30.0" style="-fx-background-color: #F9FAFB;">
                             <padding>
                                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                             </padding>
@@ -199,12 +199,12 @@
                                                         <SVGPath content="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.15-1.46-3.27-3.23h1.96c.1.92.94 1.61 1.98 1.61 1.05 0 1.83-.63 1.83-1.69 0-.83-.6-1.45-1.69-1.8-1.49-.45-3.03-1.25-3.03-3.07 0-1.62 1.22-2.8 2.86-3.21V5h2.66v1.99c1.43.33 2.65 1.29 2.78 2.88h-1.96c-.13-.81-.83-1.42-1.81-1.42-.99 0-1.67.58-1.67 1.51 0 .81.6 1.41 1.79 1.83 1.73.55 3.03 1.38 3.03 3.27-.01 1.66-1.24 2.86-2.89 3.22z" fill="#22c55e" scaleX="1.2" scaleY="1.2" />
                                                     </children>
                                                 </HBox>
-                                                <Label text="R$ 00,00" textFill="#111827">
+                                                <Label fx:id="lblTotalVendas" text="R$ 00,00" textFill="#111827">
                                                     <font>
                                                         <Font name="System Bold" size="30.0" />
                                                     </font>
                                                 </Label>
-                                                <Label text="+00%" textFill="#22c55e">
+                                                <Label fx:id="lblPercentualVendas" text="+00%" textFill="#22c55e">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -228,12 +228,12 @@
                                                         <SVGPath content="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="#3b82f6" scaleX="1.2" scaleY="1.2" />
                                                     </children>
                                                 </HBox>
-                                                <Label text="0" textFill="#111827">
+                                                <Label fx:id="lblTotalPedidos" text="0" textFill="#111827">
                                                     <font>
                                                         <Font name="System Bold" size="30.0" />
                                                     </font>
                                                 </Label>
-                                                <Label text="+0 hoje" textFill="#3b82f6">
+                                                <Label fx:id="lblVariacaoPedidos" text="+0 hoje" textFill="#3b82f6">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -257,19 +257,19 @@
                                                         <SVGPath content="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" fill="#4b5563" scaleX="1.2" scaleY="1.2" />
                                                     </children>
                                                 </HBox>
-                                                <Label text="0" textFill="#111827">
+                                                <Label fx:id="lblProdutosAtivos" text="0" textFill="#111827">
                                                     <font>
                                                         <Font name="System Bold" size="30.0" />
                                                     </font>
                                                 </Label>
                                                 <HBox spacing="4.0">
                                                     <children>
-                                                        <Label text="0" textFill="#ef4444">
+                                                        <Label fx:id="lblNumeroEstoqueBaixo" text="0" textFill="#ef4444">
                                                             <font>
                                                                 <Font name="System Bold" size="14.0" />
                                                             </font>
                                                         </Label>
-                                                        <Label text="em estoque baixo" textFill="#6b7280">
+                                                        <Label fx:id="lblProdutosEstoqueBaixo" text="em estoque baixo" textFill="#6b7280">
                                                             <font>
                                                                 <Font size="14.0" />
                                                             </font>
@@ -300,295 +300,19 @@
 
                                         <HBox spacing="5.0" style="-fx-background-color: #F3F4F6; -fx-background-radius: 8; -fx-padding: 4;">
                                             <children>
-                                                <Button prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Todos" HBox.hgrow="ALWAYS" />
-                                                <Button prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Registrado" HBox.hgrow="ALWAYS" />
-                                                <Button prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Em Andamento" HBox.hgrow="ALWAYS" />
-                                                <Button prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Pronto" HBox.hgrow="ALWAYS" />
-                                                <Button prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Finalizado" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnTodos" prefWidth="150.0" style="-fx-background-color: #7C0000; -fx-text-fill: white; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Todos" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnRegistrado" prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Registrado" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnEmAndamento" prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Em Andamento" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnPronto" prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Pronto" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnFinalizado" prefWidth="150.0" style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 2, 0, 0, 1); -fx-font-weight: bold; -fx-cursor: hand;" text="Finalizado" HBox.hgrow="ALWAYS" />
                                             </children>
                                         </HBox>
-      
-                                                          <VBox spacing="15.0">
+
+                                        <VBox fx:id="vboxPedidos" spacing="15.0">
                                             <children>
-                                                <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);">
-                                                    <padding>
-                                                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
-                                                    </padding>
-                                                    <children>
-                                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                                            <children>
-                                                                <Label text="Francisco #002" textFill="#111827">
-                                                                    <font>
-                                                                        <Font name="System Bold" size="16.0" />
-                                                                    </font>
-                                                                </Label>
-                                                                <HBox spacing="5.0">
-                                                                    <children>
-                                                                        <Label style="-fx-background-color: #DBEAFE; -fx-text-fill: #1D4ED8; -fx-background-radius: 4; -fx-padding: 2 8;" text="Registrado">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="10.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <Label style="-fx-background-color: #F3F4F6; -fx-text-fill: #4B5563; -fx-background-radius: 4; -fx-padding: 2 8;" text="Entrega">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="10.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <Label style="-fx-background-color: #FFEDD5; -fx-text-fill: #C2410C; -fx-background-radius: 4; -fx-padding: 2 8;" text="Não Pago">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="10.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                    </children>
-                                                                </HBox>
-                                                                <Region HBox.hgrow="ALWAYS" />
-                                                                <HBox spacing="10.0">
-                                                                    <children>
-                                                                        <Button style="-fx-background-color: transparent; -fx-border-color: #d1d5db; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" fill="#6b7280" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                        <Button style="-fx-background-color: transparent; -fx-border-color: #d1d5db; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#6b7280" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                        <Button style="-fx-background-color: transparent; -fx-border-color: #d1d5db; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#6b7280" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                        <Button style="-fx-background-color: #fee2e2; -fx-border-color: #fca5a5; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#ef4444" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                    </children>
-                                                                </HBox>
-                                                            </children>
-                                                        </HBox>
-            
-                                                                                      <HBox spacing="30.0">
-                                                            <children>
-                                                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                                    <children>
-                                                                        <Label text="01/12/2025, 18:23:27" textFill="#9ca3af">
-                                                                            <font>
-                                                                                <Font size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <VBox spacing="2.0">
-                                                                            <children>
-                                                                                <Label text="Itens:" textFill="#6b7280">
-                                                                                    <font>
-                                                                                        <Font name="System Bold" size="12.0" />
-                                                                                    </font>
-                                                                                </Label>
-                                                                                <Label text="1x produto" textFill="#4b5563" />
-                                                                                <Label text="2x Batata Frita" textFill="#4b5563" />
-                                                                            </children>
-                                                                        </VBox>
-                                                                    </children>
-                                                                </VBox>
-                                                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                                    <children>
-                                                                        <Label text="Pagamento:" textFill="#9ca3af">
-                                                                            <font>
-                                                                                <Font size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <Label text="Dinheiro" textFill="#4b5563">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                                                            <children>
-                                                                                <SVGPath content="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="#9ca3af" scaleX="0.8" scaleY="0.8" />
-                                                                                <Label text="45" textFill="#6b7280" />
-                                                                            </children>
-                                                                        </HBox>
-                                                                    </children>
-                                                                </VBox>
-                                                            </children>
-                                                        </HBox>
-            
-                                                                                      <Separator opacity="0.5" />
-            
-                                                                                      <HBox alignment="CENTER_LEFT">
-                                                            <children>
-                                                                <Label text="R$ 00,00" textFill="#111827">
-                                                                    <font>
-                                                                        <Font name="System Bold" size="18.0" />
-                                                                    </font>
-                                                                </Label>
-                                                                <Region HBox.hgrow="ALWAYS" />
-                                                                
-                                                                                                          <HBox alignment="CENTER_RIGHT" spacing="-10.0">
-                                                                    <children>
-                                                                        <ComboBox fx:id="statusComboBox1" prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #E5E7EB; -fx-background-radius: 20; -fx-font-weight: bold; -fx-text-base-color: #374151;">
-                                                                             <items>
-                                                                                <FXCollections fx:factory="observableArrayList">
-                                                                                   <String fx:value="Registrado" />
-                                                                                   <String fx:value="Em Andamento" />
-                                                                                   <String fx:value="Pronto" />
-                                                                                   <String fx:value="Finalizado" />
-                                                                                </FXCollections>
-                                                                             </items>
-                                                                             <value>
-                                                                                <String fx:value="Registrado" />
-                                                                             </value>
-                                                                        </ComboBox>
-                                                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 2);">
-                                                                            <image>
-                                                                                <Image url="@/assets/imgs/avatar_placeholder.png" />
-                                                                            </image>
-                                                                            <clip>
-                                                                                <Circle centerX="16" centerY="16" radius="16" />
-                                                                            </clip>
-                                                                        </ImageView>
-                                                                    </children>
-                                                                </HBox>
-                                                            </children>
-                                                        </HBox>
-                                                    </children>
-                                                </VBox>
-      
-                                                                  <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);">
-                                                    <padding>
-                                                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
-                                                    </padding>
-                                                    <children>
-                                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                                            <children>
-                                                                <Label text="Francisco #002" textFill="#111827">
-                                                                    <font>
-                                                                        <Font name="System Bold" size="16.0" />
-                                                                    </font>
-                                                                </Label>
-                                                                <HBox spacing="5.0">
-                                                                    <children>
-                                                                        <Label style="-fx-background-color: #DBEAFE; -fx-text-fill: #1D4ED8; -fx-background-radius: 4; -fx-padding: 2 8;" text="Registrado">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="10.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <Label style="-fx-background-color: #F3F4F6; -fx-text-fill: #4B5563; -fx-background-radius: 4; -fx-padding: 2 8;" text="Entrega">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="10.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                    </children>
-                                                                </HBox>
-                                                                <Region HBox.hgrow="ALWAYS" />
-                                                                <HBox spacing="10.0">
-                                                                    <children>
-                                                                        <Button style="-fx-background-color: transparent; -fx-border-color: #d1d5db; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" fill="#6b7280" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                        <Button style="-fx-background-color: transparent; -fx-border-color: #d1d5db; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#6b7280" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                        <Button style="-fx-background-color: transparent; -fx-border-color: #d1d5db; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#6b7280" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                        <Button style="-fx-background-color: #fee2e2; -fx-border-color: #fca5a5; -fx-border-radius: 4; -fx-padding: 4; -fx-cursor: hand;">
-                                                                            <graphic>
-                                                                                <SVGPath content="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#ef4444" scaleX="0.8" scaleY="0.8" />
-                                                                            </graphic>
-                                                                        </Button>
-                                                                    </children>
-                                                                </HBox>
-                                                            </children>
-                                                        </HBox>
-      
-                                                                          <HBox spacing="30.0">
-                                                            <children>
-                                                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                                    <children>
-                                                                        <Label text="01/12/2025, 18:23:27" textFill="#9ca3af">
-                                                                            <font>
-                                                                                <Font size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <VBox spacing="2.0">
-                                                                            <children>
-                                                                                <Label text="Itens:" textFill="#6b7280">
-                                                                                    <font>
-                                                                                        <Font name="System Bold" size="12.0" />
-                                                                                    </font>
-                                                                                </Label>
-                                                                                <Label text="1x Galeto inteiro" textFill="#4b5563" />
-                                                                            </children>
-                                                                        </VBox>
-                                                                    </children>
-                                                                </VBox>
-                                                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                                    <children>
-                                                                        <Label text="Pagamento:" textFill="#9ca3af">
-                                                                            <font>
-                                                                                <Font size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                        <Label text="Dinheiro" textFill="#4b5563">
-                                                                            <font>
-                                                                                <Font name="System Bold" size="12.0" />
-                                                                            </font>
-                                                                        </Label>
-                                                                    </children>
-                                                                </VBox>
-                                                            </children>
-                                                        </HBox>
-                                                        
-                                                                                <Separator opacity="0.5" />
-      
-                                                                          <HBox alignment="CENTER_LEFT">
-                                                            <children>
-                                                                <Label text="R$ 38.50" textFill="#111827">
-                                                                    <font>
-                                                                        <Font name="System Bold" size="18.0" />
-                                                                    </font>
-                                                                </Label>
-                                                                <Region HBox.hgrow="ALWAYS" />
-                                                                
-                                                                                        <HBox alignment="CENTER_RIGHT" spacing="-10.0">
-                                                                    <children>
-                                                                        <ComboBox fx:id="statusComboBox2" prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #E5E7EB; -fx-background-radius: 20; -fx-font-weight: bold; -fx-text-base-color: #374151;">
-                                                                             <items>
-                                                                                <FXCollections fx:factory="observableArrayList">
-                                                                                   <String fx:value="Registrado" />
-                                                                                   <String fx:value="Em Andamento" />
-                                                                                   <String fx:value="Pronto" />
-                                                                                   <String fx:value="Finalizado" />
-                                                                                </FXCollections>
-                                                                             </items>
-                                                                             <value>
-                                                                                <String fx:value="Registrado" />
-                                                                             </value>
-                                                                        </ComboBox>
-                                                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 2);">
-                                                                            <image>
-                                                                                <Image url="@/assets/imgs/avatar_placeholder.png" />
-                                                                            </image>
-                                                                            <clip>
-                                                                                <Circle centerX="16" centerY="16" radius="16" />
-                                                                            </clip>
-                                                                        </ImageView>
-                                                                    </children>
-                                                                </HBox>
-                                                            </children>
-                                                        </HBox>
-                                                    </children>
-                                                </VBox>
-      
-                                                              </children>
+                                                <!-- Os pedidos serão carregados dinamicamente aqui -->
+                                                <Label text="Carregando pedidos..." textFill="#6b7280" />
+                                            </children>
                                         </VBox>
                                     </children>
                                 </VBox>

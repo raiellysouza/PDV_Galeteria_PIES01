@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -34,11 +35,6 @@ public class MovimentoCaixaService {
     @Transactional
     public MovimentoCaixa registrarSaida(BigDecimal valor, String descricao, String referenciaExterna) {
         return registrarMovimento(TipoMovimentoCaixa.SAIDA, valor, descricao, referenciaExterna);
-    }
-
-    @Transactional(readOnly = true)
-    public List<MovimentoCaixa> listarMovimentosDoCaixa(Long caixaId) {
-        return movimentoCaixaRepository.findByCaixaIdOrderByDataHoraAsc(caixaId);
     }
 
     @Transactional(readOnly = true)
@@ -126,6 +122,17 @@ public class MovimentoCaixaService {
                 "Troco",
                 "TROCO_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
         );
+    }
+
+    public List<MovimentoCaixa> listarMovimentosDoCaixa(Long caixaId) {
+        return movimentoCaixaRepository.findByCaixaIdOrderByDataHoraDesc(caixaId);
+    }
+
+    public List<MovimentoCaixa> listarMovimentosDoDia(LocalDate data) {
+        LocalDateTime inicioDia = data.atStartOfDay();
+        LocalDateTime fimDia = data.atTime(23, 59, 59);
+
+        return movimentoCaixaRepository.findByDataHoraBetweenOrderByDataHoraDesc(inicioDia, fimDia);
     }
 }
 

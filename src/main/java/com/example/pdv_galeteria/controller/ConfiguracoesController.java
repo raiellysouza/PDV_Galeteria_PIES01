@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
@@ -23,8 +24,28 @@ public class ConfiguracoesController {
     private void initialize() {
     }
 
-    public void abrirTelaDashboard(ActionEvent actionEvent) {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/Dashboard.fxml", "Dashboard", actionEvent);
+    @FXML
+    private void abrirTelaDashboard() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashBoard.fxml");
+            if (fxmlUrl == null) {
+                mostrarErro("Arquivo da tela de dashboard não encontrado!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+            Stage stage = getCurrentStage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dashboard");
+            stage.centerOnScreen();
+        } catch (Exception e) {
+            mostrarErro("Erro ao abrir tela de dashboard: " + e.getMessage());
+        }
     }
 
     public void abrirTelaVendas(ActionEvent actionEvent) {
@@ -203,5 +224,32 @@ public class ConfiguracoesController {
             alert.setContentText(mensagem);
             alert.showAndWait();
         });
+    }
+
+    private void mostrarErro(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+    private Stage getCurrentStage() {
+        try {
+            for (Window window : Window.getWindows()) {
+                if (window instanceof Stage && window.isShowing()) {
+                    return (Stage) window;
+                }
+            }
+
+            Stage primaryStage = (Stage) Stage.getWindows().get(0);
+            if (primaryStage != null) {
+                return primaryStage;
+            }
+
+            return new Stage();
+        } catch (Exception e) {
+            return new Stage();
+        }
     }
 }
