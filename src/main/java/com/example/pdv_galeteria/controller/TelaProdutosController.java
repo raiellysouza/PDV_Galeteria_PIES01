@@ -1081,4 +1081,36 @@ public class TelaProdutosController implements Initializable {
         } catch (Exception e) {
         }
     }
+
+    @FXML
+    private void abrirTelaDashboard() {
+        try {
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashBoard.fxml");
+            if (fxmlUrl == null) {
+                mostrarErro("Arquivo da tela de dashboard não encontrado!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+            Stage stage = getCurrentStage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dashboard");
+            stage.centerOnScreen();
+        } catch (Exception e) {
+            mostrarErro("Erro ao abrir tela de dashboard: " + e.getMessage());
+        }
+    }
+
+    private void mostrarErro(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
 }

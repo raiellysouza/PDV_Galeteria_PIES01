@@ -85,6 +85,4 @@ public class UsuarioService {
         String salt = BCrypt.gensalt(workload);
         return BCrypt.hashpw(senhaPlain, salt);
     }
-    
-    
 }

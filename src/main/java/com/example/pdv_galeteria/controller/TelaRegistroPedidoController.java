@@ -590,13 +590,7 @@ public class TelaRegistroPedidoController implements Initializable {
     @FXML
     private void abrirTelaDashboard() {
         try {
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashboard.fxml");
-            if (fxmlUrl == null) {
-                mostrarAlerta("Funcionalidade em Desenvolvimento",
-                        "Tela de dashboard será implementada em breve!",
-                        Alert.AlertType.INFORMATION);
-                return;
-            }
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaDashBoard.fxml");
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
 

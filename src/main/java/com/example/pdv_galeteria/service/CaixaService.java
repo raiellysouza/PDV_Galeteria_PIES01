@@ -5,18 +5,16 @@ import com.example.pdv_galeteria.model.StatusCaixa;
 import com.example.pdv_galeteria.model.MovimentoCaixa;
 import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
 import com.example.pdv_galeteria.repository.CaixaRepository;
-
 import com.example.pdv_galeteria.repository.MovimentoCaixaRepository;
 import jakarta.transaction.Transactional;
-
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,13 +32,27 @@ public class CaixaService {
     @Lazy
     private MovimentoCaixaService movimentoCaixaService;
 
-
     public Optional<Caixa> getCaixaDoDia() {
         return caixaRepository.findCaixaDoDia();
     }
 
     public Optional<Caixa> getCaixaAbertoDoDia() {
-        return caixaRepository.findCaixaAbertoDoDia();
+        try {
+            LocalDate hoje = LocalDate.now();
+
+            List<Caixa> caixasHoje = caixaRepository.findByDataAberturaBetween(
+                    hoje.atStartOfDay(),
+                    hoje.atTime(23, 59, 59)
+            );
+
+            return caixasHoje.stream()
+                    .filter(c -> c.getStatus() == StatusCaixa.ABERTO)
+                    .findFirst();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar caixa aberto: " + e.getMessage());
+            return Optional.empty();
+        }
     }
 
     public boolean existeCaixaDoDia() {
@@ -289,6 +301,27 @@ public class CaixaService {
             System.err.println("Erro ao buscar movimentações do dia: " + e.getMessage());
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    public Optional<Caixa> getUltimoCaixaFechadoDoDia() {
+        try {
+            LocalDate hoje = LocalDate.now();
+            LocalDateTime inicioDia = hoje.atStartOfDay();
+            LocalDateTime fimDia = hoje.atTime(23, 59, 59);
+
+            List<Caixa> caixasHoje = caixaRepository.findByDataAberturaBetween(inicioDia, fimDia);
+
+            System.out.println("Caixas encontrados hoje: " + caixasHoje.size());
+
+            return caixasHoje.stream()
+                    .filter(c -> c.getStatus() == StatusCaixa.FECHADO)
+                    .max(Comparator.comparing(Caixa::getDataFechamento));
+
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar último caixa fechado do dia: " + e.getMessage());
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
 

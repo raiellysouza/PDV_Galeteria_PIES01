@@ -126,7 +126,7 @@ public class RelatoriosController {
     }
 
     public void abrirTelaDashboard(ActionEvent actionEvent) {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/Dashboard.fxml", "Dashboard", actionEvent);
+        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaDashBoard.fxml", "Dashboard", actionEvent);
     }
 
     public void abrirTelaEstoque(ActionEvent actionEvent) {

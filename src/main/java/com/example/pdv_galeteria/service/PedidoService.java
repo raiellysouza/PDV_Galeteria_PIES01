@@ -1,18 +1,25 @@
 package com.example.pdv_galeteria.service;
 
-import com.example.pdv_galeteria.model.ItemPedido;
-import com.example.pdv_galeteria.model.Pedido;
-import com.example.pdv_galeteria.model.StatusPedido;
+import com.example.pdv_galeteria.model.*;
+import com.example.pdv_galeteria.repository.CaixaRepository;
 import com.example.pdv_galeteria.repository.PedidoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
+
+    @Autowired
+    @Qualifier("caixaRepository")
+    private CaixaRepository caixaRepository;
 
     public PedidoService(PedidoRepository pedidoRepository){
         this.pedidoRepository = pedidoRepository;
@@ -86,5 +93,63 @@ public class PedidoService {
         }
         pedidoRepository.deleteById(id);
     }
-}
 
+    public Pedido buscarPedidoComItens(Long id) {
+        return pedidoRepository.buscarPedidoComItens(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + id));
+    }
+
+    public Pedido buscarPedidoParaImpressao(Long id) {
+        return pedidoRepository.buscarPedidoParaImpressao(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + id));
+    }
+
+    public void atualizarCliente(Long pedidoId, String novoCliente) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        pedido.setCliente(novoCliente);
+        pedidoRepository.save(pedido);
+    }
+
+    public Optional<Caixa> getUltimoCaixaFechadoDoDia() {
+        try {
+            LocalDate hoje = LocalDate.now();
+
+            List<Caixa> caixasHoje = caixaRepository.findByDataAberturaBetween(
+                    hoje.atStartOfDay(),
+                    hoje.atTime(23, 59, 59)
+            );
+
+            return caixasHoje.stream()
+                    .filter(c -> c.getStatus() == StatusCaixa.FECHADO)
+                    .max(Comparator.comparing(Caixa::getDataFechamento));
+
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar último caixa fechado: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Caixa> getCaixaAtual() {
+        return getCaixaAbertoDoDia();
+    }
+
+    public Optional<Caixa> getCaixaAbertoDoDia() {
+        try {
+            LocalDate hoje = LocalDate.now();
+
+            List<Caixa> caixasHoje = caixaRepository.findByDataAberturaBetween(
+                    hoje.atStartOfDay(),
+                    hoje.atTime(23, 59, 59)
+            );
+
+            return caixasHoje.stream()
+                    .filter(c -> c.getStatus() == StatusCaixa.ABERTO)
+                    .findFirst();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao buscar caixa aberto: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+}

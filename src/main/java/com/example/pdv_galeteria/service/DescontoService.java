@@ -1,4 +1,4 @@
-package com.example.pdv_galeteria.service;
+/**package com.example.pdv_galeteria.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,3 +19,4 @@ public class DiscountService {
         return result.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : result;
     }
 }
+**/
