@@ -1,4 +1,4 @@
-/**package com.example.pdv_galeteria.service;
+package com.example.pdv_galeteria.service;
 
 import com.example.pdv_galeteria.model.ItemPedido;
 import com.example.pdv_galeteria.model.Pedido;
@@ -26,21 +26,12 @@ public class PdfService {
         PdfWriter writer = new PdfWriter(caminhoArquivo);
         PdfDocument pdf = new PdfDocument(writer);
         Document document = new Document(pdf, PageSize.A4);
+
         document.setMargins(40, 40, 40, 40);
-
-        // Cabeçalho
         adicionarCabecalho(document, pedido);
-
-        // Informações do pedido
         adicionarInformacoesPedido(document, pedido);
-
-        // Itens do pedido
         adicionarItensPedido(document, pedido);
-
-        // Total
         adicionarTotal(document, pedido);
-
-        // Rodapé
         adicionarRodape(document);
 
         document.close();
@@ -48,7 +39,6 @@ public class PdfService {
     }
 
     private void adicionarCabecalho(Document document, Pedido pedido) {
-        // Título
         Paragraph titulo = new Paragraph("RECIBO DE PEDIDO")
                 .setFontSize(24)
                 .setBold()
@@ -56,7 +46,6 @@ public class PdfService {
                 .setTextAlignment(TextAlignment.CENTER)
                 .setMarginBottom(10);
 
-        // Logo/Nome da empresa
         Paragraph empresa = new Paragraph("GALETERIA PDV")
                 .setFontSize(18)
                 .setBold()
@@ -66,8 +55,6 @@ public class PdfService {
         document.add(titulo);
         document.add(empresa);
 
-        // Linha divisória - CORREÇÃO AQUI
-        // Use um parágrafo com linha ou um separador simples
         Paragraph linhaDivisoria = new Paragraph("________________________________________________")
                 .setFontColor(COR_PRIMARIA)
                 .setTextAlignment(TextAlignment.CENTER)
@@ -78,7 +65,6 @@ public class PdfService {
     private void adicionarInformacoesPedido(Document document, Pedido pedido) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-        // Usar uma tabela simples ou parágrafos
         Paragraph infoPedido = new Paragraph()
                 .add(new Text("Nº do Pedido: ").setBold())
                 .add(String.format("#%03d\n", pedido.getId()))
@@ -98,7 +84,6 @@ public class PdfService {
     }
 
     private void adicionarItensPedido(Document document, Pedido pedido) {
-        // Título da seção
         Paragraph tituloItens = new Paragraph("ITENS DO PEDIDO")
                 .setBold()
                 .setFontSize(14)
@@ -107,7 +92,6 @@ public class PdfService {
 
         document.add(tituloItens);
 
-        // Tabela de itens simplificada
         if (pedido.getItens() != null && !pedido.getItens().isEmpty()) {
             for (ItemPedido item : pedido.getItens()) {
                 double subtotal = item.getQuantidade() * item.getPrecoUnitario();
@@ -124,17 +108,15 @@ public class PdfService {
             }
         }
 
-        document.add(new Paragraph("\n")); // Espaço
+        document.add(new Paragraph("\n"));
     }
 
     private void adicionarTotal(Document document, Pedido pedido) {
-        // Linha separadora
         Paragraph linha = new Paragraph("________________________________________________")
                 .setMarginTop(10)
                 .setMarginBottom(10);
         document.add(linha);
 
-        // Total
         Paragraph total = new Paragraph()
                 .add(new Text("TOTAL: ").setBold().setFontSize(16))
                 .add(new Text(String.format("R$ %.2f", pedido.getTotal()))
@@ -156,4 +138,3 @@ public class PdfService {
         document.add(agradecimento);
     }
 }
-**/
