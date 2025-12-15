@@ -20,7 +20,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.List;
@@ -29,7 +29,7 @@ import javafx.scene.Node;
 import java.util.Optional;
 import com.example.pdv_galeteria.service.CaixaService;
 
-@Service
+@Component
 public class EntregadorController {
 
     @FXML private VBox containerEntregadores;
@@ -45,12 +45,33 @@ public class EntregadorController {
     @FXML
     public void initialize() {
         System.out.println("=== INICIALIZANDO CONTROLLER ENTREGADORES ===");
-        carregarEntregadores();
+        
+        // Garantir que o repository seja injetado
+        if (entregadorRepository == null && PdvGaleteriaApplication.getSpringContext() != null) {
+            entregadorRepository = PdvGaleteriaApplication.getSpringContext().getBean(EntregadorRepository.class);
+            System.out.println("EntregadorRepository injetado manualmente: " + (entregadorRepository != null));
+        }
+        
+        if (containerEntregadores != null) {
+            carregarEntregadores();
+        } else {
+            System.err.println("ERRO: containerEntregadores é null! Verifique o FXML.");
+        }
     }
 
     private void carregarEntregadores() {
         try {
             System.out.println("Carregando entregadores do banco...");
+
+            if (containerEntregadores == null) {
+                System.err.println("ERRO: containerEntregadores é null!");
+                return;
+            }
+            
+            if (entregadorRepository == null) {
+                System.err.println("ERRO: entregadorRepository é null!");
+                return;
+            }
 
             containerEntregadores.getChildren().clear();
 
@@ -437,6 +458,16 @@ public class EntregadorController {
             try {
                 System.out.println("Salvando: " + novoEntregador);
 
+                if (entregadorRepository == null) {
+                    if (PdvGaleteriaApplication.getSpringContext() != null) {
+                        entregadorRepository = PdvGaleteriaApplication.getSpringContext().getBean(EntregadorRepository.class);
+                    }
+                    if (entregadorRepository == null) {
+                        mostrarErro("Erro", "Serviço não disponível. Tente novamente.");
+                        return;
+                    }
+                }
+
                 if (entregadorRepository.existsByTelefone(novoEntregador.getTelefone())) {
                     mostrarErro("Telefone já cadastrado", "Já existe um entregador com este telefone.");
                     return;
@@ -522,6 +553,16 @@ public class EntregadorController {
             }
 
             String telefoneFormatado = formatarTelefone(telefone);
+
+            if (entregadorRepository == null) {
+                if (PdvGaleteriaApplication.getSpringContext() != null) {
+                    entregadorRepository = PdvGaleteriaApplication.getSpringContext().getBean(EntregadorRepository.class);
+                }
+                if (entregadorRepository == null) {
+                    mostrarErro("Erro", "Serviço não disponível. Tente novamente.");
+                    return;
+                }
+            }
 
             if (entregadorRepository.existsByTelefone(telefoneFormatado)) {
                 mostrarErro("Telefone já cadastrado", "Já existe um entregador com este telefone.");
@@ -708,9 +749,9 @@ public class EntregadorController {
         try {
             System.out.println("Abrindo tela de configurações...");
 
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracoes.fxml");
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml");
             if (fxmlUrl == null) {
-                System.err.println("Arquivo FXML não encontrado: TelaConfiguracoes.fxml");
+                System.err.println("Arquivo FXML não encontrado: TelaConfiguracao.fxml");
                 mostrarAlerta("Erro", "Tela de configurações não disponível", Alert.AlertType.ERROR);
                 return;
             }

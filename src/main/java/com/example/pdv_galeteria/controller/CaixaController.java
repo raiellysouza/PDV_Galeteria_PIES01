@@ -121,14 +121,22 @@ public class CaixaController implements Initializable {
             return;
         }
 
-        if (caixaService == null && PdvGaleteriaApplication.getSpringContext() != null) {
-            caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
-            System.out.println("CaixaService obtido manualmente: " + (caixaService != null));
+        if (caixaService == null) {
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
+                System.out.println("CaixaService obtido manualmente: " + (caixaService != null));
+            } else {
+                System.err.println("ERRO: SpringContext não disponível e caixaService é null!");
+            }
         }
 
-        if (movimentoCaixaService == null && PdvGaleteriaApplication.getSpringContext() != null) {
-            movimentoCaixaService = PdvGaleteriaApplication.getSpringContext().getBean(MovimentoCaixaService.class);
-            System.out.println("MovimentoCaixaService obtido manualmente: " + (movimentoCaixaService != null));
+        if (movimentoCaixaService == null) {
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                movimentoCaixaService = PdvGaleteriaApplication.getSpringContext().getBean(MovimentoCaixaService.class);
+                System.out.println("MovimentoCaixaService obtido manualmente: " + (movimentoCaixaService != null));
+            } else {
+                System.err.println("ERRO: SpringContext não disponível e movimentoCaixaService é null!");
+            }
         }
 
         carregarImagens();
