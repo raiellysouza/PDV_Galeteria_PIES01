@@ -414,16 +414,37 @@ public class RegistroPedidoPopupController implements Initializable {
             pedido.setFormaPagamento(formaPagamento);
             pedido.setTipoEntrega(tipoEntrega);
             pedido.setStatus(StatusPedido.REGISTRADO);
+            
 
+            pedido.setTelefone(telefone);
+            pedido.setEndereco(enderecoEntrega);
+            pedido.setPontoReferencia(pontoReferencia);
+            pedido.setObservacoes(observacoes);
+            
+            if (formaPagamento.equals("Dinheiro") && valorPagoStr != null && !valorPagoStr.trim().isEmpty()) {
+                try {
+                    String valorLimpo = valorPagoStr
+                            .replace("R$", "")
+                            .replace(" ", "")
+                            .replace(".", "")
+                            .replace(",", ".")
+                            .trim();
+                    if (!valorLimpo.isEmpty()) {
+                        double valorPago = Double.parseDouble(valorLimpo);
+                        pedido.setValorPago(valorPago);
+                        if (valorPago > totalPedido) {
+                            pedido.setTroco(valorPago - totalPedido);
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("Erro ao processar valor pago: " + e.getMessage());
+                }
+            }
+            
+            pedido.setTempoEstimado("40min");
+            
             if (checkEntrega != null && checkEntrega.isSelected()) {
-                String enderecoCompleto = enderecoEntrega;
-                if (!pontoReferencia.isEmpty()) {
-                    enderecoCompleto += " - " + pontoReferencia;
-                }
-                pedido.setTipoEntrega("Entrega - " + enderecoCompleto);
-
-                if (!observacoes.isEmpty()) {
-                }
+                pedido.setTaxaEntrega(3.0);
             }
 
             System.out.println("Adicionando itens ao pedido...");
