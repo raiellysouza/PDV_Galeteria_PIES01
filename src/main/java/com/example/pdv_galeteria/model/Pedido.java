@@ -29,6 +29,30 @@ public class Pedido {
     @Column(name = "tipo_entrega", length = 50)
     private String tipoEntrega;
 
+    @Column(name = "telefone", length = 20)
+    private String telefone;
+
+    @Column(name = "endereco", length = 255)
+    private String endereco;
+
+    @Column(name = "ponto_referencia", length = 255)
+    private String pontoReferencia;
+
+    @Column(name = "observacoes", length = 500)
+    private String observacoes;
+
+    @Column(name = "valor_pago")
+    private Double valorPago;
+
+    @Column(name = "troco")
+    private Double troco;
+
+    @Column(name = "tempo_estimado", length = 20)
+    private String tempoEstimado;
+
+    @Column(name = "taxa_entrega")
+    private Double taxaEntrega;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> itens = new ArrayList<>();
 
@@ -73,6 +97,22 @@ public class Pedido {
     public void setFormaPagamento(String formaPagamento){this.formaPagamento = formaPagamento;}
     public String getTipoEntrega(){return tipoEntrega;}
     public void setTipoEntrega(String tipoEntrega){this.tipoEntrega = tipoEntrega;}
+    public String getTelefone(){return telefone;}
+    public void setTelefone(String telefone){this.telefone = telefone;}
+    public String getEndereco(){return endereco;}
+    public void setEndereco(String endereco){this.endereco = endereco;}
+    public String getPontoReferencia(){return pontoReferencia;}
+    public void setPontoReferencia(String pontoReferencia){this.pontoReferencia = pontoReferencia;}
+    public String getObservacoes(){return observacoes;}
+    public void setObservacoes(String observacoes){this.observacoes = observacoes;}
+    public Double getValorPago(){return valorPago;}
+    public void setValorPago(Double valorPago){this.valorPago = valorPago;}
+    public Double getTroco(){return troco;}
+    public void setTroco(Double troco){this.troco = troco;}
+    public String getTempoEstimado(){return tempoEstimado;}
+    public void setTempoEstimado(String tempoEstimado){this.tempoEstimado = tempoEstimado;}
+    public Double getTaxaEntrega(){return taxaEntrega;}
+    public void setTaxaEntrega(Double taxaEntrega){this.taxaEntrega = taxaEntrega;}
     public List<ItemPedido> getItens(){return itens;}
     public void setItens(List<ItemPedido> itens){this.itens = itens;}
 }
