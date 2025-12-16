@@ -3,29 +3,33 @@ package com.example.pdv_galeteria.controller;
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.model.ComboItem;
 import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.repository.ComboRepository;
 import com.example.pdv_galeteria.service.ComboService;
 import com.example.pdv_galeteria.service.ProdutoService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.Priority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import com.example.pdv_galeteria.model.ComboItem;
-import com.example.pdv_galeteria.model.Produto;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +50,9 @@ public class TelaCombosController {
     private FlowPane produtosContainer;
 
     @FXML
+    private VBox produtosListContainer;
+
+    @FXML
     private FlowPane combosContainer;
 
     @FXML
@@ -53,19 +60,12 @@ public class TelaCombosController {
 
     @FXML
     private TextArea nomeComboField;
-
     @FXML
     private TextArea precoComboField;
-
     @FXML
     private TextArea nomeProdutoField;
-
     @FXML
     private TextArea quantidadeField;
-
-    @FXML
-    private TextArea produtosTextArea;
-
     @FXML
     private FlowPane comboContainer;
 
@@ -74,6 +74,21 @@ public class TelaCombosController {
     @FXML
     public void initialize() {
         carregarCombos();
+
+        if (combosContainer != null) {
+            carregarCombos();
+        }
+
+        nomeProdutoField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue == null || newValue.trim().isEmpty()) {
+                sugestoesContainer.setVisible(false);
+                return;
+            }
+
+            List<Produto> encontrados = produtoService.buscarListaPorNome(newValue.trim());
+            mostrarSugestoes(encontrados);
+        });
+
     }
 
     public void setCombosContainer(FlowPane combosContainer) {
@@ -119,34 +134,22 @@ public class TelaCombosController {
     }
 
     public Pane criarCardCombo(Combo combo) {
+
         Pane card = new Pane();
         card.getStyleClass().add("card-produtos");
         card.setPrefSize(400, 178);
         card.setMinSize(400, 178);
         card.setMaxSize(400, 178);
-
         card.setStyle("-fx-background-color: white; " +
                 "-fx-background-radius: 5; " +
                 "-fx-border-radius: 5; " +
                 "-fx-border-color: rgba(0,0,0,0.2); " +
                 "-fx-border-width: 1;");
 
-        Label labelNome = new Label(combo.getNome() != null ? combo.getNome() : "Combo sem nome");
-        labelNome.setLayoutX(20);
+        Label labelNome = new Label(combo.getNome());
+        labelNome.setLayoutX(14);
         labelNome.setLayoutY(14);
-        labelNome.setFont(Font.font("System", FontWeight.BOLD, 21));
-        labelNome.setStyle("-fx-text-fill: #111827;");
-        labelNome.setWrapText(true);
-        labelNome.setMaxWidth(260);
-
-        Label labelPreco = new Label(String.format("R$ %.2f", combo.getPrecoTotal()));
-        labelPreco.setLayoutX(14);
-        labelPreco.setLayoutY(82);
-        labelPreco.setFont(Font.font("System", FontWeight.BOLD, 28));
-        labelPreco.setStyle("-fx-text-fill: #2a6df4;");
-
-        String categoria = "Combo";
-        Label labelCategoria = new Label(categoria);
+        labelNome.setStyle("-fx-font-weight: bold; -fx-font-size: 21px; -fx-text-fill: black;");
 
         Pane categoriaPane = new Pane();
         categoriaPane.setLayoutX(299);
@@ -156,104 +159,90 @@ public class TelaCombosController {
                 "-fx-background-radius: 20; " +
                 "-fx-border-radius: 20;");
 
-        Label labelCategoriaTexto = new Label(categoria);
-        labelCategoriaTexto.setLayoutX(9);
-        labelCategoriaTexto.setLayoutY(3);
-        labelCategoriaTexto.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #374151;");
-        categoriaPane.getChildren().add(labelCategoriaTexto);
+        Label labelCategoria = new Label("Combo");
+        labelCategoria.setLayoutX(9);
+        labelCategoria.setLayoutY(3);
+        labelCategoria.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #374151;");
+        categoriaPane.getChildren().add(labelCategoria);
 
-        int qtdItens = combo.getItensDoCombo() != null ? combo.getItensDoCombo().size() : 0;
-        Label labelQtd = new Label(qtdItens + " itens");
-        labelQtd.setLayoutX(14);
-        labelQtd.setLayoutY(120);
-        labelQtd.setFont(Font.font("System", FontWeight.NORMAL, 14));
-        labelQtd.setStyle("-fx-text-fill: #6b7280;");
+        Label labelPreco = new Label(String.format("R$ %.2f", combo.getPrecoTotal()));
+        labelPreco.setLayoutX(14);
+        labelPreco.setLayoutY(82);
+        labelPreco.setStyle("-fx-font-weight: bold; -fx-font-size: 28px; -fx-text-fill: #2a6df4;");
 
-        double larguraBtnEditar = 90;
-        double larguraBtnExcluir = 30;
-        double alturaBotoes = 29;
-        double posY = 144;
+        int qtdItens = (combo.getItensDoCombo() != null)
+                ? combo.getItensDoCombo().size()
+                : 0;
 
-        double espacoEntreBotoes = 10;
+        Label labelQtdItens = new Label("Esse combo vem com " + qtdItens + " itens");
+        labelQtdItens.setLayoutX(14);
+        labelQtdItens.setLayoutY(120);
+        labelQtdItens.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280;");
 
-        double larguraTotalBotoes = larguraBtnEditar + espacoEntreBotoes + larguraBtnExcluir;
-        double inicioX = (400 - larguraTotalBotoes) / 2;
-
-        double posXEditar = inicioX;
-        double posXExcluir = inicioX + larguraBtnEditar + espacoEntreBotoes;
-
-        Button btnEditar = criarBotaoComIcone("Editar", posXEditar, posY, larguraBtnEditar, alturaBotoes, "/assets/imgs/editar.png");
-        Button btnExcluir = criarBotaoApenasIcone(posXExcluir, posY, larguraBtnExcluir, alturaBotoes, "/assets/imgs/delete.png");
-
+        Button btnEditar = criarBotaoComIcone("Editar", 65, 144, 90, 29, "/assets/imgs/editar.png");
         btnEditar.setOnAction(e -> abrirTelaEditarCombo(combo));
-        btnExcluir.setOnAction(e -> excluirCombo(combo));
 
-        btnEditar.setStyle("-fx-background-color: white; " +
-                "-fx-background-radius: 6; " +
-                "-fx-border-color: #d1d5db; " +
-                "-fx-border-radius: 6; " +
-                "-fx-font-size: 12px; " +
-                "-fx-font-weight: bold; " +
-                "-fx-text-fill: #374151; " +
-                "-fx-cursor: hand; " +
-                "-fx-padding: 5 10;");
+        Button btnApagar = criarBotaoIcone(269, 144, 30, 29, "/assets/imgs/delete.png");
+        btnApagar.setOnAction(e -> excluirCombo(combo));
 
-        btnExcluir.setStyle("-fx-background-color: white; " +
-                "-fx-background-radius: 6; " +
-                "-fx-border-color: #d1d5db; " +
-                "-fx-border-radius: 6; " +
-                "-fx-font-size: 12px; " +
-                "-fx-font-weight: bold; " +
-                "-fx-text-fill: #dc2626; " +
-                "-fx-cursor: hand; " +
-                "-fx-padding: 5;");
-
-        card.getChildren().addAll(labelNome, labelPreco, categoriaPane, labelQtd, btnEditar, btnExcluir);
-        btnEditar.setCursor(Cursor.HAND);
-        btnExcluir.setCursor(Cursor.HAND);
+        card.getChildren().addAll(
+                labelNome,
+                categoriaPane,
+                labelPreco,
+                labelQtdItens,
+                btnEditar,
+                btnApagar);
 
         return card;
     }
 
     private Button criarBotaoComIcone(String texto, double x, double y, double width, double height, String iconePath) {
-        Button btn = new Button(texto);
-        btn.setLayoutX(x);
-        btn.setLayoutY(y);
-        btn.setPrefSize(width, height);
-
+        Button botao = new Button(texto);
+        botao.setLayoutX(x);
+        botao.setLayoutY(y);
+        botao.setPrefSize(width, height);
+        botao.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 6; " +
+                "-fx-background-radius: 6; " +
+                "-fx-text-fill: #374151; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 12px;");
         try {
-            ImageView icon = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
-            icon.setFitWidth(16);
-            icon.setFitHeight(16);
-            btn.setGraphic(icon);
-            btn.setGraphicTextGap(5);
+            ImageView icone = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
+            icone.setFitWidth(16);
+            icone.setFitHeight(16);
+            botao.setGraphic(icone);
+            botao.setContentDisplay(ContentDisplay.LEFT);
+            botao.setGraphicTextGap(8);
         } catch (Exception e) {
-            System.err.println("Ícone não encontrado: " + iconePath);
+            System.out.println("Ícone não encontrado: " + iconePath);
         }
 
-        return btn;
+        return botao;
     }
 
-    private Button criarBotaoApenasIcone(double x, double y, double width, double height, String iconePath) {
-        Button btn = new Button();
-        btn.setLayoutX(x);
-        btn.setLayoutY(y);
-        btn.setPrefSize(width, height);
-        btn.setMinSize(width, height);
-        btn.setMaxSize(width, height);
-
+    private Button criarBotaoIcone(double x, double y, double width, double height, String iconePath) {
+        Button botao = new Button();
+        botao.setLayoutX(x);
+        botao.setLayoutY(y);
+        botao.setPrefSize(width, height);
+        botao.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #D1D5DB; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 6; " +
+                "-fx-background-radius: 6;");
         try {
-            ImageView icon = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
-            icon.setFitWidth(16);
-            icon.setFitHeight(16);
-            btn.setGraphic(icon);
+            ImageView icone = new ImageView(new Image(getClass().getResourceAsStream(iconePath)));
+            icone.setFitWidth(16);
+            icone.setFitHeight(16);
+            botao.setGraphic(icone);
         } catch (Exception e) {
-            System.err.println("Ícone não encontrado: " + iconePath);
-            btn.setText("×");
-            btn.setStyle(btn.getStyle() + "-fx-font-size: 16px;");
+            System.out.println("Ícone não encontrado: " + iconePath);
         }
 
-        return btn;
+        return botao;
     }
 
     private void abrirTelaEditarCombo(Combo combo) {
@@ -262,12 +251,13 @@ public class TelaCombosController {
 
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/EditarCombo.fxml"));
-            loader.setControllerFactory(applicationContext::getBean);
 
+            loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
 
             EditarCombosController controller = loader.getController();
             controller.setCombo(comboCompleto);
+
             Stage stage = new Stage();
             stage.setTitle("Editar Combo");
             stage.setScene(new Scene(root));
@@ -303,7 +293,7 @@ public class TelaCombosController {
     public void abrirTelaCombo() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/telaCombo.fxml"));
+                    getClass().getClassLoader().getResource("com/example/pdv_galeteria/Frontend/views/telaCombo.fxml"));
 
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
@@ -338,13 +328,24 @@ public class TelaCombosController {
                 return;
             }
 
-            ComboItem item = new ComboItem();
-            item.setProduto(produto);
-            item.setQuantidade(quantidade);
-            itensDoCombo.add(item);
+            ComboItem existente = itensDoCombo.stream()
+                    .filter(i -> i.getProduto().getId().equals(produto.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existente != null) {
+                existente.setQuantidade(existente.getQuantidade() + quantidade);
+            } else {
+                ComboItem item = new ComboItem();
+                item.setProduto(produto);
+                item.setQuantidade(quantidade);
+                itensDoCombo.add(item);
+            }
+
             atualizarListaDeProdutos();
             nomeProdutoField.clear();
             quantidadeField.clear();
+
         } catch (NumberFormatException e) {
             mostrarAlerta("Erro", "Quantidade inválida. Digite um número inteiro.", Alert.AlertType.ERROR);
         } catch (Exception e) {
@@ -375,7 +376,6 @@ public class TelaCombosController {
 
             nomeComboField.clear();
             precoComboField.clear();
-            produtosTextArea.clear();
             itensDoCombo.clear();
 
         } catch (Exception e) {
@@ -386,13 +386,76 @@ public class TelaCombosController {
     }
 
     private void atualizarListaDeProdutos() {
-        StringBuilder sb = new StringBuilder();
-        for (ComboItem item : itensDoCombo) {
-            sb.append(item.getProduto().getNome())
-                    .append(" - Quantidade: ").append(item.getQuantidade())
-                    .append("\n");
+
+        produtosListContainer.getChildren().clear();
+
+        for (int i = 0; i < itensDoCombo.size(); i++) {
+
+            ComboItem item = itensDoCombo.get(i);
+
+            HBox linha = new HBox();
+            linha.setSpacing(10);
+            linha.setStyle("""
+                    -fx-background-color: #f7f7f7;
+                    -fx-padding: 10;
+                    -fx-background-radius: 8;
+                    -fx-border-radius: 8;
+                    -fx-border-color: #ddd;
+                    """);
+
+            Label nome = new Label(item.getQuantidade() + "x  " + item.getProduto().getNome());
+            nome.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+
+            Region espaco = new Region();
+            HBox.setHgrow(espaco, Priority.ALWAYS);
+
+            Button btnExcluir = new Button("🗑");
+            btnExcluir.setStyle("""
+                    -fx-background-color: transparent;
+                    -fx-font-size: 16px;
+                    -fx-cursor: hand;
+                    """);
+
+            final int index = i;
+
+            btnExcluir.setOnAction(e -> {
+                itensDoCombo.remove(index);
+                atualizarListaDeProdutos();
+            });
+
+            linha.getChildren().addAll(nome, espaco, btnExcluir);
+            produtosListContainer.getChildren().add(linha);
         }
-        produtosTextArea.setText(sb.toString());
+    }
+
+    private void mostrarSugestoes(List<Produto> produtos) {
+        sugestoesContainer.getChildren().clear();
+
+        if (produtos == null || produtos.isEmpty()) {
+            sugestoesContainer.setVisible(false);
+            return;
+        }
+
+        for (Produto p : produtos) {
+
+            Label opcao = new Label(p.getNome());
+            opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;");
+            opcao.setMaxWidth(Double.MAX_VALUE);
+
+            opcao.setOnMouseEntered(
+                    e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: #e6e6e6; -fx-font-size: 14;"));
+            opcao.setOnMouseExited(
+                    e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;"));
+
+            opcao.setOnMouseClicked(e -> {
+                nomeProdutoField.setText(p.getNome());
+                sugestoesContainer.setVisible(false);
+            });
+
+            sugestoesContainer.getChildren().add(opcao);
+        }
+
+        sugestoesContainer.setVisible(true);
     }
 
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {

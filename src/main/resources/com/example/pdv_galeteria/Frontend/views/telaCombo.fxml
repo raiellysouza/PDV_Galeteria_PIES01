@@ -8,33 +8,39 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="483.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.TelaCombosController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+    prefHeight="483.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.example.pdv_galeteria.controller.TelaCombosController">
     <children>
-        <Label layoutX="14.0" layoutY="14.0" prefHeight="37.0" prefWidth="247.0" text="Cadastro de Combos">
+        <Label layoutX="14.0" layoutY="14.0" prefHeight="37.0" prefWidth="247.0"
+            text="Cadastro de Combos">
             <font>
                 <Font name="System Bold" size="24.0" />
             </font>
         </Label>
 
-        <TextArea fx:id="nomeComboField" layoutX="14.0" layoutY="84.0" prefHeight="38.0" prefWidth="350.0" promptText="Ex: Combo familia" />
+        <TextArea fx:id="nomeComboField" layoutX="14.0" layoutY="84.0" prefHeight="38.0"
+            prefWidth="350.0" promptText="Ex: Combo familia" />
         <Label layoutX="14.0" layoutY="67.0" text="Nome do combo:" />
 
-        <TextArea fx:id="precoComboField" layoutX="379.0" layoutY="84.0" prefHeight="39.0" prefWidth="197.0" promptText="00,00" />
+        <TextArea fx:id="precoComboField" layoutX="379.0" layoutY="84.0" prefHeight="39.0"
+            prefWidth="197.0" promptText="00,00" />
         <Label layoutX="379.0" layoutY="67.0" text="Preço:" />
 
-         <Label layoutX="14.0" layoutY="133.0" text="Escreva o nome do Produto:" />
+        <Label layoutX="14.0" layoutY="133.0" text="Escreva o nome do Produto:" />
 
-        <TextArea fx:id="nomeProdutoField" 
-                  layoutX="14.0" layoutY="150.0" 
-                  prefHeight="39.0" prefWidth="564.0" 
-                  promptText="Nome produto" />
+        <TextArea fx:id="nomeProdutoField"
+            layoutX="14.0" layoutY="150.0"
+            prefHeight="39.0" prefWidth="564.0"
+            promptText="Nome produto" />
 
-<VBox fx:id="sugestoesContainer"
-      layoutX="14.0"
-      layoutY="189.0"
-      spacing="4"
-      prefWidth="564"
-      style="
+        <VBox fx:id="sugestoesContainer"
+            layoutX="14.0"
+            layoutY="189.0"
+            spacing="4"
+            prefWidth="564"
+            style="
           -fx-background-color: white;
           -fx-border-color: #cccccc;
           -fx-border-radius: 4;
@@ -42,24 +48,35 @@
           -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10, 0, 0, 2);
           -fx-view-order: -1;
       "
-      visible="false">
+            visible="false">
 </VBox>
-        <TextArea fx:id="quantidadeField" layoutX="14.0" layoutY="216.0" prefHeight="39.0" prefWidth="314.0" promptText="Quantidade" />
+        <TextArea fx:id="quantidadeField" layoutX="14.0" layoutY="216.0" prefHeight="39.0"
+            prefWidth="314.0" promptText="Quantidade" />
         <Label layoutX="14.0" layoutY="199.0" text="Quantidade:" />
 
-        <TextArea fx:id="produtosTextArea"
-                  layoutX="14.0" layoutY="273.0"
-                  prefHeight="122.0" prefWidth="564.0"
-                  editable="false" wrapText="true"
-                  style="-fx-border-color: #ccc; -fx-border-radius: 6; -fx-background-color: #fff;"
-                  promptText="Produtos adicionados aparecerão aqui..." />
-        <Button layoutX="12.0" layoutY="415.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="564.0" style="-fx-background-color: orange;" text="Adicionar Combo" textFill="WHITE" onAction="#salvarCombo">
+        <VBox fx:id="produtosListContainer"
+            layoutX="14.0"
+            layoutY="273.0"
+            prefHeight="122.0"
+            prefWidth="564.0"
+            spacing="6"
+            style="
+          -fx-background-color: #ffffff;
+          -fx-border-color: #cccccc;
+          -fx-border-radius: 6;
+          -fx-padding: 8;
+      " />
+        <Button layoutX="12.0" layoutY="415.0" mnemonicParsing="false" prefHeight="39.0"
+            prefWidth="564.0" style="-fx-background-color: orange;" text="Adicionar Combo"
+            textFill="WHITE" onAction="#salvarCombo">
             <font>
                 <Font name="System Bold" size="14.0" />
             </font>
         </Button>
 
-        <Button layoutX="344.0" layoutY="216.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="233.0" style="-fx-background-color: orange;" text="Adicionar" textFill="WHITE" onAction="#adicionarProduto" >
+        <Button layoutX="344.0" layoutY="216.0" mnemonicParsing="false" prefHeight="39.0"
+            prefWidth="233.0" style="-fx-background-color: orange;" text="Adicionar"
+            textFill="WHITE" onAction="#adicionarProduto">
             <font>
                 <Font name="System Bold" size="14.0" />
             </font>
