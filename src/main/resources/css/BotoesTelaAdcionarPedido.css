@@ -1,16 +1,14 @@
 #meuBotao {
-    -fx-background-color: orange;
+    -fx-background-color: #f68411;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-cursor: hand;
 }
 
-
 #meuBotao:hover {
      -fx-background-color: #FFB84D; 
 }
-
 
 #meuBotao:selected {
     -fx-background-color: #CC6600;
@@ -21,17 +19,19 @@
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-cursor: hand;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
 }
 #Cancel:hover {
     -fx-background-color: rgb(158, 158, 158);
 }
 .cadastrar {
-    -fx-background-color: #f0932b;
+    -fx-background-color: #f68411;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-background-radius: 8;
+    -fx-background-radius: 8px;
     -fx-cursor: hand;
-    -fx-font-size: 20px; 
+    -fx-font-size: 20px;
 }
 
 

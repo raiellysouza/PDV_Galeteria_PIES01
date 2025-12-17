@@ -3,6 +3,7 @@ package com.example.pdv_galeteria.controller;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.Entregador;
 import com.example.pdv_galeteria.model.StatusEntregador;
+import com.example.pdv_galeteria.model.UsuarioSessao;
 import com.example.pdv_galeteria.repository.EntregadorRepository;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -38,6 +39,8 @@ public class EntregadorController {
     @FXML private Label labelEntregasHoje;
     @FXML private TextField txtNomeCompletoPopup;
     @FXML private TextField txtTelefonePopup;
+    @Autowired private UsuarioSessao usuarioSessao;
+    @FXML private Label labelNomeUsuario;
 
     @Autowired
     private EntregadorRepository entregadorRepository;
@@ -45,7 +48,25 @@ public class EntregadorController {
     @FXML
     public void initialize() {
         System.out.println("=== INICIALIZANDO CONTROLLER ENTREGADORES ===");
+
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            labelNomeUsuario.setText(usuarioSessao.getNomeUsuario());
+        }
+
+        atualizarNomeUsuarioNoMenu();
         carregarEntregadores();
+    }
+
+    private void atualizarNomeUsuarioNoMenu() {
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            String nome = usuarioSessao.getNomeUsuario();
+            System.out.println("Atualizando nome do usuário: " + nome);
+            labelNomeUsuario.setText(nome);
+        } else {
+            System.out.println("Erro: labelNomeUsuario ou usuarioSessao é nulo");
+            System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
+            System.out.println("usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
+        }
     }
 
     private void carregarEntregadores() {
@@ -681,14 +702,12 @@ public class EntregadorController {
             }
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
 
-            CaixaController controller = loader.getController();
             if (PdvGaleteriaApplication.getSpringContext() != null) {
-                CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
-                controller.setCaixaService(caixaService);
-                System.out.println("CaixaService injetado manualmente");
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
             }
+
+            Parent root = loader.load();
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -737,12 +756,18 @@ public class EntregadorController {
     }
 
     @FXML
-    private void sairParaLogin(ActionEvent event) {
+    private void sairParaLogin() {
         try {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
+            if (usuarioSessao != null) {
+                usuarioSessao.logout();
+            }
+
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
             ConfirmacaoSaidaController controller = loader.getController();
@@ -750,24 +775,22 @@ public class EntregadorController {
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
 
+            Stage currentStage = (Stage) labelNomeUsuario.getScene().getWindow();
+
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Confirmação de Saída");
             popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            popupStage.initOwner(currentStage);
             popupStage.setResizable(false);
             popupStage.centerOnScreen();
 
             popupStage.showAndWait();
 
             if (controller.isConfirmado()) {
-                System.out.println("Usuário confirmou saída, voltando para login...");
-                voltarParaTelaLogin(event);
-            } else {
-                System.out.println("Usuário cancelou a saída.");
+                voltarParaTelaLogin(currentStage);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmação de Saída");
@@ -776,38 +799,33 @@ public class EntregadorController {
 
             Optional<ButtonType> resultado = alert.showAndWait();
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                voltarParaTelaLogin(event);
+                if (usuarioSessao != null) {
+                    usuarioSessao.logout();
+                }
+                voltarParaTelaLogin((Stage) alert.getDialogPane().getScene().getWindow());
             }
         }
     }
 
-    private void voltarParaTelaLogin(ActionEvent event) {
+    private void voltarParaTelaLogin(Stage currentStage) {
         try {
-            System.out.println("Iniciando processo de volta para login...");
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login");
+            currentStage.centerOnScreen();
 
-            System.out.println("Tela de login carregada com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao voltar para login: " + e.getMessage());
-            reiniciarAplicacaoCompleta(event);
         }
     }
+
 
     private void reiniciarAplicacaoCompleta(ActionEvent event) {
         try {

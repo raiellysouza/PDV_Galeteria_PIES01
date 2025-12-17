@@ -1,6 +1,7 @@
 package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
+import com.example.pdv_galeteria.model.UsuarioSessao;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -8,8 +9,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
@@ -23,65 +27,88 @@ public class RelatoriosController {
     @FXML
     private javafx.scene.control.Button sairButton;
 
+    @Autowired
+    private UsuarioSessao usuarioSessao;
+
+    @FXML
+    private Label labelNomeUsuario;
+
     @FXML
     private void initialize() {
+
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            labelNomeUsuario.setText(usuarioSessao.getNomeUsuario());
+        }
+
+        atualizarNomeUsuarioNoMenu();
     }
 
-    public void sairParaLogin(ActionEvent actionEvent) {
+    private void atualizarNomeUsuarioNoMenu() {
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            String nome = usuarioSessao.getNomeUsuario();
+            System.out.println("Atualizando nome do usuário: " + nome);
+            labelNomeUsuario.setText(nome);
+        } else {
+            System.out.println("Erro: labelNomeUsuario ou usuarioSessao é nulo");
+            System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
+            System.out.println("usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
+        }
+    }
+
+    @FXML
+    private void sairParaLogin() {
         try {
             System.out.println("Abrindo pop-up de confirmação de saída...");
+
+            if (usuarioSessao != null) {
+                usuarioSessao.logout();
+            }
 
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
 
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
             Parent root = loader.load();
+            ConfirmacaoSaidaController controller = loader.getController();
 
-            if (loader.getController() instanceof ConfirmacaoSaidaController) {
-                ConfirmacaoSaidaController controller = loader.getController();
+            Stage popupStage = new Stage();
+            controller.setPopupStage(popupStage);
 
-                Stage popupStage = new Stage();
-                controller.setPopupStage(popupStage);
+            Stage currentStage = (Stage) labelNomeUsuario.getScene().getWindow();
 
-                popupStage.setScene(new Scene(root));
-                popupStage.setTitle("Confirmação de Saída");
-                popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setScene(new Scene(root));
+            popupStage.setTitle("Confirmação de Saída");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(currentStage);
+            popupStage.setResizable(false);
+            popupStage.centerOnScreen();
 
-                Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-                popupStage.initOwner(currentStage);
-                popupStage.setResizable(false);
-                popupStage.centerOnScreen();
+            popupStage.showAndWait();
 
-                popupStage.showAndWait();
-
-                if (controller.isConfirmado()) {
-                    System.out.println("Usuário confirmou saída, voltando para login...");
-                    voltarParaTelaLogin(actionEvent);
-                } else {
-                    System.out.println("Usuário cancelou a saída.");
-                }
+            if (controller.isConfirmado()) {
+                voltarParaTelaLogin(currentStage);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmação de Saída");
             alert.setHeaderText("Deseja realmente sair?");
             alert.setContentText("Você será redirecionado para a tela de login.");
 
-            Optional<javafx.scene.control.ButtonType> resultado = alert.showAndWait();
-            if (resultado.isPresent() && resultado.get() == javafx.scene.control.ButtonType.OK) {
-                voltarParaTelaLogin(actionEvent);
+            Optional<ButtonType> resultado = alert.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                if (usuarioSessao != null) {
+                    usuarioSessao.logout();
+                }
+                voltarParaTelaLogin((Stage) alert.getDialogPane().getScene().getWindow());
             }
         }
     }
 
-    private void voltarParaTelaLogin(ActionEvent actionEvent) {
+    private void voltarParaTelaLogin(Stage currentStage) {
         try {
-            System.out.println("Iniciando processo de volta para login...");
-
-            Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
@@ -90,18 +117,15 @@ public class RelatoriosController {
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login");
+            currentStage.centerOnScreen();
 
-            System.out.println("Tela de login carregada com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao voltar para login: " + e.getMessage());
-
-            reiniciarAplicacaoCompleta(actionEvent);
         }
     }
+
 
     private void reiniciarAplicacaoCompleta(ActionEvent actionEvent) {
         try {
@@ -133,8 +157,33 @@ public class RelatoriosController {
         navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaProdutos.fxml", "Estoque", actionEvent);
     }
 
-    public void abrirTelaCaixa(ActionEvent actionEvent) {
-        navegarParaTela("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml", "Controle de Caixa", actionEvent);
+    @FXML
+    private void abrirTelaCaixa(ActionEvent event) {
+        try {
+            System.out.println("Abrindo tela do caixa...");
+
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml");
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
+            Parent root = loader.load();
+
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Controle de Caixa");
+            stage.centerOnScreen();
+
+            System.out.println("Tela do caixa aberta com sucesso!");
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir tela do caixa: " + e.getMessage());
+            e.printStackTrace();
+
+        }
     }
 
     public void abrirTelaVendas(ActionEvent actionEvent) {
@@ -169,6 +218,7 @@ public class RelatoriosController {
             Parent root = loader.load();
 
             Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+
             stage.setScene(new Scene(root));
             stage.setTitle(titulo);
             stage.centerOnScreen();

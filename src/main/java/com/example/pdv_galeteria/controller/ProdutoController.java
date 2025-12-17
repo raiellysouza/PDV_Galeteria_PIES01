@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class ProdutoController {
 
@@ -53,6 +55,59 @@ public class ProdutoController {
         System.out.println("ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
         configurarCheckboxes();
+        configurarValidacaoCamposComVirgula();
+    }
+
+    private void configurarValidacaoCamposComVirgula() {
+        if (txtPreco != null) {
+            txtPreco.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*([,\\.]\\d{0,2})?")) {
+                    txtPreco.setText(oldValue);
+                }
+            });
+        }
+
+        if (txtPrecoEditar != null) {
+            txtPrecoEditar.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*([,\\.]\\d{0,2})?")) {
+                    txtPrecoEditar.setText(oldValue);
+                }
+            });
+        }
+
+        if (txtEstoque != null) {
+            txtEstoque.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*")) {
+                    txtEstoque.setText(oldValue);
+                }
+            });
+        }
+    }
+
+    private void configurarValidacaoCampos() {
+        if (txtPreco != null) {
+            txtPreco.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*([,\\.]\\d{0,2})?")) {
+                    txtPreco.setText(oldValue);
+                }
+            });
+        }
+
+        if (txtPrecoEditar != null) {
+            txtPrecoEditar.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*([,\\.]\\d{0,2})?")) {
+                    txtPrecoEditar.setText(oldValue);
+                }
+            });
+        }
+
+        if (txtEstoque != null) {
+            txtEstoque.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*")) {
+                    txtEstoque.setText(oldValue);
+                }
+            });
+        }
     }
 
     private void configurarCheckboxes() {
@@ -116,32 +171,91 @@ public class ProdutoController {
                 return;
             }
 
-            if (txtNome.getText().isEmpty() || txtPreco.getText().isEmpty() || txtEstoque.getText().isEmpty()) {
-                mostrarAlerta("Erro", "Preencha todos os campos obrigatórios!");
+            if (!validarCamposCadastro()) {
                 return;
             }
 
-            Produto produto = new Produto();
-            produto.setNome(txtNome.getText().trim());
+            String nome = txtNome.getText().trim();
 
             String precoText = txtPreco.getText().replace(",", ".");
-            produto.setPreco(Double.parseDouble(precoText));
+            Double preco = Double.parseDouble(precoText);
 
-            produto.setQuantidade(Integer.parseInt(txtEstoque.getText().trim()));
+            Integer quantidade = Integer.parseInt(txtEstoque.getText().trim());
+
+            Produto produto = new Produto();
+            produto.setNome(nome);
+            produto.setPreco(preco);
+            produto.setQuantidade(quantidade);
 
             Produto produtoSalvo = produtoService.salvar(produto);
-            System.out.println("Produto salvo com ID: " + produtoSalvo.getId());
 
-            mostrarAlerta("Sucesso", "Produto cadastrado com sucesso!");
             limparCampos();
             fecharJanela();
 
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Erro", "Preço e estoque devem ser números válidos!\nEx: 25.50 ou 25,50");
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("Já existe um produto ativo")) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Produto Já Existe");
+                alert.setHeaderText("Não é possível criar o produto");
+                alert.setContentText(e.getMessage() +
+                        "\n\nSoluções:\n" +
+                        "1. Use um nome diferente\n" +
+                        "2. Edite o produto existente\n" +
+                        "3. Verifique se há produtos desativados com esse nome");
+                alert.showAndWait();
+            } else {
+                mostrarAlerta("Erro", e.getMessage());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Erro", "Erro ao cadastrar produto: " + e.getMessage());
         }
+    }
+
+    private boolean validarCamposCadastro() {
+        StringBuilder erros = new StringBuilder();
+
+        if (txtNome.getText().trim().isEmpty()) {
+            erros.append("• Digite o nome do produto\n");
+        }
+
+        if (txtPreco.getText().trim().isEmpty()) {
+            erros.append("• Digite o preço do produto\n");
+        } else {
+            try {
+                double preco = Double.parseDouble(txtPreco.getText().replace(",", "."));
+                if (preco <= 0) {
+                    erros.append("• O preço deve ser maior que zero\n");
+                }
+            } catch (NumberFormatException e) {
+                erros.append("• Preço inválido (use números)\n");
+            }
+        }
+
+        if (txtEstoque.getText().trim().isEmpty()) {
+            erros.append("• Digite a quantidade em estoque\n");
+        } else {
+            try {
+                int quantidade = Integer.parseInt(txtEstoque.getText().trim());
+                if (quantidade < 0) {
+                    erros.append("• A quantidade não pode ser negativa\n");
+                }
+            } catch (NumberFormatException e) {
+                erros.append("• Quantidade inválida (use números inteiros)\n");
+            }
+        }
+
+        if (erros.length() > 0) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Validação");
+            alert.setHeaderText("Corrija os seguintes erros:");
+            alert.setContentText(erros.toString());
+            alert.showAndWait();
+            return false;
+        }
+
+        return true;
     }
 
     @FXML
@@ -164,15 +278,69 @@ public class ProdutoController {
                 return;
             }
 
-            produtoParaEdicao.setNome(txtNomeEditar.getText().trim());
-
+            String novoNome = txtNomeEditar.getText().trim();
             String precoText = txtPrecoEditar.getText().replace(",", ".");
-            produtoParaEdicao.setPreco(Double.parseDouble(precoText));
+            Double novoPreco = Double.parseDouble(precoText);
+
+            if (!novoNome.equals(produtoParaEdicao.getNome())) {
+                Optional<Produto> produtoComMesmoNome = produtoService.buscarPorNomeExatoIncluindoDesativados(novoNome);
+
+                if (produtoComMesmoNome.isPresent()) {
+                    Produto outroProduto = produtoComMesmoNome.get();
+
+                    if (outroProduto.getAtivo() != null && outroProduto.getAtivo()) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Nome Já Existe");
+                        alert.setHeaderText("Não é possível usar este nome");
+                        alert.setContentText("Já existe um produto ATIVO com o nome '" + novoNome + "'\n" +
+                                "ID: " + outroProduto.getId() + "\n\n" +
+                                "Use um nome diferente.");
+                        alert.showAndWait();
+                        return;
+                    } else {
+                        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                        confirm.setTitle("Produto Desativado Encontrado");
+                        confirm.setHeaderText("Existe um produto DESATIVADO com este nome");
+                        confirm.setContentText("Deseja reativar o produto desativado?\n" +
+                                "Ou use um nome diferente para criar um novo produto.");
+
+                        confirm.getButtonTypes().setAll(
+                                new javafx.scene.control.ButtonType("Reativar", javafx.scene.control.ButtonBar.ButtonData.YES),
+                                new javafx.scene.control.ButtonType("Usar Outro Nome", javafx.scene.control.ButtonBar.ButtonData.NO)
+                        );
+
+                        Optional<javafx.scene.control.ButtonType> result = confirm.showAndWait();
+                        if (result.isPresent() && result.get().getText().equals("Reativar")) {
+                            Produto novoProduto = new Produto();
+                            novoProduto.setNome(novoNome);
+                            novoProduto.setPreco(novoPreco);
+                            novoProduto.setQuantidade(produtoParaEdicao.getQuantidade());
+
+                            Produto reativado = produtoService.salvar(novoProduto);
+
+                            Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
+                            sucesso.setTitle("Produto Reativado");
+                            sucesso.setHeaderText(null);
+                            sucesso.setContentText("Produto '" + novoNome + "' reativado com sucesso!\n" +
+                                    "O produto anterior mantém seu nome original.");
+                            sucesso.showAndWait();
+
+                            fecharJanelaEdicao();
+                            return;
+                        } else {
+                            return;
+                        }
+                    }
+                }
+            }
+
+            produtoParaEdicao.setNome(novoNome);
+            produtoParaEdicao.setPreco(novoPreco);
 
             Produto produtoAtualizado = produtoService.salvar(produtoParaEdicao);
             System.out.println("Produto atualizado com ID: " + produtoAtualizado.getId());
 
-            mostrarAlerta("Sucesso", "Produto atualizado com sucesso!");
+            mostrarAlerta("Sucesso", "Produto '" + novoNome + "' atualizado com sucesso!");
 
             fecharJanelaEdicao();
 
@@ -201,19 +369,6 @@ public class ProdutoController {
         this.onEdicaoConcluidaCallback = callback;
     }
 
-    private void fecharJanelaEdicao() {
-        if (onEdicaoConcluidaCallback != null) {
-            onEdicaoConcluidaCallback.run();
-        }
-
-        if (txtNomeEditar != null && txtNomeEditar.getScene() != null) {
-            Stage stage = (Stage) txtNomeEditar.getScene().getWindow();
-            stage.close();
-        }
-    }
-
-
-
     private void mostrarAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
@@ -235,6 +390,17 @@ public class ProdutoController {
     private void fecharJanela() {
         if (txtNome != null && txtNome.getScene() != null) {
             Stage stage = (Stage) txtNome.getScene().getWindow();
+            stage.close();
+        }
+    }
+
+    private void fecharJanelaEdicao() {
+        if (onEdicaoConcluidaCallback != null) {
+            onEdicaoConcluidaCallback.run();
+        }
+
+        if (txtNomeEditar != null && txtNomeEditar.getScene() != null) {
+            Stage stage = (Stage) txtNomeEditar.getScene().getWindow();
             stage.close();
         }
     }

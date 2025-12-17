@@ -1,9 +1,6 @@
 package com.example.pdv_galeteria.controller;
 
-import com.example.pdv_galeteria.model.Caixa;
-import com.example.pdv_galeteria.model.MovimentoCaixa;
-import com.example.pdv_galeteria.model.StatusCaixa;
-import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
+import com.example.pdv_galeteria.model.*;
 import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.service.MovimentoCaixaService;
@@ -34,6 +31,7 @@ import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.example.pdv_galeteria.service.MovimentoCaixaService;
+import org.springframework.stereotype.Controller;
 
 import java.io.File;
 import java.io.InputStream;
@@ -48,7 +46,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-@Component
+@Controller
 public class CaixaController implements Initializable {
 
     @Autowired
@@ -100,6 +98,12 @@ public class CaixaController implements Initializable {
     @FXML
     private VBox vboxMovimentacoes;
 
+    @Autowired
+    private UsuarioSessao usuarioSessao;
+
+    @FXML
+    private Label labelNomeUsuario;
+
     private Image graficoVerde;
     private Image graficoVermelho;
 
@@ -112,6 +116,11 @@ public class CaixaController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("=== CaixaController.initialize() INICIADO ===");
+
+        System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "INJETADO" : "NULO"));
+        System.out.println("usuarioSessao: " + (usuarioSessao != null ? "INJETADO" : "NULO"));
+
+        atualizarNomeUsuario();
 
         System.out.println("caixaService: " + (caixaService != null ? "INJETADO" : "NULO"));
         System.out.println("movimentoCaixaService: " + (movimentoCaixaService != null ? "INJETADO" : "NULO"));
@@ -137,6 +146,20 @@ public class CaixaController implements Initializable {
             atualizarInterface();
             configurarAtualizacaoAutomatica();
         });
+    }
+
+    private void atualizarNomeUsuario() {
+        System.out.println("=== atualizarNomeUsuario() ===");
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            String nome = usuarioSessao.getNomeUsuario();
+            System.out.println("Configurando label para: " + nome);
+            labelNomeUsuario.setText(nome);
+            System.out.println("Label atualizado com sucesso!");
+        } else {
+            System.out.println("Falha ao atualizar nome do usuário:");
+            System.out.println("- labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
+            System.out.println("- usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
+        }
     }
 
     private void carregarImagens() {
@@ -175,7 +198,7 @@ public class CaixaController implements Initializable {
         }
     }
 
-    private void atualizarInterface() {
+    public void atualizarInterface() {
         System.out.println("=== atualizarInterface() ===");
 
         try {
@@ -375,8 +398,14 @@ public class CaixaController implements Initializable {
         try {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
+            if (usuarioSessao != null) {
+                usuarioSessao.logout();
+            }
+
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
             ConfirmacaoSaidaController controller = loader.getController();
@@ -384,24 +413,22 @@ public class CaixaController implements Initializable {
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
 
+            Stage currentStage = (Stage) labelNomeUsuario.getScene().getWindow();
+
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Confirmação de Saída");
             popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(getCurrentStage());
+            popupStage.initOwner(currentStage);
             popupStage.setResizable(false);
             popupStage.centerOnScreen();
 
             popupStage.showAndWait();
 
             if (controller.isConfirmado()) {
-                System.out.println("Usuário confirmou saída, voltando para login...");
-                voltarParaTelaLogin();
-            } else {
-                System.out.println("Usuário cancelou a saída.");
+                voltarParaTelaLogin(currentStage);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmação de Saída");
@@ -410,32 +437,30 @@ public class CaixaController implements Initializable {
 
             Optional<ButtonType> resultado = alert.showAndWait();
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                voltarParaTelaLogin();
+                if (usuarioSessao != null) {
+                    usuarioSessao.logout();
+                }
+                voltarParaTelaLogin((Stage) alert.getDialogPane().getScene().getWindow());
             }
         }
     }
 
-    private void voltarParaTelaLogin() {
+    private void voltarParaTelaLogin(Stage currentStage) {
         try {
-            System.out.println("Iniciando processo de volta para login...");
-
-            Stage stage = getCurrentStage();
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
             loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login");
+            currentStage.centerOnScreen();
 
-            System.out.println("Tela de login carregada com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao voltar para login: " + e.getMessage());
-            reiniciarAplicacaoCompleta();
         }
     }
 
@@ -906,6 +931,10 @@ public class CaixaController implements Initializable {
     public void setCaixaService(CaixaService caixaService) {
         System.out.println("setCaixaService() chamado: " + (caixaService != null ? "OK" : "NULL"));
         this.caixaService = caixaService;
+
+        Platform.runLater(() -> {
+            atualizarNomeUsuario();
+        });
     }
 
     private void carregarMovimentacoesDoDia() {

@@ -29,6 +29,10 @@ public class AdicionarPedidoController {
     private TableView<ItemPedido> tabelaItens;
     @FXML
     private Label lblTotal;
+    @FXML
+    private Button btnCancelar;
+    @FXML
+    private TextField txtPrevisaoEntrega;
 
     private final ObservableList<ItemPedido> itens = FXCollections.observableArrayList();
 
@@ -47,6 +51,16 @@ public class AdicionarPedidoController {
         tabelaItens.setItems(itens);
 
         cbCanalVenda.valueProperty().addListener((obs, oldV, newV) -> ajustarCampos(newV));
+
+        configurarCampoPrevisao();
+    }
+
+    private void configurarCampoPrevisao() {
+        txtPrevisaoEntrega.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                txtPrevisaoEntrega.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
     }
 
     private void ajustarCampos(String canal) {
@@ -55,7 +69,7 @@ public class AdicionarPedidoController {
         txtNomeCliente.setDisable(modoLote);
         txtEndereco.setDisable(modoLote);
         cbTipoEntrega.setDisable(modoLote);
-        spnPrevisao.setDisable(modoLote);
+        txtPrevisaoEntrega.setDisable(modoLote);
     }
 
     private double calcularTotal() {
@@ -66,10 +80,40 @@ public class AdicionarPedidoController {
 
     @FXML
     private void confirmarPedido() {
-        String canal = cbCanalVenda.getValue();
+        String previsaoText = txtPrevisaoEntrega.getText().trim();
+        int previsaoEntrega = 0;
 
+        try {
+            if (!previsaoText.isEmpty()) {
+                previsaoEntrega = Integer.parseInt(previsaoText);
+                if (previsaoEntrega < 0) {
+                    mostrarAlerta("Erro", "O tempo de previsão não pode ser negativo");
+                    return;
+                }
+            }
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "Digite um número válido para o tempo de previsão");
+            return;
+        }
+
+        if (cbCanalVenda.getValue() == null) {
+            mostrarAlerta("Erro", "Selecione o canal da venda");
+            return;
+        }
+
+        if (txtNomeCliente.getText().trim().isEmpty()) {
+            mostrarAlerta("Erro", "Informe o nome do cliente");
+            return;
+        }
+
+        if (itens.isEmpty()) {
+            mostrarAlerta("Erro", "Adicione pelo menos um item ao pedido");
+            return;
+        }
+
+        String canal = cbCanalVenda.getValue();
         double total = calcularTotal();
-        lblTotal.setText(String.valueOf(total));
+        lblTotal.setText(String.format("R$ %.2f", total));
 
         boolean vendaLote = canal.equals("site") || canal.equals("ifood") || canal.equals("outro");
 
@@ -79,13 +123,9 @@ public class AdicionarPedidoController {
             return;
         }
 
-        // aqui adiciona o metodo para criar pedido normal
+        System.out.println("Pedido registrado com sucesso!");
+        System.out.println("Previsão de entrega: " + previsaoEntrega + " minutos");
 
-        fecharJanela();
-    }
-
-    @FXML
-    private void cancelar() {
         fecharJanela();
     }
 
@@ -94,9 +134,29 @@ public class AdicionarPedidoController {
         stage.close();
     }
 
+    private void mostrarAlerta(String titulo, String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
     public void adicionarItem(String produto, int quantidade, double precoUnitario) {
         ItemPedido novo = new ItemPedido(produto, quantidade, precoUnitario);
         itens.add(novo);
-        lblTotal.setText(String.valueOf(calcularTotal()));
+        lblTotal.setText(String.format("R$ %.2f", calcularTotal()));
+    }
+
+    public void setPrevisaoEntrega(int minutos) {
+        txtPrevisaoEntrega.setText(String.valueOf(minutos));
+    }
+
+    public int getPrevisaoEntrega() {
+        try {
+            return Integer.parseInt(txtPrevisaoEntrega.getText().trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

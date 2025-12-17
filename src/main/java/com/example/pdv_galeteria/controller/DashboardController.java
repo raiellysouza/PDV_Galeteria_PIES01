@@ -1,10 +1,7 @@
 package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
-import com.example.pdv_galeteria.model.ItemPedido;
-import com.example.pdv_galeteria.model.Pedido;
-import com.example.pdv_galeteria.model.Produto;
-import com.example.pdv_galeteria.model.StatusPedido;
+import com.example.pdv_galeteria.model.*;
 import com.example.pdv_galeteria.service.PedidoService;
 import com.example.pdv_galeteria.service.ProdutoService;
 import javafx.application.Platform;
@@ -104,6 +101,12 @@ public class DashboardController implements Initializable {
     @FXML
     private ComboBox<String> statusComboBox2;
 
+    @Autowired
+    private UsuarioSessao usuarioSessao;
+
+    @FXML
+    private Label labelNomeUsuario;
+
     private StatusPedido filtroAtual = null;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private Map<Long, ComboBox<String>> combosPorPedido = new HashMap<>();
@@ -121,6 +124,10 @@ public class DashboardController implements Initializable {
                 }
             }
 
+            if (labelNomeUsuario != null && usuarioSessao != null) {
+                labelNomeUsuario.setText(usuarioSessao.getNomeUsuario());
+            }
+
             configurarFiltros();
             configurarComboBoxStatus();
             carregarDadosDashboard();
@@ -129,6 +136,19 @@ public class DashboardController implements Initializable {
 
         } catch (Exception e) {
             mostrarErro("Erro ao inicializar dashboard: " + e.getMessage());
+        }
+        atualizarNomeUsuarioNoMenu();
+    }
+
+    private void atualizarNomeUsuarioNoMenu() {
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            String nome = usuarioSessao.getNomeUsuario();
+            System.out.println("Atualizando nome do usuário: " + nome);
+            labelNomeUsuario.setText(nome);
+        } else {
+            System.out.println("Erro: labelNomeUsuario ou usuarioSessao é nulo");
+            System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
+            System.out.println("usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
         }
     }
 
@@ -291,22 +311,9 @@ public class DashboardController implements Initializable {
 
     private List<Pedido> getPedidosDoDia() {
         try {
-            List<Pedido> todosPedidos = pedidoService.listarTodos();
-            LocalDate hoje = LocalDate.now();
+            List<Pedido> pedidosHoje = pedidoService.listarPedidosDoDia();
 
-            System.out.println("Total de pedidos no sistema: " + todosPedidos.size());
-
-            List<Pedido> pedidosHoje = todosPedidos.stream()
-                    .filter(p -> {
-                        if (p.getCriadoEm() == null) return false;
-                        return p.getCriadoEm().toLocalDate().equals(hoje);
-                    })
-                    .toList();
-
-            System.out.println("Pedidos de hoje: " + pedidosHoje.size());
-            pedidosHoje.forEach(p ->
-                    System.out.println("Pedido #" + p.getId() + " - " + p.getCliente() +
-                            " - " + p.getStatus() + " - " + p.getTotal()));
+            System.out.println("Total de pedidos hoje: " + pedidosHoje.size());
 
             return pedidosHoje;
 
@@ -331,12 +338,23 @@ public class DashboardController implements Initializable {
 
                 List<Pedido> pedidos;
                 if (filtroAtual == null) {
-                    pedidos = pedidoService.listarTodos();
+                    pedidos = pedidoService.listarTodosComItens();
                 } else {
-                    pedidos = pedidoService.listarPorStatus(filtroAtual);
+                    pedidos = pedidoService.listarPorStatusComItens(filtroAtual);
                 }
 
                 System.out.println("Total de pedidos para exibir: " + pedidos.size());
+
+                for (Pedido pedido : pedidos) {
+                    try {
+                        Pedido pedidoComPagamentos = pedidoService.carregarFormasPagamento(pedido.getId());
+                        if (pedidoComPagamentos != null && pedidoComPagamentos.getFormasPagamento() != null) {
+                            pedido.setFormasPagamento(pedidoComPagamentos.getFormasPagamento());
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Erro ao carregar formas de pagamento para pedido " + pedido.getId() + ": " + e.getMessage());
+                    }
+                }
 
                 List<Pedido> pedidosRecentes = pedidos.stream()
                         .sorted((p1, p2) -> {
@@ -432,7 +450,7 @@ public class DashboardController implements Initializable {
         lblEntrega.setStyle("-fx-background-color: #F3F4F6; -fx-text-fill: #4B5563; " +
                 "-fx-background-radius: 4; -fx-padding: 2 8; -fx-font-weight: bold; -fx-font-size: 10px;");
 
-        String formaPagamento = pedido.getFormaPagamento() != null ? pedido.getFormaPagamento() : "Não Pago";
+        String formaPagamento = pedido.getFormasPagamentoString() != null ? pedido.getFormasPagamentoString() : "Não Pago";
         String corPagamento = formaPagamento.equals("Não Pago") ? "#FFEDD5" : "#D1FAE5";
         String corTextoPagamento = formaPagamento.equals("Não Pago") ? "#C2410C" : "#065F46";
 
@@ -597,11 +615,11 @@ public class DashboardController implements Initializable {
         VBox coluna2 = new VBox(5);
         coluna2.setPrefWidth(300);
 
-        if (pedido.getFormaPagamento() != null) {
+        if (pedido.getFormasPagamentoString() != null) {
             Label lblPagamento = new Label("Pagamento:");
             lblPagamento.setStyle("-fx-text-fill: #9ca3af; -fx-font-size: 12px;");
 
-            Label lblFormaPagamento = new Label(pedido.getFormaPagamento());
+            Label lblFormaPagamento = new Label(pedido.getFormasPagamentoString());
             lblFormaPagamento.setStyle("-fx-text-fill: #4b5563; -fx-font-weight: bold; -fx-font-size: 12px;");
 
             coluna2.getChildren().addAll(lblPagamento, lblFormaPagamento);
@@ -710,40 +728,80 @@ public class DashboardController implements Initializable {
         try {
             Pedido pedido = pedidoService.buscarPedidoComItens(pedidoId);
 
+            Pedido pedidoComPagamentos = pedidoService.carregarFormasPagamento(pedidoId);
+            if (pedidoComPagamentos != null) {
+                pedido.setFormasPagamento(pedidoComPagamentos.getFormasPagamento());
+            }
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Detalhes do Pedido");
-            alert.setHeaderText("Pedido #" + pedidoId + " - " + pedido.getCliente());
+            alert.setHeaderText("Pedido #" + pedido.getId() + " - " + pedido.getCliente());
+
+            alert.setWidth(700);
+            alert.setHeight(500);
 
             StringBuilder content = new StringBuilder();
             content.append("Data: ").append(pedido.getCriadoEm().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))).append("\n");
             content.append("Status: ").append(pedido.getStatus()).append("\n");
-            content.append("Forma de Pagamento: ").append(pedido.getFormaPagamento()).append("\n");
+            content.append("Forma de Pagamento: ").append(pedido.getFormasPagamentoString()).append("\n");
             content.append("Tipo de Entrega: ").append(pedido.getTipoEntrega()).append("\n\n");
             content.append("Itens:\n");
 
-            if (pedido.getItens() != null && !pedido.getItens().isEmpty()) {
-                for (ItemPedido item : pedido.getItens()) {
-                    content.append("  • ").append(item.getQuantidade())
-                            .append("x ").append(item.getProduto())
-                            .append(" - R$ ").append(formatarValor(item.getPrecoUnitario()))
-                            .append(" cada (Subtotal: R$ ").append(formatarValor(item.getQuantidade() * item.getPrecoUnitario()))
-                            .append(")\n");
+            if (pedido.getItens() != null) {
+                if (!pedido.getItens().isEmpty()) {
+                    double totalItens = 0;
+                    for (ItemPedido item : pedido.getItens()) {
+                        double subtotal = item.getQuantidade() * item.getPrecoUnitario();
+                        totalItens += subtotal;
+                        content.append("  • ").append(item.getQuantidade())
+                                .append("x ").append(item.getProduto())
+                                .append(" - R$ ").append(formatarValor(item.getPrecoUnitario()))
+                                .append(" cada (Subtotal: R$ ").append(formatarValor(subtotal))
+                                .append(")\n");
+                    }
+                    content.append("\nTotal Itens: R$ ").append(formatarValor(totalItens)).append("\n");
+                } else {
+                    content.append("  Nenhum item encontrado\n");
                 }
             } else {
-                content.append("  Nenhum item encontrado\n");
+                content.append("  Erro ao carregar itens (null)\n");
             }
 
-            content.append("\nTotal: R$ ").append(formatarValor(pedido.getTotal()));
+            content.append("\nTotal Geral: R$ ").append(formatarValor(pedido.getTotal()));
 
-            alert.setContentText(content.toString());
-            alert.setWidth(600);
-            alert.setHeight(400);
-            alert.showAndWait();
+            TextArea textArea = new TextArea(content.toString());
+            textArea.setEditable(false);
+            textArea.setWrapText(true);
+            textArea.setStyle("-fx-font-family: monospace; -fx-font-size: 12px;");
+            textArea.setPrefHeight(300);
+            textArea.setPrefWidth(650);
+
+            alert.getDialogPane().setContent(textArea);
+            alert.getDialogPane().setPrefSize(700, 450);
+
+            ButtonType copiarButton = new ButtonType("Copiar", ButtonBar.ButtonData.OTHER);
+            ButtonType fecharButton = new ButtonType("Fechar", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(copiarButton, fecharButton);
+
+            alert.showAndWait().ifPresent(buttonType -> {
+                if (buttonType == copiarButton) {
+                    Clipboard clipboard = Clipboard.getSystemClipboard();
+                    ClipboardContent clipboardContent = new ClipboardContent();
+                    clipboardContent.putString(content.toString());
+                    clipboard.setContent(clipboardContent);
+                    mostrarSucesso("Conteúdo copiado para área de transferência!");
+                }
+            });
 
         } catch (Exception e) {
             System.err.println("Erro ao visualizar pedido: " + e.getMessage());
             e.printStackTrace();
-            mostrarErro("Erro ao visualizar pedido: " + e.getMessage());
+
+            Alert erroAlert = new Alert(Alert.AlertType.ERROR);
+            erroAlert.setTitle("Erro ao Carregar Pedido");
+            erroAlert.setHeaderText("Não foi possível carregar os detalhes do pedido");
+            erroAlert.setContentText("Erro: " + e.getMessage() + "\n\nID do pedido: " + pedidoId);
+            erroAlert.showAndWait();
         }
     }
 
@@ -946,67 +1004,74 @@ public class DashboardController implements Initializable {
         }
     }
 
-    public void sairParaLogin(ActionEvent actionEvent) {
+    @FXML
+    private void sairParaLogin() {
         try {
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml");
-            if (fxmlUrl == null) {
-                mostrarConfirmacaoSaida();
-                return;
+            System.out.println("Abrindo pop-up de confirmação de saída...");
+
+            if (usuarioSessao != null) {
+                usuarioSessao.logout();
             }
 
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
             Parent root = loader.load();
             ConfirmacaoSaidaController controller = loader.getController();
 
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
 
+            Stage currentStage = (Stage) labelNomeUsuario.getScene().getWindow();
+
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Confirmação de Saída");
             popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(getCurrentStage());
+            popupStage.initOwner(currentStage);
             popupStage.setResizable(false);
             popupStage.centerOnScreen();
 
             popupStage.showAndWait();
 
             if (controller.isConfirmado()) {
-                voltarParaTelaLogin();
+                voltarParaTelaLogin(currentStage);
             }
         } catch (Exception e) {
-            mostrarConfirmacaoSaida();
+            e.printStackTrace();
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmação de Saída");
+            alert.setHeaderText("Deseja realmente sair?");
+            alert.setContentText("Você será redirecionado para a tela de login.");
+
+            Optional<ButtonType> resultado = alert.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                if (usuarioSessao != null) {
+                    usuarioSessao.logout();
+                }
+                voltarParaTelaLogin((Stage) alert.getDialogPane().getScene().getWindow());
+            }
         }
     }
 
-    private void mostrarConfirmacaoSaida() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmação de Saída");
-        alert.setHeaderText("Deseja realmente sair?");
-        alert.setContentText("Você será redirecionado para a tela de login.");
-
-        Optional<javafx.scene.control.ButtonType> resultado = alert.showAndWait();
-        if (resultado.isPresent() && resultado.get() == javafx.scene.control.ButtonType.OK) {
-            voltarParaTelaLogin();
-        }
-    }
-
-    private void voltarParaTelaLogin() {
+    private void voltarParaTelaLogin(Stage currentStage) {
         try {
-            Stage stage = getCurrentStage();
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
-            }
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
+
             Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login");
+            currentStage.centerOnScreen();
+
         } catch (Exception e) {
-            reiniciarAplicacaoCompleta();
+            e.printStackTrace();
         }
     }
 
