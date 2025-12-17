@@ -1,9 +1,12 @@
-/**package com.example.pdv_galeteria.service;
+package com.example.pdv_galeteria.service;
+
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class DiscountService {
+@Service
+public class DescontoService {
 
     public BigDecimal applyPercentageDiscount(BigDecimal price, BigDecimal percent) {
         if (price == null || percent == null) throw new IllegalArgumentException("price and percent must not be null");
@@ -19,4 +22,3 @@ public class DiscountService {
         return result.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : result;
     }
 }
-**/

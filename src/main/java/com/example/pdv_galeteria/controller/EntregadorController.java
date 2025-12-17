@@ -3,6 +3,7 @@ package com.example.pdv_galeteria.controller;
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.Entregador;
 import com.example.pdv_galeteria.model.StatusEntregador;
+import com.example.pdv_galeteria.model.UsuarioSessao;
 import com.example.pdv_galeteria.repository.EntregadorRepository;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -20,7 +21,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.net.URL;
 import java.util.List;
@@ -29,7 +30,7 @@ import javafx.scene.Node;
 import java.util.Optional;
 import com.example.pdv_galeteria.service.CaixaService;
 
-@Component
+@Service
 public class EntregadorController {
 
     @FXML private VBox containerEntregadores;
@@ -38,6 +39,8 @@ public class EntregadorController {
     @FXML private Label labelEntregasHoje;
     @FXML private TextField txtNomeCompletoPopup;
     @FXML private TextField txtTelefonePopup;
+    @Autowired private UsuarioSessao usuarioSessao;
+    @FXML private Label labelNomeUsuario;
 
     @Autowired
     private EntregadorRepository entregadorRepository;
@@ -45,17 +48,35 @@ public class EntregadorController {
     @FXML
     public void initialize() {
         System.out.println("=== INICIALIZANDO CONTROLLER ENTREGADORES ===");
-        
-        // Garantir que o repository seja injetado
+
         if (entregadorRepository == null && PdvGaleteriaApplication.getSpringContext() != null) {
             entregadorRepository = PdvGaleteriaApplication.getSpringContext().getBean(EntregadorRepository.class);
             System.out.println("EntregadorRepository injetado manualmente: " + (entregadorRepository != null));
         }
-        
+
         if (containerEntregadores != null) {
             carregarEntregadores();
         } else {
             System.err.println("ERRO: containerEntregadores é null! Verifique o FXML.");
+        }
+
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            labelNomeUsuario.setText(usuarioSessao.getNomeUsuario());
+        }
+
+        atualizarNomeUsuarioNoMenu();
+        carregarEntregadores();
+    }
+
+    private void atualizarNomeUsuarioNoMenu() {
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            String nome = usuarioSessao.getNomeUsuario();
+            System.out.println("Atualizando nome do usuário: " + nome);
+            labelNomeUsuario.setText(nome);
+        } else {
+            System.out.println("Erro: labelNomeUsuario ou usuarioSessao é nulo");
+            System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
+            System.out.println("usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
         }
     }
 
@@ -67,7 +88,7 @@ public class EntregadorController {
                 System.err.println("ERRO: containerEntregadores é null!");
                 return;
             }
-            
+
             if (entregadorRepository == null) {
                 System.err.println("ERRO: entregadorRepository é null!");
                 return;
@@ -722,6 +743,11 @@ public class EntregadorController {
             }
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
+
             Parent root = loader.load();
 
             CaixaController controller = loader.getController();
@@ -749,9 +775,9 @@ public class EntregadorController {
         try {
             System.out.println("Abrindo tela de configurações...");
 
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracao.fxml");
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaConfiguracoes.fxml");
             if (fxmlUrl == null) {
-                System.err.println("Arquivo FXML não encontrado: TelaConfiguracao.fxml");
+                System.err.println("Arquivo FXML não encontrado: TelaConfiguracoes.fxml");
                 mostrarAlerta("Erro", "Tela de configurações não disponível", Alert.AlertType.ERROR);
                 return;
             }
@@ -782,14 +808,22 @@ public class EntregadorController {
         try {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
+            if (usuarioSessao != null) {
+                usuarioSessao.logout();
+            }
+
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
             ConfirmacaoSaidaController controller = loader.getController();
 
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
+
+            Stage currentStage = (Stage) labelNomeUsuario.getScene().getWindow();
 
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Confirmação de Saída");

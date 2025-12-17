@@ -1,13 +1,15 @@
-/**package com.example.pdv_galeteria.service;
+package com.example.pdv_galeteria.service;
 
-import com.example.pdv_galeteria.model.PaymentResult;
+import com.example.pdv_galeteria.model.Pagamento;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ChangeCalculator {
+@Service
+public class TrocoService {
 
     private static final BigDecimal[] DENOMINATIONS = new BigDecimal[] {
         new BigDecimal("100.00"),
@@ -24,7 +26,7 @@ public class ChangeCalculator {
         new BigDecimal("0.01")
     };
 
-    public PaymentResult calculate(BigDecimal totalDue, BigDecimal paid) {
+    public Pagamento calculate(BigDecimal totalDue, BigDecimal paid) {
         if (totalDue == null || paid == null) {
             throw new IllegalArgumentException("totalDue and paid must not be null");
         }
@@ -33,7 +35,7 @@ public class ChangeCalculator {
 
         if (paid.compareTo(totalDue) < 0) {
             BigDecimal negative = paid.subtract(totalDue);
-            return new PaymentResult(totalDue, paid, negative, new LinkedHashMap<>());
+            return new Pagamento(totalDue, paid, negative, new LinkedHashMap<>());
         }
 
         BigDecimal change = paid.subtract(totalDue).setScale(2, RoundingMode.HALF_UP);
@@ -52,7 +54,6 @@ public class ChangeCalculator {
             remainder = BigDecimal.ZERO;
         }
 
-        return new PaymentResult(totalDue, paid, change, breakdown);
+        return new Pagamento(totalDue, paid, change, breakdown);
     }
 }
-**/

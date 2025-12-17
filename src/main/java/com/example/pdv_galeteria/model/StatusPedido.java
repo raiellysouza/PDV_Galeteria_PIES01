@@ -4,8 +4,6 @@ public enum StatusPedido {
     REGISTRADO,
     EM_ANDAMENTO,
     PRONTO,
-    FINALIZADO
+    FINALIZADO,
+    CANCELADO
 }
-
-
-

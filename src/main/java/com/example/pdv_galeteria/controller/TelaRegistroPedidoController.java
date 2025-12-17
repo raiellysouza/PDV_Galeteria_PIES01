@@ -2,7 +2,9 @@ package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.Produto;
+import com.example.pdv_galeteria.model.UsuarioSessao;
 import com.example.pdv_galeteria.service.CaixaService;
+import com.example.pdv_galeteria.service.PedidoService;
 import com.example.pdv_galeteria.service.ProdutoService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -22,6 +24,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -55,6 +59,15 @@ public class TelaRegistroPedidoController implements Initializable {
 
     @Autowired
     private CaixaService caixaService;
+
+    @Autowired
+    private PedidoService pedidoService;
+
+    @Autowired
+    private UsuarioSessao usuarioSessao;
+
+    @FXML
+    private Label labelNomeUsuario;
 
     private Map<Produto, Integer> carrinho = new LinkedHashMap<>();
     private List<Produto> todosProdutos = new ArrayList<>();
@@ -103,8 +116,22 @@ public class TelaRegistroPedidoController implements Initializable {
                 scrollProdutos.widthProperty().subtract(25)
         );
 
+        atualizarNomeUsuarioNoMenu();
+
         carregarProdutos();
         atualizarCarrinho();
+    }
+
+    private void atualizarNomeUsuarioNoMenu() {
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            String nome = usuarioSessao.getNomeUsuario();
+            System.out.println("Atualizando nome do usuário: " + nome);
+            labelNomeUsuario.setText(nome);
+        } else {
+            System.out.println("Erro: labelNomeUsuario ou usuarioSessao é nulo");
+            System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
+            System.out.println("usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
+        }
     }
 
     private void carregarProdutos() {
@@ -457,73 +484,43 @@ public class TelaRegistroPedidoController implements Initializable {
         }
     }
 
-    @FXML
     private void abrirPopupRegistroPedido() {
         try {
-            System.out.println("=== ABRINDO POPUP DE REGISTRO DE PEDIDO ===");
-
-            if (carrinho == null || carrinho.isEmpty()) {
-                mostrarErro("Adicione itens ao carrinho antes de registrar o pedido!");
-                return;
-            }
-
-            double totalCarrinho = calcularTotalCarrinho();
-            System.out.println("Total do carrinho: R$ " + totalCarrinho);
-
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaAdicionarPedidos.fxml")
-            );
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaAdicionarPedidos.fxml"));
 
             if (PdvGaleteriaApplication.getSpringContext() != null) {
                 loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
             }
 
             Parent root = loader.load();
+            RegistroPedidoPopupController controller = loader.getController();
 
-            RegistroPedidoPopupController popupController = loader.getController();
+            controller.setCaixaService(caixaService);
+            controller.setPedidoService(pedidoService);
 
-            if (popupController == null) {
-                System.err.println("ERRO: Controller do popup não carregado!");
-                return;
-            }
+            controller.setTelaRegistroController(this);
 
-            if (caixaService != null) {
-                popupController.setCaixaService(caixaService);
-                System.out.println("CaixaService passado para popup: " + (caixaService != null));
-            } else {
-                System.err.println("AVISO: caixaService é nulo no controller principal!");
-            }
-
-            popupController.setDadosPedido(new HashMap<>(carrinho), totalCarrinho);
+            controller.setDadosPedido(carrinho, totalPedido);
 
             Stage popupStage = new Stage();
-            popupController.setPopupStage(popupStage);
+            controller.setPopupStage(popupStage);
+
+            popupStage.initOwner(contentPane.getScene().getWindow());
 
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Registrar Pedido");
             popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(getCurrentStage());
-            popupStage.setResizable(false);
-            popupStage.centerOnScreen();
-
-            popupStage.setOnHidden(e -> {
-                System.out.println("Popup fechado, atualizando caixa...");
-                atualizarInterfaceCaixa();
-            });
-
             popupStage.showAndWait();
 
-            carrinho.clear();
-            atualizarCarrinho();
+            limparCarrinho();
+            atualizarInterface();
 
         } catch (Exception e) {
-            System.err.println("ERRO ao abrir popup de registro: " + e.getMessage());
             e.printStackTrace();
-            mostrarErro("Erro ao abrir formulário de pedido: " + e.getMessage());
         }
     }
 
-    private void atualizarInterfaceCaixa() {
+    private void atualizarInterface() {
         try {
             if (PdvGaleteriaApplication.getSpringContext() != null) {
                 CaixaController caixaController = PdvGaleteriaApplication.getSpringContext()
@@ -671,8 +668,16 @@ public class TelaRegistroPedidoController implements Initializable {
     @FXML
     private void sairParaLogin() {
         try {
+            System.out.println("Abrindo pop-up de confirmação de saída...");
+
+            if (usuarioSessao != null) {
+                usuarioSessao.logout();
+            }
+
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
             ConfirmacaoSaidaController controller = loader.getController();
@@ -680,47 +685,40 @@ public class TelaRegistroPedidoController implements Initializable {
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
 
+            Stage currentStage = (Stage) campoBusca.getScene().getWindow();
+
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Confirmação de Saída");
             popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(contentPane.getScene().getWindow());
+            popupStage.initOwner(currentStage);
             popupStage.setResizable(false);
             popupStage.centerOnScreen();
 
             popupStage.showAndWait();
 
             if (controller.isConfirmado()) {
-                voltarParaTelaLogin();
+                voltarParaTelaLogin(currentStage);
             }
-
         } catch (Exception e) {
-            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
             e.printStackTrace();
 
-            usarFallbackConfirmacao();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmação de Saída");
+            alert.setHeaderText("Deseja realmente sair?");
+            alert.setContentText("Você será redirecionado para a tela de login.");
+
+            Optional<ButtonType> resultado = alert.showAndWait();
+            if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                if (usuarioSessao != null) {
+                    usuarioSessao.logout();
+                }
+                voltarParaTelaLogin((Stage) alert.getDialogPane().getScene().getWindow());
+            }
         }
     }
 
-    private void usarFallbackConfirmacao() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmação de Saída");
-        alert.setHeaderText("Deseja realmente sair?");
-        alert.setContentText("Você será redirecionado para a tela de login.");
-
-        ButtonType btnSim = new ButtonType("Sim, Sair", ButtonBar.ButtonData.YES);
-        ButtonType btnNao = new ButtonType("Cancelar", ButtonBar.ButtonData.NO);
-        alert.getButtonTypes().setAll(btnSim, btnNao);
-
-        Optional<ButtonType> resultado = alert.showAndWait();
-        if (resultado.isPresent() && resultado.get() == btnSim) {
-            voltarParaTelaLogin();
-        }
-    }
-
-    private void voltarParaTelaLogin() {
+    private void voltarParaTelaLogin(Stage currentStage) {
         try {
-            Stage stage = (Stage) contentPane.getScene().getWindow();
-
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
@@ -729,14 +727,12 @@ public class TelaRegistroPedidoController implements Initializable {
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login");
+            currentStage.centerOnScreen();
 
         } catch (Exception e) {
-            System.err.println("Erro ao voltar para login: " + e.getMessage());
             e.printStackTrace();
-            reiniciarAplicacaoCompleta();
         }
     }
 
@@ -769,35 +765,34 @@ public class TelaRegistroPedidoController implements Initializable {
     }
 
     @FXML
-    private void abrirTelaCaixa() {
+    private void abrirTelaCaixa(ActionEvent event) {
         try {
-            System.out.println("=== ABRINDO TELA CAIXA ===");
+            System.out.println("Abrindo tela do caixa...");
 
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml")
-            );
+            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml");
+            if (fxmlUrl == null) {
+                mostrarAlerta("Erro", "Arquivo da tela do caixa não encontrado!", Alert.AlertType.ERROR);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            if (PdvGaleteriaApplication.getSpringContext() != null) {
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+            }
 
             Parent root = loader.load();
 
-            CaixaController controller = loader.getController();
-            System.out.println("Controller obtido: " + controller);
-
-            if (PdvGaleteriaApplication.getSpringContext() != null) {
-                CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
-                controller.setCaixaService(caixaService);
-                System.out.println("CaixaService injetado manualmente!");
-            }
-
-            Stage stage = (Stage) contentPane.getScene().getWindow();
+                       Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Caixa");
+            stage.setTitle("Controle de Caixa");
             stage.centerOnScreen();
 
             System.out.println("Tela do caixa aberta com sucesso!");
-
         } catch (Exception e) {
+            System.err.println("Erro ao abrir tela do caixa: " + e.getMessage());
             e.printStackTrace();
-            mostrarAlerta("Erro", "Não foi possível abrir a tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
+            mostrarAlerta("Erro", "Erro ao abrir tela do caixa: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -823,5 +818,10 @@ public class TelaRegistroPedidoController implements Initializable {
             }
         }
         return total;
+    }
+
+    public void limparCarrinho() {
+        carrinho.clear();
+        atualizarCarrinho();
     }
 }

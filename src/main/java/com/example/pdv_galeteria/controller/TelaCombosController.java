@@ -1,10 +1,13 @@
 package com.example.pdv_galeteria.controller;
 
+import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.Combo;
 import com.example.pdv_galeteria.model.ComboItem;
 import com.example.pdv_galeteria.model.Produto;
 import com.example.pdv_galeteria.service.ComboService;
 import com.example.pdv_galeteria.service.ProdutoService;
+import com.itextpdf.io.exceptions.IOException;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -20,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -281,6 +285,81 @@ public class TelaCombosController {
     }
 
     private void excluirCombo(Combo combo) {
+        try {
+            System.out.println("Iniciando exclusão do combo: " + combo.getNome() + " (ID: " + combo.getId() + ")");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupExclusaoConfirmacao.fxml"));
+
+            loader.setControllerFactory(controller -> {
+                try {
+                    return PdvGaleteriaApplication.getSpringContext().getBean(ConfirmacaoExclusaoController.class);
+                } catch (Exception e) {
+                    System.err.println("Erro ao obter bean do Spring: " + e.getMessage());
+                    return new ConfirmacaoExclusaoController();
+                }
+            });
+
+            Parent root = loader.load();
+
+            ConfirmacaoExclusaoController popupController = loader.getController();
+
+            popupController.setCombo(combo);
+
+            popupController.setOnConfirmacaoListener((confirmado) -> {
+                if (confirmado) {
+                    try {
+                        comboService.deletarCombo(combo.getId());
+                        System.out.println("Combo excluído com sucesso");
+                        carregarCombos();
+
+                        System.out.println("Combo '" + combo.getNome() + "' excluído com sucesso");
+
+                    } catch (Exception e) {
+                        System.err.println("Erro ao excluir combo: " + e.getMessage());
+                        e.printStackTrace();
+                        mostrarAlerta("Erro", "Erro ao excluir combo: " + e.getMessage(), Alert.AlertType.ERROR);
+                    }
+                } else {
+                    System.out.println("Exclusão do combo cancelada pelo usuário");
+                }
+            });
+
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Confirmar Exclusão");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setScene(new Scene(root));
+            popupStage.setResizable(false);
+
+            popupController.setPopupStage(popupStage);
+
+            if (combosContainer != null && combosContainer.getScene() != null && combosContainer.getScene().getWindow() != null) {
+                popupStage.initOwner(combosContainer.getScene().getWindow());
+            }
+
+            popupStage.showAndWait();
+
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar popup de confirmação: " + e.getMessage());
+            e.printStackTrace();
+
+            excluirComboFallback(combo);
+        } catch (Exception e) {
+            System.err.println("ERRO ao excluir combo: " + e.getMessage());
+            e.printStackTrace();
+
+            Platform.runLater(() -> {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Erro");
+                errorAlert.setHeaderText("Não foi possível excluir o combo");
+                errorAlert.setContentText("Erro: " + e.getMessage() +
+                        "\n\nTente novamente ou contate o suporte.");
+                errorAlert.showAndWait();
+            });
+        }
+    }
+
+    private void excluirComboFallback(Combo combo) {
         Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacao.setTitle("Confirmar exclusão");
         confirmacao.setHeaderText(null);
@@ -290,8 +369,8 @@ public class TelaCombosController {
         if (resultado.isPresent() && resultado.get().getButtonData().isDefaultButton()) {
             try {
                 comboService.deletarCombo(combo.getId());
-                mostrarAlerta("Sucesso", "Combo excluído com sucesso!", Alert.AlertType.INFORMATION);
                 carregarCombos();
+                System.out.println("Combo excluído com sucesso (fallback)");
             } catch (Exception e) {
                 e.printStackTrace();
                 mostrarAlerta("Erro", "Erro ao excluir combo: " + e.getMessage(), Alert.AlertType.ERROR);

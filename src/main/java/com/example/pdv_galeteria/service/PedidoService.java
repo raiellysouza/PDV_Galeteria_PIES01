@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -61,6 +63,22 @@ public class PedidoService {
         return pedidoRepository.findByStatusOrderByCriadoEmDesc(status);
     }
 
+    @Transactional(readOnly = true)
+    public List<Pedido> listarTodosComItens() {
+        return pedidoRepository.findAllWithItens();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Pedido> listarPorStatusComItens(StatusPedido status) {
+        return pedidoRepository.findByStatusWithItens(status);
+    }
+
+    @Transactional(readOnly = true)
+    public Pedido carregarFormasPagamento(Long id) {
+        return pedidoRepository.findByIdWithFormasPagamento(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + id));
+    }
+
     @Transactional
     public Pedido atualizar(Long id, Pedido pedidoDetalhes) {
         Pedido pedidoExistente = pedidoRepository.findById(id)
@@ -69,9 +87,19 @@ public class PedidoService {
         if (pedidoDetalhes.getCliente() != null) {
             pedidoExistente.setCliente(pedidoDetalhes.getCliente());
         }
-        if (pedidoDetalhes.getFormaPagamento() != null) {
-            pedidoExistente.setFormaPagamento(pedidoDetalhes.getFormaPagamento());
+
+        if (pedidoDetalhes.getFormasPagamento() != null && !pedidoDetalhes.getFormasPagamento().isEmpty()) {
+            pedidoExistente.getFormasPagamento().clear();
+            pedidoDetalhes.getFormasPagamento().forEach(fp -> {
+                FormaPagamentoPedido novaForma = new FormaPagamentoPedido();
+                novaForma.setTipo(fp.getTipo());
+                novaForma.setValor(fp.getValor());
+                novaForma.setPedido(pedidoExistente);
+                pedidoExistente.getFormasPagamento().add(novaForma);
+            });
+            pedidoExistente.atualizarValorPago();
         }
+
         if (pedidoDetalhes.getTipoEntrega() != null) {
             pedidoExistente.setTipoEntrega(pedidoDetalhes.getTipoEntrega());
         }
@@ -92,7 +120,7 @@ public class PedidoService {
     public Pedido atualizarStatus(Long id, StatusPedido novoStatus) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
-        
+
         pedido.setStatus(novoStatus);
         return pedidoRepository.save(pedido);
     }
@@ -105,6 +133,7 @@ public class PedidoService {
         pedidoRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public Pedido buscarPedidoComItens(Long id) {
         return pedidoRepository.buscarPedidoComItens(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + id));
@@ -162,5 +191,16 @@ public class PedidoService {
             System.err.println("Erro ao buscar caixa aberto: " + e.getMessage());
             return Optional.empty();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Pedido> listarPedidosDoDia() {
+        LocalDate hoje = LocalDate.now();
+
+        List<Pedido> todosPedidos = pedidoRepository.findAllWithItens();
+
+        return todosPedidos.stream()
+                .filter(p -> p.getCriadoEm() != null && p.getCriadoEm().toLocalDate().equals(hoje))
+                .collect(Collectors.toList());
     }
 }

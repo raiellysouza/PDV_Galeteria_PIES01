@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import com.example.pdv_galeteria.model.Combo;
+import com.example.pdv_galeteria.model.UsuarioSessao;
 import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.service.ComboService;
 import javafx.event.ActionEvent;
@@ -76,6 +77,12 @@ public class TelaProdutosController implements Initializable {
     @Autowired
     private ComboService comboService;
 
+    @Autowired
+    private UsuarioSessao usuarioSessao;
+
+    @FXML
+    private Label labelNomeUsuario;
+
     private double initialX = 13.0;
     private double initialY = 293.0;
     private double cardWidth = 240.0;
@@ -98,11 +105,29 @@ public class TelaProdutosController implements Initializable {
         PdvGaleteriaApplication.debugSpringContext();
         System.out.println("ProdutoService: " + (produtoService != null ? "INJETADO" : "NULO"));
 
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            labelNomeUsuario.setText(usuarioSessao.getNomeUsuario());
+        }
+
         timerBusca = new Timer();
+
+        atualizarNomeUsuarioNoMenu();
 
         carregarProdutos();
         combosController.setCombosContainer(combosContainer);
         combosController.carregarCombos();
+    }
+
+    private void atualizarNomeUsuarioNoMenu() {
+        if (labelNomeUsuario != null && usuarioSessao != null) {
+            String nome = usuarioSessao.getNomeUsuario();
+            System.out.println("Atualizando nome do usuário: " + nome);
+            labelNomeUsuario.setText(nome);
+        } else {
+            System.out.println("Erro: labelNomeUsuario ou usuarioSessao é nulo");
+            System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
+            System.out.println("usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
+        }
     }
 
     public void carregarProdutos() {
@@ -138,106 +163,6 @@ public class TelaProdutosController implements Initializable {
         }
     }
 
-
-    private void carregarTelaCombos() {
-        try {
-            if (combosContainer == null) {
-                System.err.println("combosContainer é null!");
-                return;
-            }
-
-            combosContainer.getChildren().clear();
-
-            List<Combo> combos = comboService.buscarTodosCombos();
-
-            for (Combo combo : combos) {
-                Pane cardCombo = combosController.criarCardCombo(combo);
-                combosContainer.getChildren().add(cardCombo);
-            }
-
-            System.out.println("Combos carregados: " + combos.size());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Erro ao carregar combos: " + e.getMessage());
-        }
-    }
-
-    private void renderizarProdutos(List<Produto> produtos) {
-        if (mainContentPane != null) {
-            mainContentPane.getChildren().clear();
-        } else {
-            System.err.println("mainContentPane é nulo! Usando contentPane como fallback.");
-            contentPane.getChildren().removeIf(node -> node instanceof Pane && node.getStyleClass().contains("card-produtos"));
-        }
-
-        if (produtos.isEmpty()) {
-            mostrarMensagemSemProdutos();
-            return;
-        }
-
-        List<Produto> produtosNormais = new ArrayList<>();
-        List<Produto> combos = new ArrayList<>();
-
-        for (Produto produto : produtos) {
-            if (produto.getNome() != null && produto.getNome().toLowerCase().contains("combo")) {
-                combos.add(produto);
-            } else {
-                produtosNormais.add(produto);
-            }
-        }
-
-        double startX = 315.0;
-        double startY = 240.0;
-        double cardWidth = 400.0;
-        double cardHeight = 178.0;
-        double horizontalGap = 59.0;
-        double verticalGap = 26.0;
-
-        if (!produtosNormais.isEmpty()) {
-
-
-            int count = 0;
-            for (Produto produto : produtosNormais) {
-                double currentX = (count % 2 == 0) ? startX : startX + cardWidth + horizontalGap;
-                double currentY = startY + ((count / 2) * (cardHeight + verticalGap));
-
-                Pane cardProduto = criarCardProduto(produto, false);
-                cardProduto.setLayoutX(currentX);
-                cardProduto.setLayoutY(currentY);
-
-                if (mainContentPane != null) {
-                    mainContentPane.getChildren().add(cardProduto);
-                } else {
-                    contentPane.getChildren().add(cardProduto);
-                }
-                count++;
-            }
-        }
-
-        if (!combos.isEmpty()) {
-            double combosStartY = startY + (Math.ceil(produtosNormais.size() / 2.0) * (cardHeight + verticalGap)) + 50;
-
-
-            int comboCount = 0;
-            for (Produto combo : combos) {
-                double currentX = (comboCount % 2 == 0) ? startX : startX + cardWidth + horizontalGap;
-                double currentY = combosStartY + ((comboCount / 2) * (cardHeight + verticalGap));
-
-                Pane cardCombo = criarCardProduto(combo, true);
-                cardCombo.setLayoutX(currentX);
-                cardCombo.setLayoutY(currentY);
-
-                if (mainContentPane != null) {
-                    mainContentPane.getChildren().add(cardCombo);
-                } else {
-                    contentPane.getChildren().add(cardCombo);
-                }
-                comboCount++;
-            }
-        }
-    }
-
     private Pane criarCardProduto(Produto produto, boolean isCombo) {
         Pane card = new Pane();
         card.getStyleClass().add("card-produtos");
@@ -270,6 +195,19 @@ public class TelaProdutosController implements Initializable {
         labelCategoria.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #374151;");
         categoriaPane.getChildren().add(labelCategoria);
 
+        int quantidade = produto.getQuantidade();
+        String textoQuantidade = quantidade + " unidades";
+
+        Label labelQuantidade = new Label(textoQuantidade);
+        labelQuantidade.setLayoutX(14);
+        labelQuantidade.setLayoutY(120);
+
+        if (quantidade <= 10) {
+            labelQuantidade.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #f68411;");
+        } else {
+            labelQuantidade.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #374151;");
+        }
+
         Label labelPreco = new Label(String.format("R$ %.2f", produto.getPreco()));
         labelPreco.setLayoutX(14);
         labelPreco.setLayoutY(82);
@@ -297,12 +235,11 @@ public class TelaProdutosController implements Initializable {
         btnApagar.setOnAction(e -> {
             System.out.println("Clicou para apagar produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
             executarExclusaoProduto(produto);
-            System.out.println("Clicou para apagar produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
-            executarExclusaoProduto(produto);
         });
 
         card.getChildren().addAll(
                 labelNome, categoriaPane, labelPreco,
+                labelQuantidade,
                 btnEditar, btnSegundo, btnApagar
         );
 
@@ -471,8 +408,14 @@ public class TelaProdutosController implements Initializable {
         try {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
+            if (usuarioSessao != null) {
+                usuarioSessao.logout();
+            }
+
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaSairPrograma.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
             ConfirmacaoSaidaController controller = loader.getController();
@@ -480,24 +423,22 @@ public class TelaProdutosController implements Initializable {
             Stage popupStage = new Stage();
             controller.setPopupStage(popupStage);
 
+            Stage currentStage = (Stage) campoBusca.getScene().getWindow();
+
             popupStage.setScene(new Scene(root));
             popupStage.setTitle("Confirmação de Saída");
             popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.initOwner(contentPane.getScene().getWindow());
+            popupStage.initOwner(currentStage);
             popupStage.setResizable(false);
             popupStage.centerOnScreen();
 
             popupStage.showAndWait();
 
             if (controller.isConfirmado()) {
-                System.out.println("Usuário confirmou saída, voltando para login...");
-                voltarParaTelaLogin();
-            } else {
-                System.out.println("Usuário cancelou a saída.");
+                voltarParaTelaLogin(currentStage);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao abrir pop-up de confirmação: " + e.getMessage());
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmação de Saída");
@@ -506,17 +447,16 @@ public class TelaProdutosController implements Initializable {
 
             Optional<ButtonType> resultado = alert.showAndWait();
             if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-                voltarParaTelaLogin();
+                if (usuarioSessao != null) {
+                    usuarioSessao.logout();
+                }
+                voltarParaTelaLogin((Stage) alert.getDialogPane().getScene().getWindow());
             }
         }
     }
 
-    private void voltarParaTelaLogin() {
+    private void voltarParaTelaLogin(Stage currentStage) {
         try {
-            System.out.println("Iniciando processo de volta para login...");
-
-            Stage stage = (Stage) contentPane.getScene().getWindow();
-
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaLogin.fxml"));
 
@@ -525,16 +465,12 @@ public class TelaProdutosController implements Initializable {
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login");
+            currentStage.centerOnScreen();
 
-            System.out.println("Tela de login carregada com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erro ao voltar para login: " + e.getMessage());
-
-            reiniciarAplicacaoCompleta();
         }
     }
 
@@ -560,71 +496,108 @@ public class TelaProdutosController implements Initializable {
         }
     }
 
-    private void testePopupBasico() {
-        System.out.println("TESTE BÁSICO DO POPUP...");
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pdv_galeteria/view/popupExclusaoConfirmacao.fxml"));
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("TESTE - Popup Básico");
-            stage.show();
-
-            System.out.println("POPUP BÁSICO ABERTO COM SUCESSO!");
-        } catch (Exception e) {
-            System.err.println("FALHA NO POPUP BÁSICO: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void verificarCaminhoFXML() {
-        System.out.println("VERIFICANDO CAMINHO DO FXML...");
-        String[] caminhos = {
-                "/com/example/pdv_galeteria/view/popupExclusaoConfirmacao.fxml",
-                "/view/popupExclusaoConfirmacao.fxml",
-                "popupExclusaoConfirmacao.fxml"
-        };
-
-        for (String caminho : caminhos) {
-            try {
-                URL url = getClass().getResource(caminho);
-                System.out.println(caminho + " → " + (url != null ? "ENCONTRADO" : "NÃO ENCONTRADO"));
-                if (url != null) {
-                    System.out.println(url);
-                }
-            } catch (Exception e) {
-                System.out.println(caminho + " → ERRO: " + e.getMessage());
-            }
-        }
-    }
-
-    private void mostrarMensagemSucesso(String mensagem) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-        alert.setTitle("Sucesso");
-        alert.setHeaderText(null);
-        alert.setContentText(mensagem);
-        alert.showAndWait();
-    }
-
     private void executarExclusaoProduto(Produto produto) {
         try {
-            System.out.println("EXECUTANDO EXCLUSÃO: " + produto.getNome() + " (ID: " + produto.getId() + ")");
-            if (produtoService == null) {
-                System.err.println("produtoService é nulo!");
-                mostrarMensagemErro("Erro: Serviço não disponível");
-                return;
+            System.out.println("Iniciando desativação do produto: " + produto.getNome() + " (ID: " + produto.getId() + ")");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/PopupExclusaoConfirmacao.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
+            Parent root = loader.load();
+
+            ConfirmacaoExclusaoController popupController = loader.getController();
+
+            popupController.setProduto(produto);
+
+            popupController.setOnConfirmacaoListener((confirmado) -> {
+                if (confirmado) {
+                    try {
+                        produtoService.desativarProduto(produto.getId());
+                        System.out.println("Produto desativado com sucesso");
+                        carregarProdutos();
+
+                    } catch (Exception e) {
+                        System.err.println("Erro ao desativar produto: " + e.getMessage());
+                        e.printStackTrace();
+                        mostrarMensagemErro("Erro ao desativar produto: " + e.getMessage());
+                    }
+                } else {
+                    System.out.println("Desativação cancelada pelo usuário");
+                }
+            });
+
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Confirmar Exclusão");
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setScene(new Scene(root));
+            popupStage.setResizable(false);
+
+            popupController.setPopupStage(popupStage);
+
+            if (contentPane.getScene() != null && contentPane.getScene().getWindow() != null) {
+                popupStage.initOwner(contentPane.getScene().getWindow());
             }
 
-            produtoService.deletar(produto.getId());
-            System.out.println("Produto excluído do banco com sucesso");
+            popupStage.showAndWait();
 
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar popup de confirmação: " + e.getMessage());
+            e.printStackTrace();
+
+            mostrarConfirmacaoFallback(produto);
+        } catch (Exception e) {
+            System.err.println("ERRO ao desativar produto: " + e.getMessage());
+            e.printStackTrace();
+
+            Platform.runLater(() -> {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Erro");
+                errorAlert.setHeaderText("Não foi possível desativar o produto");
+                errorAlert.setContentText("Erro: " + e.getMessage() +
+                        "\n\nTente novamente ou contate o suporte.");
+                errorAlert.showAndWait();
+            });
+        }
+    }
+
+    private void mostrarConfirmacaoFallback(Produto produto) {
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Desativar Produto");
+        confirmAlert.setHeaderText("Desativar '" + produto.getNome() + "'?");
+        confirmAlert.setContentText(
+                "Este produto está sendo usado em combos!\n\n" +
+                        "Ao desativar:\n" +
+                        "• Estoque será zerado (0 unidades)\n" +
+                        "• Produto sairá da lista de produtos\n" +
+                        "• Continuará disponível nos combos existentes\n\n" +
+                        "Deseja continuar?"
+        );
+
+        confirmAlert.getButtonTypes().setAll(
+                new ButtonType("Sim, Desativar", ButtonBar.ButtonData.YES),
+                new ButtonType("Cancelar", ButtonBar.ButtonData.NO)
+        );
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isPresent() && result.get().getButtonData() == ButtonBar.ButtonData.YES) {
+            produtoService.desativarProduto(produto.getId());
+            System.out.println("Produto desativado com sucesso");
             carregarProdutos();
 
-            mostrarMensagemSucesso("Produto '" + produto.getNome() + "' excluído com sucesso!");
-        } catch (Exception e) {
-            System.err.println("ERRO na exclusão: " + e.getMessage());
-            e.printStackTrace();
-            mostrarMensagemErro("Erro ao excluir produto: " + e.getMessage());
+            Platform.runLater(() -> {
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Produto Desativado");
+                successAlert.setHeaderText(null);
+                successAlert.setContentText(
+                        "Produto '" + produto.getNome() + "' desativado!\n\n" +
+                                "Status: Desativado\n" +
+                                "Estoque: 0 unidades\n" +
+                                "Disponível em combos: Sim"
+                );
+                successAlert.showAndWait();
+            });
         }
     }
 
@@ -638,14 +611,9 @@ public class TelaProdutosController implements Initializable {
                 return;
             }
 
-            URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEditarProdutos.fxml");
-            if (fxmlUrl == null) {
-                System.err.println("Arquivo FXML não encontrado: TelaEditarProdutos.fxml");
-                mostrarMensagemErro("Arquivo de edição não encontrado!");
-                return;
-            }
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaEditarProdutos.fxml"));
 
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
             loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
 
             Parent root = loader.load();
@@ -671,6 +639,7 @@ public class TelaProdutosController implements Initializable {
             popupStage.showAndWait();
 
             System.out.println("Popup de edição fechado");
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Erro ao abrir tela de edição: " + e.getMessage());
@@ -918,26 +887,19 @@ public class TelaProdutosController implements Initializable {
     }
 
     @FXML
-    private void handleAbrirTelaCaixa(ActionEvent event) {
+    private void abrirTelaCaixa(ActionEvent event) {
         try {
             System.out.println("Abrindo tela do caixa...");
 
             URL fxmlUrl = getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaCaixa.fxml");
-            if (fxmlUrl == null) {
-                mostrarMensagemErro("Arquivo da tela do caixa não encontrado!");
-                return;
-            }
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
-            Parent root = loader.load();
-
-            CaixaController controller = loader.getController();
             if (PdvGaleteriaApplication.getSpringContext() != null) {
-                CaixaService caixaService = PdvGaleteriaApplication.getSpringContext().getBean(CaixaService.class);
-                controller.setCaixaService(caixaService);
-                System.out.println("CaixaService injetado manualmente");
+                loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
             }
+
+            Parent root = loader.load();
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -945,11 +907,9 @@ public class TelaProdutosController implements Initializable {
             stage.centerOnScreen();
 
             System.out.println("Tela do caixa aberta com sucesso!");
-
         } catch (Exception e) {
             System.err.println("Erro ao abrir tela do caixa: " + e.getMessage());
             e.printStackTrace();
-            mostrarMensagemErro("Erro ao abrir tela do caixa: " + e.getMessage());
         }
     }
 

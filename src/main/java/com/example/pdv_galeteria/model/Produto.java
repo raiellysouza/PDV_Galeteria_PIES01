@@ -1,28 +1,11 @@
 package com.example.pdv_galeteria.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.math.BigDecimal;
 
-@Data
 @Entity
 @Table(name = "produtos")
 public class Produto {
-
-    public Produto() {
-    }
-
-    public Produto(String nome, Double preco, Integer quantidade) {
-        this.nome = nome;
-        this.preco = preco;
-        this.quantidade = quantidade;
-    }
-
-    public Produto(String nome, BigDecimal preco, Integer quantidade) {
-        this.nome = nome;
-        this.preco = preco.doubleValue();
-        this.quantidade = quantidade;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +19,36 @@ public class Produto {
 
     @Column(nullable = false)
     private Integer quantidade;
+
+    @Column(name = "categoria")
+    private String categoria;
+
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo;
+
+    public Produto() {
+        this.preco = 0.0;
+        this.quantidade = 0;
+        this.ativo = true;
+        this.categoria = null;
+
+    }
+
+    public Produto(String nome, Double preco, Integer quantidade) {
+        this();
+        this.nome = nome;
+        this.preco = preco != null ? preco : 0.0;
+        this.quantidade = quantidade != null ? quantidade : 0;
+        this.ativo = true;
+    }
+
+    public Produto(String nome, BigDecimal preco, Integer quantidade) {
+        this();
+        this.nome = nome;
+        this.preco = preco != null ? preco.doubleValue() : 0.0;
+        this.quantidade = quantidade != null ? quantidade : 0;
+        this.ativo = true;
+    }
 
     public Long getId() {
         return id;
@@ -54,31 +67,57 @@ public class Produto {
     }
 
     public Double getPreco() {
-        return preco;
+        return preco != null ? preco : 0.0;
     }
 
     public void setPreco(Double preco) {
-        this.preco = preco;
+        this.preco = preco != null ? preco : 0.0;
     }
 
     public void setPreco(BigDecimal preco) {
-        this.preco = preco.doubleValue();
+        this.preco = preco != null ? preco.doubleValue() : 0.0;
     }
 
     public Integer getQuantidade() {
-        return quantidade;
+        return quantidade != null ? quantidade : 0;
     }
 
     public void setQuantidade(Integer quantidade) {
-        this.quantidade = quantidade;
+        this.quantidade = quantidade != null ? quantidade : 0;
     }
 
-    public BigDecimal getPrecoAsBigDecimal() {
-        return BigDecimal.valueOf(preco);
+    public Boolean getAtivo() {
+        return ativo != null ? ativo : true;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo != null ? ativo : true;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     @Override
     public String toString() {
-        return nome + " - R$ " + String.format("%.2f", preco);
+        return nome + " - R$ " + String.format("%.2f", getPreco());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Produto produto = (Produto) o;
+        return id != null && id.equals(produto.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }
