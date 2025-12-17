@@ -1,4 +1,6 @@
 package com.example.pdv_galeteria.controller;
+import com.example.pdv_galeteria.service.PdfService;
+import com.example.pdv_galeteria.service.ImpressaoService;
 
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.*;
@@ -55,6 +57,12 @@ public class DashboardController implements Initializable {
 
     @Autowired
     private ProdutoService produtoService;
+
+    @Autowired
+    private PdfService pdfService;
+
+    @Autowired
+    private ImpressaoService impressaoService;
 
     @FXML
     private Label lblTotalVendas;
@@ -121,6 +129,9 @@ public class DashboardController implements Initializable {
                 }
                 if (produtoService == null) {
                     produtoService = PdvGaleteriaApplication.getSpringContext().getBean(ProdutoService.class);
+                }
+                if (impressaoService == null) {
+                    impressaoService = PdvGaleteriaApplication.getSpringContext().getBean(ImpressaoService.class);
                 }
             }
 
@@ -492,15 +503,15 @@ public class DashboardController implements Initializable {
         Button btnEditar = criarBotaoAcao("editar", "Editar pedido",
                 e -> editarPedido(pedido.getId()));
 
-        /**Button btnImprimir = criarBotaoAcao("imprimir", "Imprimir pedido",
-                e -> imprimirPedido(pedido.getId()));**/
+        Button btnImprimir = criarBotaoAcao("imprimir", "Imprimir pedido",
+                e -> imprimirPedido(pedido.getId()));
 
         Button btnExcluir = criarBotaoAcao("excluir", "Excluir pedido",
                 e -> confirmarExclusaoPedido(pedido.getId()));
 
         btnExcluir.setStyle("-fx-background-color: #fee2e2; -fx-border-color: #fca5a5;");
 
-        botoes.getChildren().addAll(btnVisualizar, btnEditar,btnExcluir);
+        botoes.getChildren().addAll(btnVisualizar, btnEditar, btnImprimir, btnExcluir);
         return botoes;
     }
 
@@ -1104,7 +1115,7 @@ public class DashboardController implements Initializable {
         }
     }
 
-    /**
+
     private void mostrarReciboEmTela(String conteudo) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Recibo do Pedido");
@@ -1137,50 +1148,166 @@ public class DashboardController implements Initializable {
 
     private void imprimirPedido(Long pedidoId) {
         try {
+            // Verificar se o serviço está disponível
+            if (impressaoService == null) {
+                System.err.println("ERRO: ImpressaoService é nulo!");
+                if (PdvGaleteriaApplication.getSpringContext() != null) {
+                    impressaoService = PdvGaleteriaApplication.getSpringContext().getBean(ImpressaoService.class);
+                }
+                if (impressaoService == null) {
+                    mostrarErro("Serviço de impressão não disponível. Reinicie a aplicação.");
+                    return;
+                }
+            }
+
+            // Buscar pedido com todos os dados necessários
             Pedido pedido = pedidoService.buscarPedidoComItens(pedidoId);
+            if (pedido == null) {
+                mostrarErro("Pedido não encontrado!");
+                return;
+            }
+
+            System.out.println("=== IMPRIMINDO PEDIDO #" + pedidoId + " ===");
+            System.out.println("Cliente: " + pedido.getCliente());
+            System.out.println("Total: R$ " + pedido.getTotal());
 
             Alert alert = new Alert(Alert.AlertType.NONE);
-            alert.setTitle("Imprimir Pedido #" + pedidoId);
-            alert.setHeaderText("Escolha o formato de impressão:");
+            alert.setTitle("Imprimir Comanda #" + pedidoId);
+            alert.setHeaderText("Escolha a opção de impressão:");
 
+            ButtonType btnImprimirComanda = new ButtonType("Imprimir Comanda");
             ButtonType btnPDF = new ButtonType("Gerar PDF");
             ButtonType btnTXT = new ButtonType("Gerar TXT");
-            ButtonType btnCopiar = new ButtonType("Copiar");
+            ButtonType btnPreview = new ButtonType("Visualizar Preview");
             ButtonType btnCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-            alert.getButtonTypes().setAll(btnPDF, btnTXT, btnCopiar, btnCancelar);
+            alert.getButtonTypes().setAll(btnImprimirComanda, btnPDF, btnTXT, btnPreview, btnCancelar);
 
-            TextArea preview = new TextArea(gerarReciboFormatado(pedido));
+            // Gerar preview da comanda
+            String previewComanda = "";
+            try {
+                previewComanda = impressaoService.gerarPreviewComanda(pedido);
+            } catch (Exception e) {
+                System.err.println("Erro ao gerar preview: " + e.getMessage());
+                e.printStackTrace();
+                previewComanda = "Erro ao gerar preview: " + e.getMessage();
+            }
+
+            TextArea preview = new TextArea(previewComanda);
             preview.setEditable(false);
-            preview.setWrapText(true);
-            preview.setPrefHeight(150);
-            preview.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 11px;");
+            preview.setWrapText(false);
+            preview.setPrefHeight(250);
+            preview.setPrefWidth(450);
+            preview.setStyle("-fx-font-family: 'Courier New', monospace; -fx-font-size: 11px;");
 
             VBox content = new VBox(10);
             content.getChildren().addAll(
-                    new Label("Prévia do pedido:"),
+                    new Label("Prévia da comanda:"),
                     preview
             );
 
             alert.getDialogPane().setContent(content);
+            alert.getDialogPane().setPrefSize(500, 400);
 
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.isPresent()) {
-                if (result.get() == btnPDF) {
+                if (result.get() == btnImprimirComanda) {
+                    // Imprimir comanda usando ImpressaoService
+                    System.out.println("Tentando imprimir comanda...");
+                    try {
+                        boolean sucesso = impressaoService.imprimirComanda(pedido);
+                        if (sucesso) {
+                            mostrarSucesso("Comanda enviada para impressão com sucesso!");
+                            System.out.println("Impressão realizada com sucesso!");
+                        } else {
+                            // Se falhar, salva o arquivo
+                            File arquivo = impressaoService.salvarArquivoImpressao(pedido);
+                            mostrarSucesso("Impressão não realizada. Arquivo salvo em: " + arquivo.getAbsolutePath());
+                            System.out.println("Arquivo salvo em: " + arquivo.getAbsolutePath());
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Erro ao imprimir: " + e.getMessage());
+                        e.printStackTrace();
+                        try {
+                            File arquivo = impressaoService.salvarArquivoImpressao(pedido);
+                            mostrarErro("Erro ao imprimir. Arquivo salvo em: " + arquivo.getAbsolutePath() + "\nErro: " + e.getMessage());
+                        } catch (Exception ex) {
+                            mostrarErro("Erro ao imprimir e salvar arquivo: " + e.getMessage());
+                        }
+                    }
+                } else if (result.get() == btnPDF) {
                     gerarPDFPedido(pedido);
                 } else if (result.get() == btnTXT) {
                     gerarTXTPedido(pedido);
-                } else if (result.get() == btnCopiar) {
-                    copiarReciboPedido(pedido);
+                } else if (result.get() == btnPreview) {
+                    mostrarPreviewComanda(pedido);
                 }
             }
 
         } catch (Exception e) {
-            mostrarErro("Erro ao gerar recibo: " + e.getMessage());
+            System.err.println("ERRO CRÍTICO ao imprimir comanda: " + e.getMessage());
             e.printStackTrace();
+            mostrarErro("Erro ao imprimir comanda: " + e.getMessage() + "\n\nDetalhes no console.");
         }
-    }**/
+    }
+
+    private void mostrarPreviewComanda(Pedido pedido) {
+        try {
+            // Verificar se o serviço está disponível
+            if (impressaoService == null) {
+                System.err.println("ERRO: ImpressaoService é nulo!");
+                if (PdvGaleteriaApplication.getSpringContext() != null) {
+                    impressaoService = PdvGaleteriaApplication.getSpringContext().getBean(ImpressaoService.class);
+                }
+                if (impressaoService == null) {
+                    mostrarErro("Serviço de impressão não disponível. Reinicie a aplicação.");
+                    return;
+                }
+            }
+
+            System.out.println("Gerando preview para pedido #" + pedido.getId());
+            String preview = impressaoService.gerarPreviewComanda(pedido);
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Preview da Comanda - Pedido #" + pedido.getId());
+            alert.setHeaderText("Visualização da comanda");
+            alert.setWidth(550);
+            alert.setHeight(650);
+
+            TextArea textArea = new TextArea(preview);
+            textArea.setEditable(false);
+            textArea.setWrapText(false);
+            textArea.setStyle("-fx-font-family: 'Courier New', monospace; -fx-font-size: 11px;");
+            textArea.setPrefSize(500, 580);
+
+            ScrollPane scrollPane = new ScrollPane(textArea);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+            scrollPane.setPrefSize(500, 580);
+
+            ButtonType copiarButton = new ButtonType("Copiar");
+            ButtonType fecharButton = new ButtonType("Fechar", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(copiarButton, fecharButton);
+
+            alert.getDialogPane().setContent(scrollPane);
+            alert.getDialogPane().setPrefSize(550, 650);
+
+            alert.showAndWait().ifPresent(buttonType -> {
+                if (buttonType == copiarButton) {
+                    Clipboard clipboard = Clipboard.getSystemClipboard();
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(preview);
+                    clipboard.setContent(content);
+                    mostrarSucesso("Preview copiado para a área de transferência!");
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Erro ao gerar preview: " + e.getMessage());
+            e.printStackTrace();
+            mostrarErro("Erro ao gerar preview: " + e.getMessage() + "\n\nDetalhes no console.");
+        }
+    }
 
     private Button criarBotaoOpcao(String texto, String tooltip) {
         Button btn = new Button(texto);
@@ -1194,7 +1321,7 @@ public class DashboardController implements Initializable {
         return btn;
     }
 
-    /**
+
     private void gerarPDFPedido(Pedido pedido) {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -1302,7 +1429,7 @@ public class DashboardController implements Initializable {
 
         StringBuilder sb = new StringBuilder();
         sb.append("========================================\n");
-        sb.append("           GALETERIA PDV               \n");
+        sb.append("           GALETERIA DO IRMÃO          \n");
         sb.append("========================================\n\n");
         sb.append("RECIBO DO PEDIDO\n");
         sb.append("Número: #").append(String.format("%03d", pedido.getId())).append("\n");
@@ -1339,5 +1466,5 @@ public class DashboardController implements Initializable {
         sb.append("========================================\n");
 
         return sb.toString();
-    }**/
+    }
 }

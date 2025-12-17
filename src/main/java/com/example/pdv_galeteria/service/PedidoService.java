@@ -18,13 +18,16 @@ import java.util.stream.Collectors;
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
+    private final ImpressaoService impressaoService;
 
     @Autowired
     @Qualifier("caixaRepository")
     private CaixaRepository caixaRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository){
+    @Autowired
+    public PedidoService(PedidoRepository pedidoRepository, ImpressaoService impressaoService){
         this.pedidoRepository = pedidoRepository;
+        this.impressaoService = impressaoService;
     }
 
     @Transactional
@@ -33,7 +36,15 @@ public class PedidoService {
             pedido.setStatus(StatusPedido.REGISTRADO);
         }
         pedido.recalcularTotal();
-        return pedidoRepository.save(pedido);
+        Pedido pedidoSalvo = pedidoRepository.save(pedido);
+    
+        try {
+            impressaoService.imprimirAutomaticamente(pedidoSalvo);
+        } catch (Exception e) {
+            System.err.println("Erro na impressão automática do pedido #" + pedidoSalvo.getId() + ": " + e.getMessage());
+        }
+        
+        return pedidoSalvo;
     }
 
     @Transactional(readOnly = true)

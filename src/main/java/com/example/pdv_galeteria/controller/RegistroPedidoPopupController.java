@@ -3,6 +3,7 @@ package com.example.pdv_galeteria.controller;
 import com.example.pdv_galeteria.model.*;
 import com.example.pdv_galeteria.service.CaixaService;
 import com.example.pdv_galeteria.service.PedidoService;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -86,7 +87,10 @@ public class RegistroPedidoPopupController implements Initializable {
     private Map<Produto, Integer> carrinho;
     private double totalPedido;
     private DecimalFormat df = new DecimalFormat("#,##0.00");
+
     private Stage popupStage;
+    private ToggleGroup grupoFormaPagamento = new ToggleGroup();
+
     private static Long contadorVendas = 1L;
 
     private List<ToggleButton> botoesFormaPagamento = new ArrayList<>();
@@ -655,6 +659,7 @@ public class RegistroPedidoPopupController implements Initializable {
             }
         }
 
+        System.out.println("=== VALIDAÇÃO CONCLUÍDA COM SUCESSO ===");
         return true;
     }
 
@@ -731,6 +736,15 @@ public class RegistroPedidoPopupController implements Initializable {
         sucesso.setHeaderText(null);
         sucesso.setContentText(mensagem);
         sucesso.showAndWait();
+    }
+
+    public void setPopupStage(Stage stage) {
+        this.popupStage = stage;
+    }
+
+    public void setCaixaService(CaixaService caixaService) {
+        this.caixaService = caixaService;
+        System.out.println("CaixaService injetado no pop-up controller: " + (caixaService != null));
     }
 
     @FXML
@@ -984,14 +998,6 @@ public class RegistroPedidoPopupController implements Initializable {
         } catch (Exception e) {
             return "0,00";
         }
-    }
-
-    public void setPopupStage(Stage stage) {
-        this.popupStage = stage;
-    }
-
-    public void setCaixaService(CaixaService caixaService) {
-        this.caixaService = caixaService;
     }
 
     public void setPedidoService(PedidoService pedidoService) {

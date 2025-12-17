@@ -2,69 +2,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.6</version>
-        <relativePath />
+        <relativePath/>
     </parent>
+
     <groupId>com.example</groupId>
     <artifactId>pdv-galeteria</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>pdv-galeteria</name>
-    <description>Backend PDV para Galeteria</description>
-    <url />
-    <licenses>
-        <license />
-    </licenses>
-    <developers>
-        <developer />
-    </developers>
-    <scm>
-        <connection />
-        <developerConnection />
-        <tag />
-        <url />
-    </scm>
+
     <properties>
         <java.version>21</java.version>
         <javafx.version>21.0.1</javafx.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.16.1</version>
         </dependency>
 
         <dependency>
@@ -72,24 +61,13 @@
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itext7-core</artifactId>
@@ -111,6 +89,7 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -123,28 +102,69 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
+
                 <configuration>
-                    <mainClass>com.example.pdvgaleteria.PdvGaleteriaApplication</mainClass>
+                    <mainClass>com.example.pdv_galeteria.PdvGaleteriaApplication</mainClass>
                 </configuration>
+
+                <executions>
+
+                    <execution>
+                        <id>teste-impressao</id>
+                        <configuration>
+                            <mainClass>com.example.pdv_galeteria.TesteImpressaoComanda</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>criar-pedido</id>
+                        <configuration>
+                            <mainClass>com.example.pdv_galeteria.CriarPedidoNoBanco</mainClass>
+                            <classpathScope>test</classpathScope>
+                            <commandlineArgs>--criar-pedido</commandlineArgs>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>inserir-pedido-sql</id>
+                        <configuration>
+                            <mainClass>com.example.pdv_galeteria.InserirPedidoSQL</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>imprimir-comanda</id>
+                        <configuration>
+                            <mainClass>com.example.pdv_galeteria.ImprimirComanda</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>listar-impressoras</id>
+                        <configuration>
+                            <mainClass>com.example.pdv_galeteria.ListarImpressoras</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </execution>
+
+                </executions>
             </plugin>
+
         </plugins>
+
         <resources>
             <resource>
                 <directory>src</directory>
@@ -156,5 +176,6 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+
     </build>
 </project>
