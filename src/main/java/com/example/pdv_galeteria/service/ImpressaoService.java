@@ -10,6 +10,7 @@ import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.Copies;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,13 +28,11 @@ public class ImpressaoService {
     @Value("${impressora.auto:true}")
     private boolean impressaoAutomatica;
 
-
     public ImpressaoService() {
         this.nomeImpressoraSistema = "";
         this.nomeImpressora = "PDV Galeteria";
         this.impressaoAutomatica = true;
     }
-    
 
     public void setNomeImpressoraSistema(String nome) {
         this.nomeImpressoraSistema = nome;
@@ -50,14 +49,14 @@ public class ImpressaoService {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         outputStream.write(INIT);
-        
+
         outputStream.write(ESC);
-        outputStream.write(0x74); 
-        outputStream.write(0x02); 
+        outputStream.write(0x74);
+        outputStream.write(0x02);
 
         outputStream.write(ESC);
         outputStream.write(0x61);
-        outputStream.write(0x00); 
+        outputStream.write(0x00);
 
         escreverLinha(outputStream, "-".repeat(32));
         String nomeComanda = nomeImpressora.replace("IRMAO", "IRMÃO");
@@ -68,7 +67,7 @@ public class ImpressaoService {
         outputStream.write(BOLD_ON);
         escreverLinhaSemPular(outputStream, String.format("PEDIDO #%06d", pedido.getId()));
         outputStream.write(BOLD_OFF);
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         escreverLinhaSemPular(outputStream, "Data: " + pedido.getCriadoEm().format(formatter));
 
@@ -79,26 +78,26 @@ public class ImpressaoService {
         if (pedido.getTelefone() != null && !pedido.getTelefone().trim().isEmpty()) {
             escreverLinhaSemPular(outputStream, "Telefone: " + pedido.getTelefone());
         }
-        
+
         if (pedido.getEndereco() != null && !pedido.getEndereco().trim().isEmpty()) {
             String enderecoCompleto = pedido.getEndereco();
             if (pedido.getPontoReferencia() != null && !pedido.getPontoReferencia().trim().isEmpty()) {
                 enderecoCompleto += " - " + pedido.getPontoReferencia();
             }
             escreverTextoQuebradoSemPular(outputStream, "Entrega: ", enderecoCompleto, 23);
-            
+
             if (pedido.getTelefone() != null && !pedido.getTelefone().trim().isEmpty()) {
                 escreverLinhaSemPular(outputStream, "Telefone: " + pedido.getTelefone());
             }
         }
-        
+
         if (pedido.getTempoEstimado() != null && !pedido.getTempoEstimado().trim().isEmpty()) {
             escreverLinhaSemPular(outputStream, "Tempo estimado: " + pedido.getTempoEstimado());
         }
-        
+
         outputStream.write(FEED_LINE);
         escreverLinhaSemPular(outputStream, "-".repeat(32));
-        
+
         outputStream.write(BOLD_ON);
         escreverLinhaSemPular(outputStream, String.format("%-16s %3s %8s", "PRODUTO", "QTD", "TOTAL"));
         outputStream.write(BOLD_OFF);
@@ -116,14 +115,14 @@ public class ImpressaoService {
                     produto, item.getQuantidade(), subtotal);
             escreverLinhaSemPular(outputStream, linha);
         }
-        
-        if (pedido.getTaxaEntrega() != null && pedido.getTaxaEntrega() > 0) {
+
+        if (pedido.getTaxaEntrega() != null && pedido.getTaxaEntrega().compareTo(BigDecimal.ZERO) > 0) {
             escreverLinhaSemPular(outputStream, String.format("%-20s R$ %7.2f",
-                    "taxa de entrega", pedido.getTaxaEntrega()));
+                    "taxa de entrega", pedido.getTaxaEntrega().doubleValue()));
         }
-        
+
         outputStream.write(FEED_LINE);
-        
+
         if (pedido.getObservacoes() != null && !pedido.getObservacoes().trim().isEmpty()) {
             escreverTextoQuebradoSemPular(outputStream, "obs: ", pedido.getObservacoes(), 28);
             outputStream.write(FEED_LINE);
@@ -131,22 +130,22 @@ public class ImpressaoService {
 
         escreverLinhaSemPular(outputStream, "-".repeat(32));
 
-        double totalComTaxa = pedido.getTotal();
-        if (pedido.getTaxaEntrega() != null) {
-            totalComTaxa += pedido.getTaxaEntrega();
-        }
+        BigDecimal totalPedido = BigDecimal.valueOf(pedido.getTotal() != null ? pedido.getTotal() : 0.0);
+        BigDecimal taxaEntrega = pedido.getTaxaEntrega() != null ? pedido.getTaxaEntrega() : BigDecimal.ZERO;
+        BigDecimal totalComTaxa = totalPedido.add(taxaEntrega);
+
         outputStream.write(BOLD_ON);
-        escreverLinhaSemPular(outputStream, String.format("TOTAL: R$ %.2f", totalComTaxa));
+        escreverLinhaSemPular(outputStream, String.format("TOTAL: R$ %.2f", totalComTaxa.doubleValue()));
         outputStream.write(BOLD_OFF);
-        
+
         if (pedido.getFormaPagamento() != null && !pedido.getFormaPagamento().trim().isEmpty()) {
             escreverLinhaSemPular(outputStream, "Pagamento: " + pedido.getFormaPagamento());
         }
-        
+
         if (pedido.getValorPago() != null && pedido.getValorPago() > 0) {
             escreverLinhaSemPular(outputStream, String.format("Valor Pago: R$ %.2f", pedido.getValorPago()));
         }
-        
+
         if (pedido.getTroco() != null && pedido.getTroco() > 0) {
             escreverLinhaSemPular(outputStream, String.format("Troco: R$ %.2f", pedido.getTroco()));
         }
@@ -162,19 +161,19 @@ public class ImpressaoService {
 
         return outputStream.toByteArray();
     }
-    
+
     private void escreverLinha(ByteArrayOutputStream outputStream, String texto) throws IOException {
         byte[] bytes = converterParaCP860(texto);
         outputStream.write(bytes);
         outputStream.write(FEED_LINE);
     }
-    
+
     private void escreverLinhaSemPular(ByteArrayOutputStream outputStream, String texto) throws IOException {
         byte[] bytes = converterParaCP860(texto);
         outputStream.write(bytes);
         outputStream.write(FEED_LINE);
     }
-    
+
     private byte[] converterParaCP860(String texto) {
         try {
             java.nio.charset.Charset charset = java.nio.charset.Charset.forName("IBM860");
@@ -191,26 +190,26 @@ public class ImpressaoService {
             }
         }
     }
-    
+
     private void escreverTextoQuebrado(ByteArrayOutputStream outputStream, String prefixo, String texto, int larguraMaxima) throws IOException {
         if (texto == null || texto.trim().isEmpty()) {
             return;
         }
-        
+
         int larguraPrimeiraLinha = larguraMaxima - prefixo.length();
-        
+
         if (texto.length() <= larguraPrimeiraLinha) {
             escreverLinha(outputStream, prefixo + texto);
             return;
         }
-        
+
         String[] palavras = texto.split(" ");
         StringBuilder linhaAtual = new StringBuilder();
         boolean primeiraLinha = true;
-        
+
         for (String palavra : palavras) {
             int larguraLinha = primeiraLinha ? larguraPrimeiraLinha : larguraMaxima;
-            
+
             if (linhaAtual.length() + palavra.length() + 1 <= larguraLinha) {
                 if (linhaAtual.length() > 0) {
                     linhaAtual.append(" ");
@@ -240,21 +239,21 @@ public class ImpressaoService {
         if (texto == null || texto.trim().isEmpty()) {
             return;
         }
-        
+
         int larguraPrimeiraLinha = larguraMaxima - prefixo.length();
-        
+
         if (texto.length() <= larguraPrimeiraLinha) {
             escreverLinhaSemPular(outputStream, prefixo + texto);
             return;
         }
-        
+
         String[] palavras = texto.split(" ");
         StringBuilder linhaAtual = new StringBuilder();
         boolean primeiraLinha = true;
-        
+
         for (String palavra : palavras) {
             int larguraLinha = primeiraLinha ? larguraPrimeiraLinha : larguraMaxima;
-            
+
             if (linhaAtual.length() + palavra.length() + 1 <= larguraLinha) {
                 if (linhaAtual.length() > 0) {
                     linhaAtual.append(" ");
@@ -270,7 +269,7 @@ public class ImpressaoService {
                 linhaAtual = new StringBuilder(palavra);
             }
         }
-        
+
         if (linhaAtual.length() > 0) {
             if (primeiraLinha) {
                 escreverLinhaSemPular(outputStream, prefixo + linhaAtual);
@@ -322,7 +321,7 @@ public class ImpressaoService {
     private boolean imprimirViaPrintService(byte[] dadosEscPos, Pedido pedido) {
         try {
             PrintService impressora = buscarImpressora();
-            
+
             if (impressora == null) {
                 System.err.println("Nenhuma impressora encontrada.");
                 System.err.println("Verifique se a impressora está instalada e configurada.");
@@ -341,9 +340,9 @@ public class ImpressaoService {
             System.out.println("Enviando dados para impressão...");
             printJob.print(doc, attributes);
             System.out.println("Dados enviados para a impressora com sucesso!");
-            
+
             return true;
-            
+
         } catch (PrintException e) {
             System.err.println("Erro ao imprimir: " + e.getMessage());
             e.printStackTrace();
@@ -357,18 +356,18 @@ public class ImpressaoService {
 
     private PrintService buscarImpressora() {
         PrintService[] servicos = PrintServiceLookup.lookupPrintServices(null, null);
-        
+
         if (nomeImpressoraSistema != null && !nomeImpressoraSistema.trim().isEmpty()) {
             String nomeBusca = nomeImpressoraSistema.trim();
             System.out.println("Buscando impressora: " + nomeBusca);
-            
+
             for (PrintService servico : servicos) {
                 String nomeServico = servico.getName();
                 if (nomeServico.toLowerCase().contains(nomeBusca.toLowerCase())) {
                     return servico;
                 }
             }
-            
+
             System.err.println("Impressora '" + nomeBusca + "' não encontrada.");
             System.err.println("Impressoras disponíveis:");
             for (PrintService servico : servicos) {
@@ -376,19 +375,19 @@ public class ImpressaoService {
             }
             return null;
         }
-        
+
         PrintService padrao = PrintServiceLookup.lookupDefaultPrintService();
         if (padrao != null) {
             System.out.println("Usando impressora padrão: " + padrao.getName());
             return padrao;
         }
-        
+
         return null;
     }
 
     private void listarImpressorasDisponiveis() {
         PrintService[] servicos = PrintServiceLookup.lookupPrintServices(null, null);
-        
+
         if (servicos.length == 0) {
             System.err.println("Nenhuma impressora encontrada no sistema.");
         } else {
@@ -416,10 +415,9 @@ public class ImpressaoService {
         }
     }
 
-
     public String gerarPreviewComanda(Pedido pedido) {
         StringBuilder preview = new StringBuilder();
-        
+
         preview.append("-".repeat(32)).append("\n");
         preview.append("\n");
         String nomeComanda = nomeImpressora.replace("IRMAO", "IRMÃO");
@@ -429,21 +427,21 @@ public class ImpressaoService {
         preview.append("\n");
         preview.append(String.format("PEDIDO #%06d", pedido.getId())).append("\n");
         preview.append("\n");
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         preview.append("Data: ").append(pedido.getCriadoEm().format(formatter)).append("\n");
         preview.append("\n");
-        
+
         if (pedido.getCliente() != null && !pedido.getCliente().trim().isEmpty()) {
             preview.append("Cliente: ").append(pedido.getCliente()).append("\n");
             preview.append("\n");
         }
-        
+
         if (pedido.getTelefone() != null && !pedido.getTelefone().trim().isEmpty()) {
             preview.append("Telefone: ").append(pedido.getTelefone()).append("\n");
             preview.append("\n");
         }
-        
+
         if (pedido.getEndereco() != null && !pedido.getEndereco().trim().isEmpty()) {
             String enderecoCompleto = pedido.getEndereco();
             if (pedido.getPontoReferencia() != null && !pedido.getPontoReferencia().trim().isEmpty()) {
@@ -451,92 +449,88 @@ public class ImpressaoService {
             }
             preview.append("Entrega: ").append(enderecoCompleto).append("\n");
             preview.append("\n");
-            
+
             if (pedido.getTelefone() != null && !pedido.getTelefone().trim().isEmpty()) {
                 preview.append("Telefone: ").append(pedido.getTelefone()).append("\n");
                 preview.append("\n");
             }
         }
-        
+
         if (pedido.getTempoEstimado() != null && !pedido.getTempoEstimado().trim().isEmpty()) {
             preview.append("Tempo estimado: ").append(pedido.getTempoEstimado()).append("\n");
             preview.append("\n");
         }
-        
+
         preview.append("-".repeat(35)).append("\n");
         preview.append("\n");
         preview.append(String.format("%-20s %3s %10s", "PRODUTO", "QTD", "TOTAL")).append("\n");
         preview.append("\n");
         preview.append("-".repeat(35)).append("\n");
-        
-    
+
         List<ItemPedido> itens = pedido.getItens();
         for (ItemPedido item : itens) {
             String produto = item.getProduto();
             if (produto.length() > 20) {
                 produto = produto.substring(0, 20);
             }
-            
+
             double subtotal = item.getQuantidade() * item.getPrecoUnitario();
             String linha = String.format("%-20s %3d R$ %10.2f",
                     produto, item.getQuantidade(), subtotal);
             preview.append(linha).append("\n");
         }
-        
-    
-        if (pedido.getTaxaEntrega() != null && pedido.getTaxaEntrega() > 0) {
+
+        if (pedido.getTaxaEntrega() != null && pedido.getTaxaEntrega().compareTo(BigDecimal.ZERO) > 0) {
             preview.append(String.format("%-24s R$ %10.2f",
-                    "taxa de entrega", pedido.getTaxaEntrega())).append("\n");
+                    "taxa de entrega", pedido.getTaxaEntrega().doubleValue())).append("\n");
         }
-        
+
         preview.append("\n");
         preview.append("\n");
-        
-    
+
         if (pedido.getObservacoes() != null && !pedido.getObservacoes().trim().isEmpty()) {
             preview.append("obs: ").append(pedido.getObservacoes()).append("\n");
         }
-        
+
         preview.append("\n");
         preview.append("-".repeat(35)).append("\n");
-        
+
         preview.append("\n");
-        
-    
-        double totalComTaxa = pedido.getTotal();
-        if (pedido.getTaxaEntrega() != null) {
-            totalComTaxa += pedido.getTaxaEntrega();
-        }
-        preview.append(String.format("TOTAL: R$ %.2f", totalComTaxa)).append("\n");
+
+        BigDecimal totalPedido = BigDecimal.valueOf(pedido.getTotal() != null ? pedido.getTotal() : 0.0);
+        BigDecimal taxaEntrega = pedido.getTaxaEntrega() != null ? pedido.getTaxaEntrega() : BigDecimal.ZERO;
+        BigDecimal totalComTaxa = totalPedido.add(taxaEntrega);
+
+        preview.append(String.format("TOTAL: R$ %.2f", totalComTaxa.doubleValue())).append("\n");
         preview.append("\n");
-        
+
         if (pedido.getFormaPagamento() != null && !pedido.getFormaPagamento().trim().isEmpty()) {
             preview.append("Pagamento: ").append(pedido.getFormaPagamento()).append("\n");
             preview.append("\n");
         }
-        
+
         if (pedido.getValorPago() != null && pedido.getValorPago() > 0) {
             preview.append(String.format("Valor Pago: R$ %.2f", pedido.getValorPago())).append("\n");
             preview.append("\n");
         }
-        
+
         if (pedido.getTroco() != null && pedido.getTroco() > 0) {
             preview.append(String.format("Troco: R$ %.2f", pedido.getTroco())).append("\n");
             preview.append("\n");
         }
-        
+
         preview.append("-".repeat(35)).append("\n");
         preview.append("\n");
         preview.append("  Obrigado pela preferência!").append("\n");
         preview.append("\n");
         preview.append("-".repeat(35)).append("\n");
-        
+
         return preview.toString();
     }
 
     public File salvarPreviewComanda(Pedido pedido) throws IOException {
         String preview = gerarPreviewComanda(pedido);
-        
+
         File diretorioImpressoes = new File("impressoes");
         if (!diretorioImpressoes.exists()) {
             diretorioImpressoes.mkdirs();
@@ -545,13 +539,13 @@ public class ImpressaoService {
         String nomeArquivo = String.format("preview_comanda_%d_%s.txt",
                 pedido.getId(),
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")));
-        
+
         File arquivo = new File(diretorioImpressoes, nomeArquivo);
-        
+
         try (FileWriter writer = new FileWriter(arquivo, StandardCharsets.UTF_8)) {
             writer.write(preview);
         }
-        
+
         return arquivo;
     }
 
@@ -563,4 +557,3 @@ public class ImpressaoService {
         return " ".repeat(espacos) + texto;
     }
 }
-

@@ -2,9 +2,11 @@ package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.Entregador;
+import com.example.pdv_galeteria.model.Entrega;
 import com.example.pdv_galeteria.model.StatusEntregador;
 import com.example.pdv_galeteria.model.UsuarioSessao;
 import com.example.pdv_galeteria.repository.EntregadorRepository;
+import com.example.pdv_galeteria.repository.EntregaRepository;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,13 +24,19 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import java.util.Optional;
 import com.example.pdv_galeteria.service.CaixaService;
+import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 @Service
 public class EntregadorController {
@@ -41,9 +49,16 @@ public class EntregadorController {
     @FXML private TextField txtTelefonePopup;
     @Autowired private UsuarioSessao usuarioSessao;
     @FXML private Label labelNomeUsuario;
+    @FXML  public Label lblEntregadorNome;
+    @FXML  public TextField txtNumeroPedidoPopup;
+    @FXML  public TextField txtIdIfoodPopup;
+    private Entregador entregadorAtual;
 
     @Autowired
     private EntregadorRepository entregadorRepository;
+
+    @Autowired
+    private EntregaRepository entregaRepository;
 
     @FXML
     public void initialize() {
@@ -52,6 +67,11 @@ public class EntregadorController {
         if (entregadorRepository == null && PdvGaleteriaApplication.getSpringContext() != null) {
             entregadorRepository = PdvGaleteriaApplication.getSpringContext().getBean(EntregadorRepository.class);
             System.out.println("EntregadorRepository injetado manualmente: " + (entregadorRepository != null));
+        }
+
+        if (entregaRepository == null && PdvGaleteriaApplication.getSpringContext() != null) {
+            entregaRepository = PdvGaleteriaApplication.getSpringContext().getBean(EntregaRepository.class);
+            System.out.println("EntregaRepository injetado manualmente: " + (entregaRepository != null));
         }
 
         if (containerEntregadores != null) {
@@ -103,8 +123,8 @@ public class EntregadorController {
             System.out.println("Encontrados " + entregadores.size() + " entregadores");
 
             for (Entregador entregador : entregadores) {
-                HBox card = criarCardEntregador(entregador);
-                containerEntregadores.getChildren().add(card);
+                VBox cardCompleto = criarCardEntregadorCompleto(entregador);
+                containerEntregadores.getChildren().add(cardCompleto);
             }
 
             atualizarEstatisticas(entregadores);
@@ -131,17 +151,33 @@ public class EntregadorController {
         return tituloBox;
     }
 
-    private HBox criarCardEntregador(Entregador entregador) {
-        HBox card = new HBox(15);
-        card.setAlignment(Pos.CENTER_LEFT);
-        card.setStyle(
+    private VBox criarCardEntregadorCompleto(Entregador entregador) {
+        VBox cardCompleto = new VBox(15);
+        cardCompleto.setStyle(
                 "-fx-background-color: #F8FAFC;" +
                         "-fx-background-radius: 8;" +
                         "-fx-border-color: #E5E7EB;" +
                         "-fx-border-width: 1;" +
-                        "-fx-border-radius: 8;"
+                        "-fx-border-radius: 8;" +
+                        "-fx-padding: 15;"
         );
-        card.setPadding(new Insets(15, 20, 15, 20));
+
+        HBox topBox = criarTopBoxEntregador(entregador);
+        cardCompleto.getChildren().add(topBox);
+
+        List<Entrega> entregasHoje = entregaRepository.findEntregasHojeByEntregador(entregador);
+
+        if (!entregasHoje.isEmpty()) {
+            VBox entregasBox = criarEntregasBox(entregador, entregasHoje);
+            cardCompleto.getChildren().add(entregasBox);
+        }
+
+        return cardCompleto;
+    }
+
+    private HBox criarTopBoxEntregador(Entregador entregador) {
+        HBox card = new HBox(15);
+        card.setAlignment(Pos.CENTER_LEFT);
 
         StackPane iconPane = new StackPane();
         Circle circleBg = new Circle(24, Color.web("#DBEAFE"));
@@ -173,73 +209,44 @@ public class EntregadorController {
         entregasTexto.setTextFill(Color.web("#6B7280"));
         entregasTexto.setFont(Font.font(10));
 
-        HBox contadorBox = new HBox(8);
-        contadorBox.setAlignment(Pos.CENTER);
-
-        Button btnMenos = new Button("-");
-        btnMenos.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: #6B7280;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-padding: 0 0 2 0;"
-        );
-        btnMenos.setOnAction(e -> alterarEntregas(entregador, -1));
-
-        Label entregasCount = new Label(String.valueOf(entregador.getEntregasHoje()));
+        long entregasHojeCount = entregaRepository.countByEntregadorAndDataHoraToday(entregador);
+        Label entregasCount = new Label(String.valueOf(entregasHojeCount));
         entregasCount.setTextFill(Color.web("#111827"));
         entregasCount.setFont(Font.font("System Bold", 16));
         entregasCount.setMinWidth(20);
         entregasCount.setAlignment(Pos.CENTER);
 
-        Button btnMais = new Button("+");
-        btnMais.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: #6B7280;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-padding: 0 0 2 0;"
-        );
-        btnMais.setOnAction(e -> alterarEntregas(entregador, 1));
-
-        contadorBox.getChildren().addAll(btnMais, entregasCount, btnMenos);
-        entregasBox.getChildren().addAll(entregasTexto, contadorBox);
+        entregasBox.getChildren().addAll(entregasTexto, entregasCount);
 
         Label statusLabel = new Label(entregador.getStatus().getDescricao().toLowerCase());
-        statusLabel.setStyle(
-                "-fx-background-color: #F97316;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-background-radius: 12;" +
-                        "-fx-font-size: 12;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-padding: 4 12;" +
-                        "-fx-min-width: 56;" +
-                        "-fx-alignment: center;"
-        );
 
         switch (entregador.getStatus()) {
-            case DISPONIVEL -> statusLabel.setStyle(
-                    "-fx-background-color: #F97316;" +
-                            "-fx-text-fill: white;" +
-                            "-fx-background-radius: 12;" +
-                            "-fx-font-size: 12;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-padding: 4 12;" +
-                            "-fx-min-width: 56;" +
-                            "-fx-alignment: center;"
-            );
-            case EM_ENTREGA -> statusLabel.setStyle(
-                    "-fx-background-color: #3B82F6;" +
-                            "-fx-text-fill: white;" +
-                            "-fx-background-radius: 12;" +
-                            "-fx-font-size: 12;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-padding: 4 12;" +
-                            "-fx-min-width: 56;" +
-                            "-fx-alignment: center;"
-            );
+            case DISPONIVEL -> {
+                statusLabel.setText("ativo");
+                statusLabel.setStyle(
+                        "-fx-background-color: #10B981;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-background-radius: 12;" +
+                                "-fx-font-size: 12;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-padding: 4 12;" +
+                                "-fx-min-width: 56;" +
+                                "-fx-alignment: center;"
+                );
+            }
+            case EM_ENTREGA -> {
+                statusLabel.setText("ativo");
+                statusLabel.setStyle(
+                        "-fx-background-color: #f68411;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-background-radius: 12;" +
+                                "-fx-font-size: 12;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-padding: 4 12;" +
+                                "-fx-min-width: 56;" +
+                                "-fx-alignment: center;"
+                );
+            }
             case INATIVO -> statusLabel.setStyle(
                     "-fx-background-color: #6B7280;" +
                             "-fx-text-fill: white;" +
@@ -251,6 +258,61 @@ public class EntregadorController {
                             "-fx-alignment: center;"
             );
         }
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+        Button btnAddEntrega = new Button("+ Add Entrega");
+        btnAddEntrega.setStyle(
+                "-fx-background-color: #F97316;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 6;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-size: 12;" +
+                        "-fx-padding: 6 12;"
+        );
+        btnAddEntrega.setOnAction(e -> abrirPopupAdicionarEntrega(entregador));
+
+        if (entregador.getStatus() == StatusEntregador.INATIVO) {
+            btnAddEntrega.setDisable(true);
+            btnAddEntrega.setStyle(
+                    "-fx-background-color: #9CA3AF;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 6;" +
+                            "-fx-font-size: 12;" +
+                            "-fx-padding: 6 12;"
+            );
+        }
+
+        btnAddEntrega.setOnMouseEntered(e -> {
+            if (!btnAddEntrega.isDisabled()) {
+                btnAddEntrega.setStyle(
+                        "-fx-background-color: #EA580C;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-background-radius: 6;" +
+                                "-fx-cursor: hand;" +
+                                "-fx-font-size: 12;" +
+                                "-fx-padding: 6 12;"
+                );
+            }
+        });
+
+        btnAddEntrega.setOnMouseExited(e -> {
+            if (!btnAddEntrega.isDisabled()) {
+                btnAddEntrega.setStyle(
+                        "-fx-background-color: #F97316;" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-background-radius: 6;" +
+                                "-fx-cursor: hand;" +
+                                "-fx-font-size: 12;" +
+                                "-fx-padding: 6 12;"
+                );
+            }
+        });
 
         Button btnAcao = new Button();
         btnAcao.setStyle(
@@ -299,25 +361,269 @@ public class EntregadorController {
                         "-fx-font-weight: normal;"
         ));
 
+        buttonBox.getChildren().addAll(btnAddEntrega, statusLabel, btnAcao);
+
         HBox rightBox = new HBox(15);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
-        rightBox.getChildren().addAll(entregasBox, statusLabel, btnAcao);
+        rightBox.getChildren().addAll(entregasBox, buttonBox);
 
         card.getChildren().addAll(iconPane, infoBox, spacer, rightBox);
         return card;
     }
 
-    private void alterarEntregas(Entregador entregador, int quantidade) {
+    private VBox criarEntregasBox(Entregador entregador, List<Entrega> entregas) {
+        VBox entregasBox = new VBox(10);
+        entregasBox.setStyle(
+                "-fx-background-color: #FFFFFF;" +
+                        "-fx-border-color: #E5E7EB;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 6;" +
+                        "-fx-padding: 15;"
+        );
+
+        Label tituloEntregas = new Label("Entregas realizadas hoje:");
+        tituloEntregas.setTextFill(Color.web("#111827"));
+        tituloEntregas.setFont(Font.font("System Bold", 14));
+        entregasBox.getChildren().add(tituloEntregas);
+
+        GridPane tabela = new GridPane();
+        tabela.setHgap(20);
+        tabela.setVgap(8);
+        tabela.setPadding(new Insets(5, 0, 0, 0));
+
+        Label headerPedido = new Label("Pedido");
+        headerPedido.setTextFill(Color.web("#6B7280"));
+        headerPedido.setFont(Font.font("System Bold", 12));
+        tabela.add(headerPedido, 0, 0);
+
+        Label headerIfood = new Label("ID iFood");
+        headerIfood.setTextFill(Color.web("#6B7280"));
+        headerIfood.setFont(Font.font("System Bold", 12));
+        tabela.add(headerIfood, 1, 0);
+
+        Label headerHorario = new Label("Horário");
+        headerHorario.setTextFill(Color.web("#6B7280"));
+        headerHorario.setFont(Font.font("System Bold", 12));
+        tabela.add(headerHorario, 2, 0);
+
+        int row = 1;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (Entrega entrega : entregas.stream().limit(5).collect(Collectors.toList())) {
+            Label pedidoLabel = new Label(entrega.getNumeroPedido());
+            pedidoLabel.setTextFill(Color.web("#111827"));
+            pedidoLabel.setFont(Font.font(12));
+            tabela.add(pedidoLabel, 0, row);
+
+            Label ifoodLabel = new Label(entrega.getIdIfood() != null && !entrega.getIdIfood().isEmpty() ? entrega.getIdIfood() : "-");
+            ifoodLabel.setTextFill(Color.web("#6B7280"));
+            ifoodLabel.setFont(Font.font(12));
+            tabela.add(ifoodLabel, 1, row);
+
+            Label horarioLabel = new Label(entrega.getDataHora().format(formatter));
+            horarioLabel.setTextFill(Color.web("#6B7280"));
+            horarioLabel.setFont(Font.font(12));
+            tabela.add(horarioLabel, 2, row);
+
+            row++;
+        }
+
+        entregasBox.getChildren().add(tabela);
+
+        if (entregas.size() > 5) {
+            Label maisLabel = new Label("... e mais " + (entregas.size() - 5) + " entregas");
+            maisLabel.setTextFill(Color.web("#6B7280"));
+            maisLabel.setFont(Font.font(10));
+            maisLabel.setPadding(new Insets(5, 0, 0, 0));
+            entregasBox.getChildren().add(maisLabel);
+        }
+
+        return entregasBox;
+    }
+
+    @FXML
+    private void abrirPopupAdicionarEntrega(Entregador entregador) {
         try {
-            int novasEntregas = entregador.getEntregasHoje() + quantidade;
-            if (novasEntregas >= 0) {
-                entregador.setEntregasHoje(novasEntregas);
-                entregadorRepository.save(entregador);
-                carregarEntregadores();
-                System.out.println("Entregas atualizadas: " + entregador.getNome() + " = " + novasEntregas);
-            }
+            System.out.println("Abrindo popup FXML para adicionar entrega ao entregador: " + entregador.getNome());
+
+            this.entregadorAtual = entregador;
+
+            abrirPopupAdicionarEntregaFXML(entregador);
+
         } catch (Exception e) {
-            System.err.println("Erro ao alterar entregas: " + e.getMessage());
+            System.err.println("Erro ao abrir popup de entrega: " + e.getMessage());
+            e.printStackTrace();
+            abrirPopupAdicionarEntregaDialog(entregador);
+        }
+    }
+
+    private void abrirPopupAdicionarEntregaFXML(Entregador entregador) {
+        try {
+            System.out.println("Carregando PopupAdicionarEntrega.fxml...");
+
+            URL fxmlUrl = getClass().getResource(
+                    "/com/example/pdv_galeteria/Frontend/views/PopupAdicionarEntrega.fxml"
+            );
+
+            if (fxmlUrl == null) {
+                System.err.println("ERRO: PopupAdicionarEntrega.fxml não encontrado!");
+                mostrarAlerta("Erro", "Arquivo de adicionar entrega não encontrado.", Alert.AlertType.ERROR);
+                abrirPopupAdicionarEntregaDialog(entregador);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+
+            Parent root = loader.load();
+
+            EntregadorController controller = loader.getController();
+
+            if (controller.lblEntregadorNome != null) {
+                controller.lblEntregadorNome.setText("Entregador: " + entregador.getNome());
+            }
+
+            controller.entregadorAtual = entregador;
+
+            if (controller.txtNumeroPedidoPopup != null) {
+                controller.txtNumeroPedidoPopup.clear();
+                controller.txtNumeroPedidoPopup.requestFocus();
+            }
+            if (controller.txtIdIfoodPopup != null) {
+                controller.txtIdIfoodPopup.clear();
+            }
+
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Adicionar Entrega");
+            popupStage.setScene(new Scene(root));
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+
+            if (containerEntregadores != null && containerEntregadores.getScene() != null) {
+                popupStage.initOwner(containerEntregadores.getScene().getWindow());
+            }
+
+            popupStage.setResizable(false);
+            popupStage.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("ERRO ao abrir popup FXML de entrega: " + e.getMessage());
+            e.printStackTrace();
+            abrirPopupAdicionarEntregaDialog(entregador);
+        }
+    }
+
+    private void abrirPopupAdicionarEntregaDialog(Entregador entregador) {
+        try {
+            System.out.println("Abrindo dialog de adicionar entrega (fallback)...");
+
+            Dialog<Entrega> dialog = new Dialog<>();
+            dialog.setTitle("Adicionar Entrega");
+            dialog.setHeaderText("Associar pedido ao entregador: " + entregador.getNome());
+
+            ButtonType salvarButton = new ButtonType("Adicionar", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(salvarButton, ButtonType.CANCEL);
+
+            VBox content = new VBox(15);
+            content.setPadding(new Insets(20));
+            content.setStyle("-fx-background-color: white;");
+
+            Label lblTitulo = new Label("Adicionar Nova Entrega");
+            lblTitulo.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #111827;");
+
+            Label lblEntregador = new Label("Entregador: " + entregador.getNome());
+            lblEntregador.setStyle("-fx-font-size: 14; -fx-text-fill: #374151;");
+
+            GridPane grid = new GridPane();
+            grid.setHgap(15);
+            grid.setVgap(15);
+            grid.setPadding(new Insets(10, 0, 0, 0));
+
+            TextField txtNumeroPedido = new TextField();
+            txtNumeroPedido.setPromptText("Ex: 001");
+            txtNumeroPedido.setPrefWidth(200);
+            txtNumeroPedido.setStyle("-fx-padding: 8; -fx-border-color: #D1D5DB; -fx-border-radius: 4;");
+
+            TextField txtIdIfood = new TextField();
+            txtIdIfood.setPromptText("Ex: IF-12345");
+            txtIdIfood.setPrefWidth(200);
+            txtIdIfood.setStyle("-fx-padding: 8; -fx-border-color: #D1D5DB; -fx-border-radius: 4;");
+
+            Label lblObrigatorio = new Label("* Campo obrigatório");
+            lblObrigatorio.setStyle("-fx-text-fill: #EF4444; -fx-font-size: 11;");
+
+            Label lblOpcional = new Label("Preencha apenas se for uma entrega do iFood");
+            lblOpcional.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 11;");
+
+            grid.add(new Label("Número do Pedido *:"), 0, 0);
+            grid.add(txtNumeroPedido, 1, 0);
+            grid.add(lblObrigatorio, 1, 1);
+
+            grid.add(new Label("ID iFood (opcional):"), 0, 2);
+            grid.add(txtIdIfood, 1, 2);
+            grid.add(lblOpcional, 1, 3);
+
+            content.getChildren().addAll(lblTitulo, lblEntregador, grid);
+            dialog.getDialogPane().setContent(content);
+
+            Platform.runLater(txtNumeroPedido::requestFocus);
+
+            dialog.setResultConverter(button -> {
+                if (button == salvarButton) {
+                    String numeroPedido = txtNumeroPedido.getText().trim();
+                    String idIfood = txtIdIfood.getText().trim();
+
+                    if (numeroPedido.isEmpty()) {
+                        mostrarErro("Campo obrigatório", "Digite o número do pedido.");
+                        return null;
+                    }
+
+                    if (entregaRepository.existsByNumeroPedido(numeroPedido)) {
+                        mostrarErro("Pedido já registrado", "Já existe uma entrega com este número de pedido.");
+                        return null;
+                    }
+
+                    Entrega novaEntrega = new Entrega();
+                    novaEntrega.setEntregador(entregador);
+                    novaEntrega.setNumeroPedido(numeroPedido);
+                    novaEntrega.setIdIfood(idIfood.isEmpty() ? null : idIfood);
+                    novaEntrega.setDataHora(LocalDateTime.now());
+
+                    return novaEntrega;
+                }
+                return null;
+            });
+
+            dialog.showAndWait().ifPresent(novaEntrega -> {
+                try {
+                    Entrega salva = entregaRepository.save(novaEntrega);
+                    System.out.println("Entrega salva: " + salva.getId());
+
+                    if (entregador.getStatus() == StatusEntregador.DISPONIVEL) {
+                        entregador.setStatus(StatusEntregador.EM_ENTREGA);
+                        entregadorRepository.save(entregador);
+                    }
+
+                    entregador.setEntregasHoje(entregador.getEntregasHoje() + 1);
+                    entregadorRepository.save(entregador);
+
+                    carregarEntregadores();
+
+                    Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
+                    sucesso.setTitle("Sucesso");
+                    sucesso.setHeaderText(null);
+                    sucesso.setContentText("Entrega adicionada com sucesso para " + entregador.getNome() + "!");
+                    sucesso.showAndWait();
+
+                } catch (Exception e) {
+                    System.err.println("Erro ao salvar entrega: " + e.getMessage());
+                    e.printStackTrace();
+                    mostrarErro("Erro ao salvar", "Não foi possível salvar a entrega.");
+                }
+            });
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir popup de entrega (dialog): " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -325,100 +631,135 @@ public class EntregadorController {
         try {
             if (entregador.getStatus() == StatusEntregador.INATIVO) {
                 entregador.setStatus(StatusEntregador.DISPONIVEL);
+                Alert info = new Alert(Alert.AlertType.INFORMATION);
+                info.setTitle("Entregador Ativado");
+                info.setHeaderText(null);
+                info.setContentText(entregador.getNome() + " foi ativado e agora está disponível para entregas.");
+                info.showAndWait();
             } else {
-                entregador.setStatus(StatusEntregador.INATIVO);
+                Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmacao.setTitle("Confirmar Desativação");
+                confirmacao.setHeaderText("Desativar " + entregador.getNome() + "?");
+                confirmacao.setContentText("O entregador não poderá receber novas entregas enquanto estiver inativo.");
+
+                Optional<ButtonType> resultado = confirmacao.showAndWait();
+                if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                    entregador.setStatus(StatusEntregador.INATIVO);
+
+                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.setTitle("Entregador Desativado");
+                    info.setHeaderText(null);
+                    info.setContentText(entregador.getNome() + " foi desativado.");
+                    info.showAndWait();
+                } else {
+                    return;
+                }
             }
+
             entregadorRepository.save(entregador);
             carregarEntregadores();
             System.out.println("Status alterado: " + entregador.getNome() + " = " + entregador.getStatus());
+
         } catch (Exception e) {
             System.err.println("Erro ao alterar status: " + e.getMessage());
+            e.printStackTrace();
+            mostrarErro("Erro", "Não foi possível alterar o status do entregador.");
         }
     }
 
     private void atualizarEstatisticas(List<Entregador> entregadores) {
         try {
-            long total = entregadores.size();
-            long ativos = entregadores.stream()
+            final long total = entregadores.size();
+            final long ativos = entregadores.stream()
                     .filter(e -> e.getStatus() != StatusEntregador.INATIVO)
                     .count();
-            long entregas = entregadores.stream()
-                    .filter(e -> e.getStatus() != StatusEntregador.INATIVO)
-                    .mapToInt(Entregador::getEntregasHoje)
-                    .sum();
+
+            long entregasHojeCalc = 0;
+            LocalDate hoje = LocalDate.now();
+            LocalDateTime startOfDay = hoje.atStartOfDay();
+            LocalDateTime endOfDay = hoje.atTime(LocalTime.MAX);
+
+            for (Entregador entregador : entregadores) {
+                if (entregador.getStatus() != StatusEntregador.INATIVO) {
+                    try {
+                        entregasHojeCalc += entregaRepository.countByEntregadorAndDateRange(
+                                entregador, startOfDay, endOfDay
+                        );
+                    } catch (Exception e) {
+                        System.err.println("Erro na consulta de entregas, usando fallback: " + e.getMessage());
+                        List<Entrega> entregasHoje = entregaRepository.findByEntregadorOrderByDataHoraDesc(entregador);
+                        entregasHojeCalc += entregasHoje.stream()
+                                .filter(entrega -> entrega.getDataHora().toLocalDate().equals(hoje))
+                                .count();
+                    }
+                }
+            }
+
+            final long entregasHojeTotal = entregasHojeCalc;
 
             Platform.runLater(() -> {
                 labelTotalEntregadores.setText(String.valueOf(total));
                 labelAtivosHoje.setText(String.valueOf(ativos));
-                labelEntregasHoje.setText(String.valueOf(entregas));
+                labelEntregasHoje.setText(String.valueOf(entregasHojeTotal));
             });
 
-            System.out.println("Estatísticas: Total=" + total + ", Ativos=" + ativos + ", Entregas=" + entregas);
+            System.out.println("Estatísticas: Total=" + total + ", Ativos=" + ativos + ", Entregas Hoje=" + entregasHojeTotal);
 
         } catch (Exception e) {
             System.err.println("Erro ao atualizar estatísticas: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     @FXML
-    public void abrirPopupCadastroFXML() {
+    public void abrirPopupCadastro() {
+        System.out.println("Abrindo tela FXML de cadastro de entregador...");
+        abrirTelaCadastroEntregadorFXML();
+    }
+
+    private void abrirTelaCadastroEntregadorFXML() {
         try {
-            System.out.println("Abrindo popup FXML de cadastro...");
+            System.out.println("Carregando TelaCadastroEntregadores.fxml...");
 
-            if (txtNomeCompletoPopup == null || txtTelefonePopup == null) {
-                System.out.println("Campos do popup não injetados. Carregando FXML...");
+            URL fxmlUrl = getClass().getResource(
+                    "/com/example/pdv_galeteria/Frontend/views/TelaCadastroEntregadores.fxml"
+            );
 
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                        "/com/example/pdv_galeteria/Frontend/views/PopupCadastroEntregador.fxml"
-                ));
-
-                loader.setController(this);
-
-                Parent root = loader.load();
-
-                System.out.println("Campos após load - Nome: " + (txtNomeCompletoPopup != null));
-                System.out.println("Campos após load - Telefone: " + (txtTelefonePopup != null));
-
-                if (txtNomeCompletoPopup != null) txtNomeCompletoPopup.clear();
-                if (txtTelefonePopup != null) txtTelefonePopup.clear();
-
-                Stage popupStage = new Stage();
-                popupStage.setTitle("Cadastrar Entregador");
-                popupStage.setScene(new Scene(root));
-                popupStage.initModality(Modality.APPLICATION_MODAL);
-
-                if (containerEntregadores != null && containerEntregadores.getScene() != null) {
-                    popupStage.initOwner(containerEntregadores.getScene().getWindow());
-                }
-
-                popupStage.setResizable(false);
-
-                Platform.runLater(() -> {
-                    if (txtNomeCompletoPopup != null) {
-                        txtNomeCompletoPopup.requestFocus();
-                    }
-                });
-
-                popupStage.showAndWait();
-
-            } else {
-                System.out.println("Campos já injetados. Reutilizando...");
-
-                txtNomeCompletoPopup.clear();
-                txtTelefonePopup.clear();
-
-                Stage stage = (Stage) txtNomeCompletoPopup.getScene().getWindow();
-
-                if (stage != null) {
-                    stage.requestFocus();
-                    stage.toFront();
-                }
+            if (fxmlUrl == null) {
+                System.err.println("ERRO: TelaCadastroEntregadores.fxml não encontrado!");
+                mostrarAlerta("Erro", "Arquivo de cadastro não encontrado.", Alert.AlertType.ERROR);
+                abrirPopupCadastroDialog();
+                return;
             }
 
-        } catch (Exception e) {
-            System.err.println("ERRO ao abrir popup FXML: " + e.getMessage());
-            e.printStackTrace();
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
 
+            Parent root = loader.load();
+
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Cadastrar Novo Entregador");
+            popupStage.setScene(new Scene(root));
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+
+            if (containerEntregadores != null && containerEntregadores.getScene() != null) {
+                popupStage.initOwner(containerEntregadores.getScene().getWindow());
+            }
+
+            popupStage.setResizable(false);
+
+            if (txtNomeCompletoPopup != null) {
+                txtNomeCompletoPopup.clear();
+                txtNomeCompletoPopup.requestFocus();
+            }
+            if (txtTelefonePopup != null) {
+                txtTelefonePopup.clear();
+            }
+
+            popupStage.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("ERRO ao abrir tela de cadastro FXML: " + e.getMessage());
+            e.printStackTrace();
             System.out.println("Usando Dialog como fallback...");
             abrirPopupCadastroDialog();
         }
@@ -434,23 +775,39 @@ public class EntregadorController {
         ButtonType salvarButton = new ButtonType("Salvar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(salvarButton, ButtonType.CANCEL);
 
+        VBox content = new VBox(15);
+        content.setPadding(new Insets(20));
+        content.setStyle("-fx-background-color: white;");
+
+        Label lblTitulo = new Label("Cadastro de Entregador");
+        lblTitulo.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #111827;");
+
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+        grid.setHgap(15);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 0, 0));
 
         TextField nomeField = new TextField();
         nomeField.setPromptText("Nome completo");
+        nomeField.setPrefWidth(250);
+        nomeField.setStyle("-fx-padding: 8; -fx-border-color: #D1D5DB; -fx-border-radius: 4;");
 
         TextField telefoneField = new TextField();
         telefoneField.setPromptText("(85) 99999-9999");
+        telefoneField.setPrefWidth(250);
+        telefoneField.setStyle("-fx-padding: 8; -fx-border-color: #D1D5DB; -fx-border-radius: 4;");
 
-        grid.add(new Label("Nome:"), 0, 0);
+        Label lblObrigatorio = new Label("* Campos obrigatórios");
+        lblObrigatorio.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 11;");
+
+        grid.add(new Label("Nome *:"), 0, 0);
         grid.add(nomeField, 1, 0);
-        grid.add(new Label("Telefone:"), 0, 1);
+        grid.add(new Label("Telefone *:"), 0, 1);
         grid.add(telefoneField, 1, 1);
+        grid.add(lblObrigatorio, 1, 2);
 
-        dialog.getDialogPane().setContent(grid);
+        content.getChildren().addAll(lblTitulo, grid);
+        dialog.getDialogPane().setContent(content);
 
         Platform.runLater(nomeField::requestFocus);
 
@@ -513,12 +870,6 @@ public class EntregadorController {
         });
     }
 
-    @FXML
-    public void abrirPopupCadastro() {
-        System.out.println("Abrindo popup de cadastro...");
-        abrirPopupCadastroFXML();
-    }
-
     private String formatarTelefone(String telefone) {
         if (telefone == null || telefone.trim().isEmpty()) {
             return "";
@@ -540,11 +891,13 @@ public class EntregadorController {
     }
 
     private void mostrarErro(String titulo, String mensagem) {
-        Alert erro = new Alert(Alert.AlertType.ERROR);
-        erro.setTitle("Erro");
-        erro.setHeaderText(titulo);
-        erro.setContentText(mensagem);
-        erro.showAndWait();
+        Platform.runLater(() -> {
+            Alert erro = new Alert(Alert.AlertType.ERROR);
+            erro.setTitle("Erro");
+            erro.setHeaderText(titulo);
+            erro.setContentText(mensagem);
+            erro.showAndWait();
+        });
     }
 
     @FXML
@@ -554,7 +907,7 @@ public class EntregadorController {
         try {
             if (txtNomeCompletoPopup == null || txtTelefonePopup == null) {
                 System.err.println("Campos do popup não encontrados! Usando Dialog...");
-                abrirPopupCadastro();
+                abrirPopupCadastroDialog();
                 return;
             }
 
@@ -601,8 +954,7 @@ public class EntregadorController {
             Entregador salvo = entregadorRepository.save(novo);
             System.out.println("Entregador salvo do popup: " + salvo);
 
-            Stage stage = (Stage) txtNomeCompletoPopup.getScene().getWindow();
-            stage.close();
+            fecharPopupCadastro();
 
             carregarEntregadores();
 
@@ -963,4 +1315,99 @@ public class EntregadorController {
         } catch (Exception e) {
         }
     }
+
+    @FXML
+    private void fecharPopupCadastro() {
+        try {
+            Stage stage = (Stage) txtNomeCompletoPopup.getScene().getWindow();
+            stage.close();
+        } catch (Exception e) {
+            System.err.println("Erro ao fechar popup: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void salvarEntregaPopup() {
+        try {
+            if (entregadorAtual == null) {
+                mostrarErro("Erro", "Entregador não definido.");
+                return;
+            }
+
+            if (txtNumeroPedidoPopup == null) {
+                mostrarErro("Erro", "Campo de número do pedido não carregado.");
+                return;
+            }
+
+            String numeroPedido = txtNumeroPedidoPopup.getText().trim();
+            String idIfood = txtIdIfoodPopup != null ? txtIdIfoodPopup.getText().trim() : "";
+
+            if (numeroPedido.isEmpty()) {
+                mostrarErro("Campo obrigatório", "Digite o número do pedido.");
+                if (txtNumeroPedidoPopup != null) {
+                    txtNumeroPedidoPopup.requestFocus();
+                }
+                return;
+            }
+
+            if (entregaRepository.existsByNumeroPedido(numeroPedido)) {
+                mostrarErro("Pedido já registrado", "Já existe uma entrega com este número de pedido.");
+                if (txtNumeroPedidoPopup != null) {
+                    txtNumeroPedidoPopup.requestFocus();
+                    txtNumeroPedidoPopup.selectAll();
+                }
+                return;
+            }
+
+            Entrega novaEntrega = new Entrega();
+            novaEntrega.setEntregador(entregadorAtual);
+            novaEntrega.setNumeroPedido(numeroPedido);
+            novaEntrega.setIdIfood(idIfood.isEmpty() ? null : idIfood);
+            novaEntrega.setDataHora(LocalDateTime.now());
+
+            Entrega salva = entregaRepository.save(novaEntrega);
+            System.out.println("Entrega salva: " + salva.getId());
+
+            if (entregadorAtual.getStatus() == StatusEntregador.DISPONIVEL) {
+                entregadorAtual.setStatus(StatusEntregador.EM_ENTREGA);
+                entregadorRepository.save(entregadorAtual);
+            }
+
+            entregadorAtual.setEntregasHoje(entregadorAtual.getEntregasHoje() + 1);
+            entregadorRepository.save(entregadorAtual);
+
+            fecharPopupAdicionarEntrega();
+
+            carregarEntregadores();
+
+            Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
+            sucesso.setTitle("Sucesso");
+            sucesso.setHeaderText(null);
+            sucesso.setContentText("Entrega adicionada com sucesso para " + entregadorAtual.getNome() + "!");
+            sucesso.showAndWait();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar entrega: " + e.getMessage());
+            e.printStackTrace();
+            mostrarErro("Erro ao salvar", "Não foi possível salvar a entrega.");
+        }
+    }
+
+    @FXML
+    private void fecharPopupAdicionarEntrega() {
+        try {
+            if (lblEntregadorNome != null && lblEntregadorNome.getScene() != null) {
+                Stage stage = (Stage) lblEntregadorNome.getScene().getWindow();
+                stage.close();
+            } else if (txtNumeroPedidoPopup != null && txtNumeroPedidoPopup.getScene() != null) {
+                Stage stage = (Stage) txtNumeroPedidoPopup.getScene().getWindow();
+                stage.close();
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao fechar popup de entrega: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }
