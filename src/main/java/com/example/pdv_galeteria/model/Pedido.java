@@ -129,6 +129,10 @@ public class Pedido {
     @Column(name = "ultima_atualizacao")
     private LocalDateTime ultimaAtualizacao = LocalDateTime.now();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "entregador_id")
+    private Entregador entregadorAssociado;
+
     public Pedido() {
         this.status = StatusPedido.REGISTRADO;
         this.criadoEm = LocalDateTime.now();
@@ -555,5 +559,11 @@ public class Pedido {
     @Override
     public String toString() {
         return "Pedido #" + numeroPedido + " - " + cliente + " - R$ " + getTotalFinal();
+    }
+
+    public Entregador getEntregadorAssociado() { return entregadorAssociado; }
+    public void setEntregadorAssociado(Entregador entregadorAssociado) {
+        this.entregadorAssociado = entregadorAssociado;
+        atualizarUltimaAtualizacao();
     }
 }

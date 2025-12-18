@@ -1,13 +1,14 @@
 package com.example.pdv_galeteria.controller;
 
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
-import com.example.pdv_galeteria.model.Entregador;
-import com.example.pdv_galeteria.model.Entrega;
-import com.example.pdv_galeteria.model.StatusEntregador;
-import com.example.pdv_galeteria.model.UsuarioSessao;
+import com.example.pdv_galeteria.model.*;
 import com.example.pdv_galeteria.repository.EntregadorRepository;
 import com.example.pdv_galeteria.repository.EntregaRepository;
+import com.example.pdv_galeteria.repository.PedidoRepository;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -60,6 +61,9 @@ public class EntregadorController {
     @Autowired
     private EntregaRepository entregaRepository;
 
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
     @FXML
     public void initialize() {
         System.out.println("=== INICIALIZANDO CONTROLLER ENTREGADORES ===");
@@ -78,6 +82,10 @@ public class EntregadorController {
             carregarEntregadores();
         } else {
             System.err.println("ERRO: containerEntregadores é null! Verifique o FXML.");
+        }
+
+        if (pedidoRepository == null && PdvGaleteriaApplication.getSpringContext() != null) {
+            pedidoRepository = PdvGaleteriaApplication.getSpringContext().getBean(PedidoRepository.class);
         }
 
         if (labelNomeUsuario != null && usuarioSessao != null) {
@@ -892,11 +900,11 @@ public class EntregadorController {
 
     private void mostrarErro(String titulo, String mensagem) {
         Platform.runLater(() -> {
-            Alert erro = new Alert(Alert.AlertType.ERROR);
-            erro.setTitle("Erro");
-            erro.setHeaderText(titulo);
-            erro.setContentText(mensagem);
-            erro.showAndWait();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText(titulo);
+            alert.setContentText(mensagem);
+            alert.showAndWait();
         });
     }
 
@@ -1335,62 +1343,268 @@ public class EntregadorController {
                 return;
             }
 
-            if (txtNumeroPedidoPopup == null) {
-                mostrarErro("Erro", "Campo de número do pedido não carregado.");
-                return;
-            }
+            String numeroPedidoOuId = txtNumeroPedidoPopup.getText().trim();
+            String idIfood = txtIdIfoodPopup.getText().trim();
 
-            String numeroPedido = txtNumeroPedidoPopup.getText().trim();
-            String idIfood = txtIdIfoodPopup != null ? txtIdIfoodPopup.getText().trim() : "";
-
-            if (numeroPedido.isEmpty()) {
+            if (numeroPedidoOuId.isEmpty()) {
                 mostrarErro("Campo obrigatório", "Digite o número do pedido.");
-                if (txtNumeroPedidoPopup != null) {
-                    txtNumeroPedidoPopup.requestFocus();
-                }
+                txtNumeroPedidoPopup.requestFocus();
                 return;
             }
 
-            if (entregaRepository.existsByNumeroPedido(numeroPedido)) {
-                mostrarErro("Pedido já registrado", "Já existe uma entrega com este número de pedido.");
-                if (txtNumeroPedidoPopup != null) {
-                    txtNumeroPedidoPopup.requestFocus();
-                    txtNumeroPedidoPopup.selectAll();
+            Optional<Pedido> pedidoOpt = pedidoRepository.findByNumeroPedido(numeroPedidoOuId);
+
+            if (pedidoOpt.isEmpty()) {
+                try {
+                    if (numeroPedidoOuId.matches("\\d+")) {
+                        Long pedidoId = Long.parseLong(numeroPedidoOuId);
+                        pedidoOpt = pedidoRepository.findById(pedidoId);
+                    }
+                } catch (NumberFormatException e) {
                 }
+            }
+
+            if (pedidoOpt.isEmpty()) {
+                mostrarErro("Pedido não encontrado",
+                        "Não existe pedido com: " + numeroPedidoOuId);
+                txtNumeroPedidoPopup.requestFocus();
+                txtNumeroPedidoPopup.selectAll();
+                return;
+            }
+
+            Pedido pedido = pedidoOpt.get();
+
+            if (!pedido.isEntrega()) {
+                mostrarErro("Pedido não é para entrega",
+                        "Este pedido é para retirada na loja.\n" +
+                                "Não pode ser associado a entregador.");
+                txtNumeroPedidoPopup.requestFocus();
+                txtNumeroPedidoPopup.selectAll();
+                return;
+            }
+
+            if (pedido.getEntregadorAssociado() != null &&
+                    !pedido.getEntregadorAssociado().getId().equals(entregadorAtual.getId())) {
+                mostrarErro("Pedido já tem entregador",
+                        "Este pedido já está com: " + pedido.getEntregadorAssociado().getNome());
+                txtNumeroPedidoPopup.requestFocus();
+                txtNumeroPedidoPopup.selectAll();
                 return;
             }
 
             Entrega novaEntrega = new Entrega();
             novaEntrega.setEntregador(entregadorAtual);
-            novaEntrega.setNumeroPedido(numeroPedido);
+            novaEntrega.setNumeroPedido(pedido.getNumeroPedido());
             novaEntrega.setIdIfood(idIfood.isEmpty() ? null : idIfood);
             novaEntrega.setDataHora(LocalDateTime.now());
 
-            Entrega salva = entregaRepository.save(novaEntrega);
-            System.out.println("Entrega salva: " + salva.getId());
+            pedido.setEntregadorAssociado(entregadorAtual);
+            pedido.setEntregador(entregadorAtual.getNome());
+            pedido.setStatusEntrega("EM_ROTA");
+            pedidoRepository.save(pedido);
+
+            entregaRepository.save(novaEntrega);
 
             if (entregadorAtual.getStatus() == StatusEntregador.DISPONIVEL) {
                 entregadorAtual.setStatus(StatusEntregador.EM_ENTREGA);
-                entregadorRepository.save(entregadorAtual);
             }
-
             entregadorAtual.setEntregasHoje(entregadorAtual.getEntregasHoje() + 1);
             entregadorRepository.save(entregadorAtual);
 
-            fecharPopupAdicionarEntrega();
+            Stage stage = (Stage) txtNumeroPedidoPopup.getScene().getWindow();
+            stage.close();
 
-            carregarEntregadores();
-
-            Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
-            sucesso.setTitle("Sucesso");
-            sucesso.setHeaderText(null);
-            sucesso.setContentText("Entrega adicionada com sucesso para " + entregadorAtual.getNome() + "!");
-            sucesso.showAndWait();
+            atualizarTelaEntregadoresSimples();
 
         } catch (Exception e) {
-            System.err.println("Erro ao salvar entrega: " + e.getMessage());
+            System.err.println("Erro: " + e.getMessage());
             e.printStackTrace();
-            mostrarErro("Erro ao salvar", "Não foi possível salvar a entrega.");
+            mostrarErro("Erro", "Não foi possível salvar a entrega.");
+        }
+    }
+
+    private void atualizarTelaEntregadoresSimples() {
+        try {
+            System.out.println("=== ATUALIZAÇÃO SIMPLES INICIADA ===");
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(300);
+
+                    Platform.runLater(() -> {
+                        try {
+                            carregarEntregadores();
+
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Sucesso");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Entrega registrada com sucesso!\nA lista foi atualizada.");
+                            alert.showAndWait();
+
+                            System.out.println("=== ATUALIZAÇÃO CONCLUÍDA ===");
+
+                        } catch (Exception e) {
+                            System.err.println("Erro no Platform.runLater: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    });
+
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+
+        } catch (Exception e) {
+            System.err.println("Erro na atualização simples: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void atualizarCardEntregadorSimples(Long entregadorId) {
+        try {
+            System.out.println("Atualizando card do entregador ID: " + entregadorId);
+
+            Optional<Entregador> entregadorAtualizadoOpt = entregadorRepository.findById(entregadorId);
+            if (entregadorAtualizadoOpt.isEmpty()) {
+                System.err.println("Entregador não encontrado no banco!");
+                carregarEntregadores();
+                return;
+            }
+
+            Entregador entregadorAtualizado = entregadorAtualizadoOpt.get();
+
+            List<Entrega> entregasHoje = entregaRepository.findEntregasHojeByEntregador(entregadorAtualizado);
+
+            for (int i = 1; i < containerEntregadores.getChildren().size(); i++) {
+                Node node = containerEntregadores.getChildren().get(i);
+                if (node instanceof VBox) {
+                    VBox cardCompleto = (VBox) node;
+
+                    if (isCardDoEntregador(cardCompleto, entregadorAtualizado)) {
+                        System.out.println("Card encontrado, atualizando...");
+
+                        VBox novoCard = criarCardEntregadorCompleto(entregadorAtualizado);
+                        containerEntregadores.getChildren().set(i, novoCard);
+
+                        atualizarEstatisticas(entregadorRepository.findAllByOrderByNomeAsc());
+
+                        System.out.println("Card atualizado com sucesso!");
+                        return;
+                    }
+                }
+            }
+
+            System.out.println("Card não encontrado, recarregando todos...");
+            carregarEntregadores();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar card: " + e.getMessage());
+            e.printStackTrace();
+            carregarEntregadores();
+        }
+    }
+
+    private boolean isCardDoEntregador(VBox cardCompleto, Entregador entregador) {
+        try {
+            for (Node node : cardCompleto.getChildren()) {
+                if (node instanceof HBox) {
+                    HBox topBox = (HBox) node;
+
+                    for (Node child : topBox.getChildren()) {
+                        if (child instanceof VBox) {
+                            VBox infoBox = (VBox) child;
+
+                            for (Node labelNode : infoBox.getChildren()) {
+                                if (labelNode instanceof Label) {
+                                    Label nomeLabel = (Label) labelNode;
+                                    if (nomeLabel.getText().equals(entregador.getNome())) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao verificar card: " + e.getMessage());
+        }
+        return false;
+    }
+
+    private void abrirDetalhesPedido(Long pedidoId) {
+        try {
+            Optional<Pedido> pedidoOpt = pedidoRepository.buscarPedidoComItens(pedidoId);
+            if (pedidoOpt.isPresent()) {
+                Pedido pedido = pedidoOpt.get();
+
+                Dialog<Void> dialog = new Dialog<>();
+                dialog.setTitle("Detalhes do Pedido #" + pedido.getNumeroPedido());
+
+                VBox content = new VBox(10);
+                content.setPadding(new Insets(15));
+
+                TableView<ItemPedido> tabelaItens = new TableView<>();
+
+                TableColumn<ItemPedido, String> colProduto = new TableColumn<>("Produto");
+                colProduto.setCellValueFactory(data ->
+                        new SimpleStringProperty(data.getValue().getProduto() != null ?
+                                data.getValue().getProduto() :
+                                "Produto não informado")
+                );
+
+                TableColumn<ItemPedido, Integer> colQuantidade = new TableColumn<>("Qtd");
+                colQuantidade.setCellValueFactory(data ->
+                        new SimpleIntegerProperty(data.getValue().getQuantidade() != null ?
+                                data.getValue().getQuantidade() : 0).asObject()
+                );
+
+                TableColumn<ItemPedido, Double> colPreco = new TableColumn<>("Preço Unit.");
+                colPreco.setCellValueFactory(data ->
+                        new SimpleDoubleProperty(data.getValue().getPrecoUnitario() != null ?
+                                data.getValue().getPrecoUnitario() : 0.0).asObject()
+                );
+
+                TableColumn<ItemPedido, Double> colTotal = new TableColumn<>("Total");
+                colTotal.setCellValueFactory(data -> {
+                    Integer qtd = data.getValue().getQuantidade() != null ? data.getValue().getQuantidade() : 0;
+                    Double preco = data.getValue().getPrecoUnitario() != null ? data.getValue().getPrecoUnitario() : 0.0;
+                    return new SimpleDoubleProperty(qtd * preco).asObject();
+                });
+
+                tabelaItens.getColumns().addAll(colProduto, colQuantidade, colPreco, colTotal);
+
+                tabelaItens.getItems().addAll(pedido.getItens());
+
+                colProduto.setPrefWidth(200);
+                colQuantidade.setPrefWidth(80);
+                colPreco.setPrefWidth(100);
+                colTotal.setPrefWidth(100);
+
+                VBox infoBox = new VBox(5);
+                infoBox.setStyle("-fx-background-color: #f9fafb; -fx-padding: 10; -fx-border-radius: 5;");
+
+                Label lblCliente = new Label("Cliente: " + pedido.getCliente());
+                Label lblTelefone = new Label("Telefone: " + (pedido.getTelefone() != null ? pedido.getTelefone() : "Não informado"));
+                Label lblEndereco = new Label("Endereço: " + pedido.getEnderecoCompleto());
+                Label lblTotal = new Label("Total: R$ " + String.format("%.2f", pedido.getTotalFinal().doubleValue()));
+                Label lblStatus = new Label("Status: " + pedido.getStatus() +
+                        (pedido.getStatusEntrega() != null ? " (" + pedido.getStatusEntrega() + ")" : ""));
+
+                infoBox.getChildren().addAll(lblCliente, lblTelefone, lblEndereco, lblTotal, lblStatus);
+
+                content.getChildren().addAll(infoBox, new Label("Itens do Pedido:"), tabelaItens);
+
+                dialog.getDialogPane().setContent(content);
+                dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+                dialog.setResizable(true);
+                dialog.getDialogPane().setPrefSize(600, 400);
+
+                dialog.showAndWait();
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir detalhes do pedido: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -1409,5 +1623,4 @@ public class EntregadorController {
             e.printStackTrace();
         }
     }
-
 }
