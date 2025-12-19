@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="450.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E0E0E0; -fx-border-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button layoutX="420.0" layoutY="5.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #666666;" text="x" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+
+      <VBox layoutX="20.0" layoutY="20.0" spacing="10.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+         <children>
+            <Label text="Senha atualizada com sucesso" textFill="#1a1a1a">
+               <font>
+                  <Font name="System Bold" size="22.0" />
+               </font>
+            </Label>
+
+            <VBox spacing="3.0">
+               <children>
+                  <Label text="Este é o seu novo código de recuperação." textFill="#555555" wrapText="true">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
+                  <Label text="Recomendamos que você anote ou armazene este código em um local seguro." textFill="#555555" wrapText="true">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
+                  <Label text="Ele será essencial caso você precise recuperar o acesso à sua conta no futuro." textFill="#555555" wrapText="true">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+
+            <HBox alignment="CENTER" prefHeight="60.0">
+               <children>
+                  <Label text="1BR1AvzX" textFill="#7b7979">
+                     <font>
+                        <Font name="System Bold" size="32.0" />
+                     </font>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
