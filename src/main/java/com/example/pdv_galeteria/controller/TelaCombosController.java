@@ -78,6 +78,20 @@ public class TelaCombosController {
     @FXML
     public void initialize() {
         carregarCombos();
+
+          if (combosContainer != null) {
+            carregarCombos();
+        }
+
+        nomeProdutoField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue == null || newValue.trim().isEmpty()) {
+                sugestoesContainer.setVisible(false);
+                return;
+            }
+
+            List<Produto> encontrados = produtoService.buscarListaPorNome(newValue.trim());
+            mostrarSugestoes(encontrados);
+        });
     }
 
     public void setCombosContainer(FlowPane combosContainer) {
@@ -276,7 +290,8 @@ public class TelaCombosController {
             stage.setTitle("Editar Combo");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
-            stage.show();
+            stage.showAndWait();
+            carregarCombos();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -472,6 +487,36 @@ public class TelaCombosController {
                     .append("\n");
         }
         produtosTextArea.setText(sb.toString());
+    }
+
+     private void mostrarSugestoes(List<Produto> produtos) {
+        sugestoesContainer.getChildren().clear();
+
+        if (produtos == null || produtos.isEmpty()) {
+            sugestoesContainer.setVisible(false);
+            return;
+        }
+
+        for (Produto p : produtos) {
+
+            Label opcao = new Label(p.getNome());
+            opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;");
+            opcao.setMaxWidth(Double.MAX_VALUE);
+
+            opcao.setOnMouseEntered(
+                    e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: #e6e6e6; -fx-font-size: 14;"));
+            opcao.setOnMouseExited(
+                    e -> opcao.setStyle("-fx-padding: 6; -fx-background-color: white; -fx-font-size: 14;"));
+
+            opcao.setOnMouseClicked(e -> {
+                nomeProdutoField.setText(p.getNome());
+                sugestoesContainer.setVisible(false);
+            });
+
+            sugestoesContainer.getChildren().add(opcao);
+        }
+
+        sugestoesContainer.setVisible(true);
     }
 
     private void mostrarAlerta(String titulo, String mensagem, Alert.AlertType tipo) {

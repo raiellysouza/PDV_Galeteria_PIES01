@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.layout.VBox?>
@@ -22,7 +23,7 @@
       <TextArea fx:id="nomeComboField" layoutX="14.0" layoutY="84.0" prefHeight="38.0" prefWidth="350.0" promptText="Ex: Combo familia" />
       <Label layoutX="14.0" layoutY="67.0" text="Nome do combo:" />
 
-      <TextArea fx:id="precoComboField" layoutX="379.0" layoutY="84.0" prefHeight="39.0" prefWidth="197.0" promptText="00,00" />
+      <TextField fx:id="precoComboField" layoutX="379.0" layoutY="84.0" prefHeight="39.0" prefWidth="197.0" promptText="00,00" />
       <Label layoutX="379.0" layoutY="67.0" text="Preço:" />
 
       <Label layoutX="14.0" layoutY="133.0" text="Escreva o nome do Produto:" />
