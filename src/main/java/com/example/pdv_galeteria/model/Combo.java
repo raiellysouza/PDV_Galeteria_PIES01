@@ -26,7 +26,7 @@ public class Combo {
     @Column(nullable = false)
     private String nome;
 
-    @Column(name = "preco", nullable = false)
+    @Column(name = "preco_total", nullable = false)
     private Double precoTotal;
 
     @OneToMany(mappedBy = "combo", cascade = CascadeType.ALL, orphanRemoval = true)

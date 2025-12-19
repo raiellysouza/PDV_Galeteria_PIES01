@@ -150,11 +150,11 @@
                         <Image url="@/assets/imgs/sair_.png" />
                     </image>
                 </ImageView>
-            <Label fx:id="labelNomeUsuario" layoutX="23.0" layoutY="602.0" style="-fx-text-fill: white;" text="Nome do Usuário" textFill="WHITE">
-               <font>
-                  <Font name="System Bold" size="22.0" />
-               </font>
-            </Label>
+                <Label fx:id="labelNomeUsuario" layoutX="23.0" layoutY="602.0" style="-fx-text-fill: white;" text="Nome do Usuário" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="22.0" />
+                    </font>
+                </Label>
             </children>
         </Pane>
 
@@ -185,7 +185,7 @@
                                             </children>
                                         </VBox>
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button fx:id="btnNovoEntregador" onAction="#abrirPopupCadastro" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="+ Novo Entregador" />
+                                        <Button fx:id="btnNovoEntregador" onAction="#abrirPopupCadastro" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 10 20;" text="+ Novo Entregador" />
                                     </children>
                                 </HBox>
 
@@ -265,7 +265,7 @@
                                     </children>
                                 </HBox>
 
-                                <VBox fx:id="containerEntregadores" prefHeight="346.0" prefWidth="834.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 2);">
+                                <VBox fx:id="containerEntregadores" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 2);">
 
                                     <padding>
                                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />

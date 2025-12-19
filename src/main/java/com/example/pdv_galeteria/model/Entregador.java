@@ -1,6 +1,8 @@
 package com.example.pdv_galeteria.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "entregadores")
@@ -22,6 +24,9 @@ public class Entregador {
 
     @Column(name = "entregas_hoje")
     private Integer entregasHoje = 0;
+
+    @OneToMany(mappedBy = "entregador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Entrega> entregas = new ArrayList<>();
 
     public Entregador() {}
 
@@ -70,6 +75,14 @@ public class Entregador {
 
     public void setEntregasHoje(Integer entregasHoje) {
         this.entregasHoje = entregasHoje;
+    }
+
+    public List<Entrega> getEntregas() {
+        return entregas;
+    }
+
+    public void setEntregas(List<Entrega> entregas) {
+        this.entregas = entregas;
     }
 
     public boolean isAtivo() {

@@ -126,7 +126,51 @@ public class RegistroPedidoPopupController implements Initializable {
         for (ToggleButton botao : botoesFormaPagamento) {
             botao.setOnAction(e -> {
                 atualizarEstiloBotoesPagamento();
+                resetarTrocoAoMudarPagamento();
                 atualizarVisibilidadeCamposPagamento();
+            });
+        }
+    }
+
+    private void configurarListenersValores() {
+        if (campoValorPagoUnico != null) {
+            campoValorPagoUnico.textProperty().addListener((observable, oldValue, newValue) -> {
+                calcularTrocoUnico();
+            });
+        }
+
+        if (campoValorDinheiro != null) {
+            campoValorDinheiro.textProperty().addListener((observable, oldValue, newValue) -> {
+                calcularTrocoMultiplo();
+                atualizarTotalPago();
+            });
+        }
+
+        if (campoValorPix != null) {
+            campoValorPix.textProperty().addListener((observable, oldValue, newValue) -> {
+                calcularTrocoMultiplo();
+                atualizarTotalPago();
+            });
+        }
+
+        if (campoValorDebito != null) {
+            campoValorDebito.textProperty().addListener((observable, oldValue, newValue) -> {
+                calcularTrocoMultiplo();
+                atualizarTotalPago();
+            });
+        }
+
+        if (campoValorCredito != null) {
+            campoValorCredito.textProperty().addListener((observable, oldValue, newValue) -> {
+                calcularTrocoMultiplo();
+                atualizarTotalPago();
+            });
+        }
+
+        if (campoTaxaEntrega != null) {
+            campoTaxaEntrega.textProperty().addListener((observable, oldValue, newValue) -> {
+                atualizarTotalComTaxa();
+                resetarTrocoAoMudarPagamento();
             });
         }
     }
@@ -171,52 +215,21 @@ public class RegistroPedidoPopupController implements Initializable {
             botao.setStyle("-fx-background-color: #f68411; -fx-background-radius: 8px;");
         }
 
-
         if (containerEndereco != null) containerEndereco.setVisible(false);
-
         if (containerValoresPagamento != null) containerValoresPagamento.setVisible(false);
         if (containerValorUnico != null) containerValorUnico.setVisible(false);
 
+        if (labelTrocoUnico != null) {
+            labelTrocoUnico.setText("R$ 0,00");
+            labelTrocoUnico.setVisible(false);
+        }
+
+        if (labelTrocoDinheiro != null) {
+            labelTrocoDinheiro.setText("R$ 0,00");
+            labelTrocoDinheiro.setVisible(false);
+        }
+
         atualizarVisibilidadeCamposPagamento();
-    }
-
-    private void configurarListenersValores() {
-        if (campoValorPagoUnico != null) {
-            campoValorPagoUnico.textProperty().addListener((observable, oldValue, newValue) -> {
-                calcularTrocoUnico();
-            });
-        }
-
-        if (campoValorDinheiro != null) {
-            campoValorDinheiro.textProperty().addListener((observable, oldValue, newValue) -> {
-                calcularTrocoMultiplo();
-                atualizarTotalPago();
-            });
-        }
-
-        if (campoValorPix != null) {
-            campoValorPix.textProperty().addListener((observable, oldValue, newValue) -> {
-                atualizarTotalPago();
-            });
-        }
-
-        if (campoValorDebito != null) {
-            campoValorDebito.textProperty().addListener((observable, oldValue, newValue) -> {
-                atualizarTotalPago();
-            });
-        }
-
-        if (campoValorCredito != null) {
-            campoValorCredito.textProperty().addListener((observable, oldValue, newValue) -> {
-                atualizarTotalPago();
-            });
-        }
-
-        if (campoTaxaEntrega != null) {
-            campoTaxaEntrega.textProperty().addListener((observable, oldValue, newValue) -> {
-                atualizarTotalComTaxa();
-            });
-        }
     }
 
     private void atualizarTotalComTaxa() {
@@ -369,9 +382,10 @@ public class RegistroPedidoPopupController implements Initializable {
             if (containerValoresPagamento != null) containerValoresPagamento.setVisible(false);
             if (containerValorUnico != null) containerValorUnico.setVisible(true);
 
-            String forma = formasSelecionadas.get(0);
-            boolean mostrarTroco = forma.equals("Dinheiro");
-            if (labelTrocoUnico != null) labelTrocoUnico.setVisible(mostrarTroco);
+            if (labelTrocoUnico != null) {
+                labelTrocoUnico.setVisible(true);
+                labelTrocoUnico.setText("R$ 0,00");
+            }
 
             limparCamposMultiplosPagamento();
         } else {
@@ -382,6 +396,13 @@ public class RegistroPedidoPopupController implements Initializable {
             if (containerValorDinheiro != null) containerValorDinheiro.setVisible(formasSelecionadas.contains("Dinheiro"));
             if (containerValorDebito != null) containerValorDebito.setVisible(formasSelecionadas.contains("Débito"));
             if (containerValorCredito != null) containerValorCredito.setVisible(formasSelecionadas.contains("Crédito"));
+
+            if (labelTrocoDinheiro != null) {
+                labelTrocoDinheiro.setVisible(formasSelecionadas.contains("Dinheiro"));
+                if (formasSelecionadas.contains("Dinheiro")) {
+                    labelTrocoDinheiro.setText("R$ 0,00");
+                }
+            }
 
             if (campoValorPagoUnico != null) campoValorPagoUnico.clear();
         }
@@ -401,47 +422,118 @@ public class RegistroPedidoPopupController implements Initializable {
     private void calcularTrocoUnico() {
         try {
             String valorStr = campoValorPagoUnico.getText();
-            double valorPago = parseValor(valorStr);
-            double troco = valorPago - getTotalComTaxa();
+            if (valorStr == null || valorStr.trim().isEmpty()) {
+                if (labelTrocoUnico != null) {
+                    labelTrocoUnico.setText("R$ 0,00");
+                }
+                return;
+            }
 
-            if (troco > 0) {
-                labelTrocoUnico.setText("R$ " + df.format(troco));
-            } else {
-                labelTrocoUnico.setText("R$ 0,00");
+            double valorPago = parseValor(valorStr);
+            double totalComTaxa = getTotalComTaxa();
+            List<String> formasSelecionadas = getFormasPagamentoSelecionadas();
+
+            if (formasSelecionadas.size() == 1) {
+                String forma = formasSelecionadas.get(0);
+                double troco = 0;
+
+                if (forma.equals("Dinheiro")) {
+                    if (valorPago >= totalComTaxa) {
+                        troco = valorPago - totalComTaxa;
+                    } else {
+                        troco = 0;
+                    }
+                }
+                else {
+                    if (valorPago > totalComTaxa) {
+                        troco = 0;
+                    } else if (valorPago < totalComTaxa) {
+                        troco = 0;
+                    } else {
+                        troco = 0;
+                    }
+                }
+
+                if (labelTrocoUnico != null) {
+                    labelTrocoUnico.setText("R$ " + df.format(troco));
+                }
             }
         } catch (NumberFormatException e) {
-            labelTrocoUnico.setText("R$ 0,00");
+            if (labelTrocoUnico != null) {
+                labelTrocoUnico.setText("R$ 0,00");
+            }
         }
     }
 
     private void calcularTrocoMultiplo() {
         try {
-            String valorStr = campoValorDinheiro.getText();
-            double valorDinheiro = parseValor(valorStr);
+            double totalComTaxa = getTotalComTaxa();
+            double totalPago = 0;
+            double valorDinheiro = 0;
 
-            double totalOutras = 0;
             List<String> formas = getFormasPagamentoSelecionadas();
 
-            if (formas.contains("Pix")) {
-                totalOutras += parseValor(campoValorPix.getText());
-            }
-            if (formas.contains("Débito")) {
-                totalOutras += parseValor(campoValorDebito.getText());
-            }
-            if (formas.contains("Crédito")) {
-                totalOutras += parseValor(campoValorCredito.getText());
+            for (String forma : formas) {
+                double valorForma = 0;
+
+                switch (forma) {
+                    case "Pix":
+                        valorForma = parseValor(campoValorPix.getText());
+                        break;
+                    case "Dinheiro":
+                        valorDinheiro = parseValor(campoValorDinheiro.getText());
+                        valorForma = valorDinheiro;
+                        break;
+                    case "Débito":
+                        valorForma = parseValor(campoValorDebito.getText());
+                        break;
+                    case "Crédito":
+                        valorForma = parseValor(campoValorCredito.getText());
+                        break;
+                }
+
+                totalPago += valorForma;
             }
 
-            double totalPago = valorDinheiro + totalOutras;
-            double troco = valorDinheiro - (getTotalComTaxa() - totalOutras);
+            if (formas.contains("Dinheiro")) {
+                double valorOutrasFormas = totalPago - valorDinheiro;
+                double valorDevidoComDinheiro = totalComTaxa - valorOutrasFormas;
 
-            if (troco > 0) {
-                labelTrocoDinheiro.setText("R$ " + df.format(troco));
+                double troco = 0;
+                if (valorDinheiro >= valorDevidoComDinheiro) {
+                    troco = valorDinheiro - valorDevidoComDinheiro;
+                }
+
+                if (labelTrocoDinheiro != null) {
+                    labelTrocoDinheiro.setText("R$ " + df.format(troco));
+                }
             } else {
+                if (labelTrocoDinheiro != null) {
+                    labelTrocoDinheiro.setText("R$ 0,00");
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            if (labelTrocoDinheiro != null) {
                 labelTrocoDinheiro.setText("R$ 0,00");
             }
-        } catch (NumberFormatException e) {
-            labelTrocoDinheiro.setText("R$ 0,00");
+        }
+    }
+
+    private void resetarTrocoAoMudarPagamento() {
+        List<String> formasSelecionadas = getFormasPagamentoSelecionadas();
+
+        if (formasSelecionadas.size() == 1) {
+            String forma = formasSelecionadas.get(0);
+            if (labelTrocoUnico != null) {
+                labelTrocoUnico.setText("R$ 0,00");
+                if (!forma.equals("Dinheiro")) {
+                }
+            }
+        } else {
+            if (labelTrocoDinheiro != null) {
+                labelTrocoDinheiro.setText("R$ 0,00");
+            }
         }
     }
 
