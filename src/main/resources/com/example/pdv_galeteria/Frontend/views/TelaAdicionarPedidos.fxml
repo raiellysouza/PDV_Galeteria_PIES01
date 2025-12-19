@@ -198,8 +198,8 @@
                             </cursor>
                         </ToggleButton>
                     </HBox>
-                </VBox>
 
+                </VBox>
                 <VBox fx:id="containerValoresPagamento" layoutX="30.0" layoutY="1020.0" prefWidth="538.0" spacing="10.0" visible="false">
                     <Label text="Valores Pagos por Forma de Pagamento*">
                         <font>
@@ -236,6 +236,9 @@
                 </VBox>
 
                 <VBox fx:id="containerValorUnico" layoutX="30.0" layoutY="1020.0" prefWidth="538.0" spacing="5.0" visible="false">
+                
+                    <Label fx:id="labelFormaPagamentoSelecionada" text="Forma de pagamento selecionada: Nenhuma" visible="true" style="-fx-font-size: 13px; -fx-text-fill: #555; -fx-padding: 4 0 8 2;" />
+
                     <Label text="Valor Pago">
                         <font>
                             <Font name="System Bold" size="12.0" />

@@ -75,6 +75,8 @@ public class RegistroPedidoPopupController implements Initializable {
     @FXML private TextField campoValorCredito;
     @FXML private TextField campoValorPagoUnico;
 
+    @FXML private Label labelFormaPagamentoSelecionada;
+
     @FXML private Label labelTrocoDinheiro;
     @FXML private Label labelTrocoUnico;
     @FXML private Label labelTotalPago;
@@ -124,12 +126,32 @@ public class RegistroPedidoPopupController implements Initializable {
 
     private void configurarBotoesFormaPagamento() {
         for (ToggleButton botao : botoesFormaPagamento) {
+            botao.setToggleGroup(grupoFormaPagamento);
+
             botao.setOnAction(e -> {
                 atualizarEstiloBotoesPagamento();
                 atualizarVisibilidadeCamposPagamento();
+                atualizarLabelFormaPagamento();
             });
         }
     }
+
+    private void atualizarLabelFormaPagamento() {
+    if (labelFormaPagamentoSelecionada == null) return;
+
+    Toggle selecionado = grupoFormaPagamento.getSelectedToggle();
+
+    if (selecionado == null) {
+        labelFormaPagamentoSelecionada.setText("Forma de pagamento selecionada: Nenhuma");
+    } else {
+        ToggleButton btn = (ToggleButton) selecionado;
+        labelFormaPagamentoSelecionada.setText(
+                "Forma de pagamento selecionada: " + btn.getText()
+        );
+    }
+    }
+
+
 
     private void configurarBotoesAcao() {
         if (btnRegistrarPedido != null) {
@@ -359,33 +381,23 @@ public class RegistroPedidoPopupController implements Initializable {
     }
 
     private void atualizarVisibilidadeCamposPagamento() {
-        List<String> formasSelecionadas = getFormasPagamentoSelecionadas();
-        int quantidadeFormas = formasSelecionadas.size();
+        Toggle selecionado = grupoFormaPagamento.getSelectedToggle();
 
-        if (quantidadeFormas == 0) {
-            if (containerValoresPagamento != null) containerValoresPagamento.setVisible(false);
-            if (containerValorUnico != null) containerValorUnico.setVisible(false);
-        } else if (quantidadeFormas == 1) {
-            if (containerValoresPagamento != null) containerValoresPagamento.setVisible(false);
-            if (containerValorUnico != null) containerValorUnico.setVisible(true);
-
-            String forma = formasSelecionadas.get(0);
-            boolean mostrarTroco = forma.equals("Dinheiro");
-            if (labelTrocoUnico != null) labelTrocoUnico.setVisible(mostrarTroco);
-
-            limparCamposMultiplosPagamento();
-        } else {
-            if (containerValoresPagamento != null) containerValoresPagamento.setVisible(true);
-            if (containerValorUnico != null) containerValorUnico.setVisible(false);
-
-            if (containerValorPix != null) containerValorPix.setVisible(formasSelecionadas.contains("Pix"));
-            if (containerValorDinheiro != null) containerValorDinheiro.setVisible(formasSelecionadas.contains("Dinheiro"));
-            if (containerValorDebito != null) containerValorDebito.setVisible(formasSelecionadas.contains("Débito"));
-            if (containerValorCredito != null) containerValorCredito.setVisible(formasSelecionadas.contains("Crédito"));
-
-            if (campoValorPagoUnico != null) campoValorPagoUnico.clear();
+        if (selecionado == null) {
+            containerValorUnico.setVisible(false);
+            containerValoresPagamento.setVisible(false);
+            return;
         }
 
+        containerValoresPagamento.setVisible(false);
+        containerValorUnico.setVisible(true);
+
+        String forma = ((ToggleButton) selecionado).getText();
+
+        boolean mostrarTroco = forma.equalsIgnoreCase("Dinheiro");
+        labelTrocoUnico.setVisible(mostrarTroco);
+
+        limparCamposMultiplosPagamento();
         atualizarTotalPago();
     }
 
@@ -664,15 +676,16 @@ public class RegistroPedidoPopupController implements Initializable {
     }
 
     private List<String> getFormasPagamentoSelecionadas() {
-        List<String> formas = new ArrayList<>();
+        Toggle selecionado = grupoFormaPagamento.getSelectedToggle();
 
-        if (btnPix != null && btnPix.isSelected()) formas.add("Pix");
-        if (btnDinheiro != null && btnDinheiro.isSelected()) formas.add("Dinheiro");
-        if (btnDebito != null && btnDebito.isSelected()) formas.add("Débito");
-        if (btnCredito != null && btnCredito.isSelected()) formas.add("Crédito");
+        if (selecionado == null) {
+            return Collections.emptyList();
+        }
 
-        return formas;
+        ToggleButton btn = (ToggleButton) selecionado;
+        return Collections.singletonList(btn.getText());
     }
+
 
     private Map<String, Double> getValoresPorFormaPagamento() {
         Map<String, Double> valores = new HashMap<>();
@@ -942,11 +955,13 @@ public class RegistroPedidoPopupController implements Initializable {
 
 
     private String getFormaPagamentoConcatenada() {
-        List<String> formas = getFormasPagamentoSelecionadas();
-        if (formas.isEmpty()) {
+        Toggle selecionado = grupoFormaPagamento.getSelectedToggle();
+
+        if (selecionado == null) {
             return "Não informado";
         }
-        return String.join(" + ", formas);
+
+        return ((ToggleButton) selecionado).getText();
     }
 
     public void setDadosPedido(Map<Produto, Integer> carrinho, double totalPedido) {
@@ -1021,6 +1036,8 @@ public class RegistroPedidoPopupController implements Initializable {
     }
 
     private void limparCamposFormulario() {
+        
+        if (labelFormaPagamentoSelecionada != null) { labelFormaPagamentoSelecionada.setText("Forma de pagamento selecionada: Nenhuma"); }
         if (campoNomeCliente != null) campoNomeCliente.clear();
         if (campoEndereco != null) campoEndereco.clear();
         if (campoTelefone != null) campoTelefone.clear();
