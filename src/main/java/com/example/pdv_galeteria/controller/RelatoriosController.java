@@ -1,7 +1,18 @@
 package com.example.pdv_galeteria.controller;
 
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
 import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.model.UsuarioSessao;
+import com.example.pdv_galeteria.service.RelatorioService;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,13 +24,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Optional;
-import java.util.ResourceBundle;
 
 @Controller
 public class RelatoriosController {
@@ -29,6 +33,9 @@ public class RelatoriosController {
 
     @Autowired
     private UsuarioSessao usuarioSessao;
+
+    @Autowired
+    private RelatorioService relatorioService;
 
     @FXML
     private Label labelNomeUsuario;
@@ -52,6 +59,23 @@ public class RelatoriosController {
             System.out.println("Erro: labelNomeUsuario ou usuarioSessao é nulo");
             System.out.println("labelNomeUsuario: " + (labelNomeUsuario != null ? "OK" : "NULO"));
             System.out.println("usuarioSessao: " + (usuarioSessao != null ? "OK" : "NULO"));
+        }
+    }
+
+    @FXML
+    private void gerarRelatorioVendas(ActionEvent event) {
+        try {
+            Path caminho = Paths.get("relatorios/relatorio_vendas.pdf");
+
+            relatorioService.gerarRelatorioVendas(
+                    LocalDate.now().minusDays(7),
+                    LocalDate.now(),
+                    caminho
+            );
+
+            mostrarMensagemSucesso("Relatório gerado com sucesso.");
+        } catch (Exception e) {
+            mostrarMensagemErro("Erro ao gerar relatório.");
         }
     }
 
@@ -126,7 +150,6 @@ public class RelatoriosController {
         }
     }
 
-
     private void reiniciarAplicacaoCompleta(ActionEvent actionEvent) {
         try {
             System.out.println("Tentando reiniciar aplicação completamente...");
@@ -172,7 +195,6 @@ public class RelatoriosController {
 
             Parent root = loader.load();
 
-
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Controle de Caixa");
@@ -182,7 +204,6 @@ public class RelatoriosController {
         } catch (Exception e) {
             System.err.println("Erro ao abrir tela do caixa: " + e.getMessage());
             e.printStackTrace();
-
         }
     }
 
