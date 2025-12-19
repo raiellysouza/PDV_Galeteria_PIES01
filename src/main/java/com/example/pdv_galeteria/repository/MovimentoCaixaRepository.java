@@ -1,15 +1,17 @@
 package com.example.pdv_galeteria.repository;
 
-import com.example.pdv_galeteria.model.Caixa;
-import com.example.pdv_galeteria.model.MovimentoCaixa;
-import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.example.pdv_galeteria.dto.RelatorioMovimentoCaixaDTO;
+import com.example.pdv_galeteria.model.MovimentoCaixa;
+import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
 
 @Repository
 public interface MovimentoCaixaRepository extends JpaRepository<MovimentoCaixa, Long> {
@@ -23,5 +25,26 @@ public interface MovimentoCaixaRepository extends JpaRepository<MovimentoCaixa, 
 
     List<MovimentoCaixa> findByCaixaId(Long caixaId);
 
-    List<MovimentoCaixa> findByDataHoraBetweenOrderByDataHoraDesc(LocalDateTime inicio, LocalDateTime fim);
+    List<MovimentoCaixa> findByDataHoraBetweenOrderByDataHoraDesc(
+            LocalDateTime inicio,
+            LocalDateTime fim
+    );
+
+    @Query("""
+        SELECT new com.example.pdv_galeteria.dto.RelatorioMovimentoCaixaDTO(
+            m.id,
+            m.dataHora,
+            m.valor,
+            m.tipo,
+            m.descricao
+        )
+        FROM MovimentoCaixa m
+        WHERE m.dataHora BETWEEN :inicio AND :fim
+          AND m.tipo = com.example.pdv_galeteria.model.TipoMovimentoCaixa.ENTRADA
+        ORDER BY m.dataHora ASC
+    """)
+    List<RelatorioMovimentoCaixaDTO> buscarMovimentosParaRelatorio(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
 }
