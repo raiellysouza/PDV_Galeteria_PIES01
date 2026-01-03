@@ -179,10 +179,13 @@
                                             </children>
                                         </VBox>
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Exportar PDF">
+                                        <Button fx:id="btnExportarPDF" onAction="#handleExportarPDF" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="Exportar PDF">
                                             <padding>
                                                 <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                                             </padding>
+                                            <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                            </cursor>
                                         </Button>
                                     </children>
                                 </HBox>
@@ -216,7 +219,7 @@
                                                 <VBox spacing="5.0">
                                                     <children>
                                                         <Label text="Total de Vendas" textFill="#6b7280" />
-                                                        <Label text="R$ 00,00" textFill="#22c55e">
+                                                        <Label fx:id="labelTotalHoje" text="R$ 00,00" textFill="#22c55e">
                                                             <font>
                                                                 <Font name="System Bold" size="28.0" />
                                                             </font>
@@ -225,7 +228,7 @@
                                                 </VBox>
                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                     <children>
-                                                        <Label text="0 pedidos" textFill="#9ca3af" />
+                                                        <Label fx:id="labelPedidosHoje" text="0 pedidos" textFill="#9ca3af" />
                                                         <Region HBox.hgrow="ALWAYS" />
                                                         <Label style="-fx-background-color: #e5e7eb; -fx-background-radius: 4; -fx-padding: 2 6;" text="Hoje" textFill="#4b5563">
                                                             <font>
@@ -234,13 +237,13 @@
                                                         </Label>
                                                     </children>
                                                 </HBox>
-                                                <Button maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
+                                                <Button fx:id="btnDetalhesHoje" onAction="#handleVerDetalhesHoje" maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
                                                     <font>
                                                         <Font name="System Bold" size="12.0" />
                                                     </font>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
+                                                    <cursor>
+                                                        <Cursor fx:constant="HAND" />
+                                                    </cursor>
                                                 </Button>
                                             </children>
                                         </VBox>
@@ -272,7 +275,7 @@
                                                 <VBox spacing="5.0">
                                                     <children>
                                                         <Label text="Total de Vendas" textFill="#6b7280" />
-                                                        <Label text="R$ 00,00" textFill="#22c55e">
+                                                        <Label fx:id="labelTotalSemana" text="R$ 00,00" textFill="#22c55e">
                                                             <font>
                                                                 <Font name="System Bold" size="28.0" />
                                                             </font>
@@ -281,7 +284,7 @@
                                                 </VBox>
                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                     <children>
-                                                        <Label text="0 pedidos" textFill="#9ca3af" />
+                                                        <Label fx:id="labelPedidosSemana" text="0 pedidos" textFill="#9ca3af" />
                                                         <Region HBox.hgrow="ALWAYS" />
                                                         <Label style="-fx-background-color: #e5e7eb; -fx-background-radius: 4; -fx-padding: 2 6;" text="Última semana" textFill="#4b5563">
                                                             <font>
@@ -290,13 +293,13 @@
                                                         </Label>
                                                     </children>
                                                 </HBox>
-                                                <Button maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
+                                                <Button fx:id="btnDetalhesSemana" onAction="#handleVerDetalhesSemana" maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
                                                     <font>
                                                         <Font name="System Bold" size="12.0" />
                                                     </font>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
+                                                    <cursor>
+                                                        <Cursor fx:constant="HAND" />
+                                                    </cursor>
                                                 </Button>
                                             </children>
                                         </VBox>
@@ -328,7 +331,7 @@
                                                 <VBox spacing="5.0">
                                                     <children>
                                                         <Label text="Total de Vendas" textFill="#6b7280" />
-                                                        <Label text="R$ 00,00" textFill="#22c55e">
+                                                        <Label fx:id="labelTotalMes" text="R$ 00,00" textFill="#22c55e">
                                                             <font>
                                                                 <Font name="System Bold" size="28.0" />
                                                             </font>
@@ -337,7 +340,7 @@
                                                 </VBox>
                                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                                     <children>
-                                                        <Label text="0 pedidos" textFill="#9ca3af" />
+                                                        <Label fx:id="labelPedidosMes" text="0 pedidos" textFill="#9ca3af" />
                                                         <Region HBox.hgrow="ALWAYS" />
                                                         <Label style="-fx-background-color: #e5e7eb; -fx-background-radius: 4; -fx-padding: 2 6;" text="Este mês" textFill="#4b5563">
                                                             <font>
@@ -346,13 +349,13 @@
                                                         </Label>
                                                     </children>
                                                 </HBox>
-                                                <Button maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
+                                                <Button fx:id="btnDetalhesMes" onAction="#handleVerDetalhesMes" maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
                                                     <font>
                                                         <Font name="System Bold" size="12.0" />
                                                     </font>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
+                                                    <cursor>
+                                                        <Cursor fx:constant="HAND" />
+                                                    </cursor>
                                                 </Button>
                                             </children>
                                         </VBox>
@@ -393,16 +396,16 @@
                                                         </Label>
                                                         <VBox>
                                                             <children>
-                                                                <Label text="produto 1" textFill="#111827">
+                                                                <Label fx:id="labelProduto1Nome" text="produto 1" textFill="#111827">
                                                                     <font>
                                                                         <Font name="System Bold" size="14.0" />
                                                                     </font>
                                                                 </Label>
-                                                                <Label text="0 unidades vendido" textFill="#6b7280" />
+                                                                <Label fx:id="labelProduto1Quantidade" text="0 unidades vendido" textFill="#6b7280" />
                                                             </children>
                                                         </VBox>
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label text="R$ 00,00" textFill="#16a34a">
+                                                        <Label fx:id="labelProduto1Valor" text="R$ 00,00" textFill="#16a34a">
                                                             <font>
                                                                 <Font name="System Bold" size="18.0" />
                                                             </font>
@@ -422,16 +425,16 @@
                                                         </Label>
                                                         <VBox>
                                                             <children>
-                                                                <Label text="produto 2" textFill="#111827">
+                                                                <Label fx:id="labelProduto2Nome" text="produto 2" textFill="#111827">
                                                                     <font>
                                                                         <Font name="System Bold" size="14.0" />
                                                                     </font>
                                                                 </Label>
-                                                                <Label text="0 unidades vendidas" textFill="#6b7280" />
+                                                                <Label fx:id="labelProduto2Quantidade" text="0 unidades vendidas" textFill="#6b7280" />
                                                             </children>
                                                         </VBox>
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label text="R$ 00,00" textFill="#dc2626">
+                                                        <Label fx:id="labelProduto2Valor" text="R$ 00,00" textFill="#dc2626">
                                                             <font>
                                                                 <Font name="System Bold" size="18.0" />
                                                             </font>
@@ -451,16 +454,16 @@
                                                         </Label>
                                                         <VBox>
                                                             <children>
-                                                                <Label text="produto 3" textFill="#111827">
+                                                                <Label fx:id="labelProduto3Nome" text="produto 3" textFill="#111827">
                                                                     <font>
                                                                         <Font name="System Bold" size="14.0" />
                                                                     </font>
                                                                 </Label>
-                                                                <Label text="0 unidades vendidas" textFill="#6b7280" />
+                                                                <Label fx:id="labelProduto3Quantidade" text="0 unidades vendidas" textFill="#6b7280" />
                                                             </children>
                                                         </VBox>
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label text="R$ 00,00" textFill="#16a34a">
+                                                        <Label fx:id="labelProduto3Valor" text="R$ 00,00" textFill="#16a34a">
                                                             <font>
                                                                 <Font name="System Bold" size="18.0" />
                                                             </font>
@@ -477,10 +480,10 @@
                 </ScrollPane>
             </children>
         </Pane>
-      <Label fx:id="labelNomeUsuario" layoutX="24.0" layoutY="608.0" style="-fx-text-fill: white;" text="Nome do Usuário" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="22.0" />
-         </font>
-      </Label>
+        <Label fx:id="labelNomeUsuario" layoutX="24.0" layoutY="608.0" style="-fx-text-fill: white;" text="Nome do Usuário" textFill="WHITE">
+            <font>
+                <Font name="System Bold" size="22.0" />
+            </font>
+        </Label>
     </children>
 </AnchorPane>

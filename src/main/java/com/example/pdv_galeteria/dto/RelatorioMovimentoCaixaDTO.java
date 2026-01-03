@@ -1,27 +1,29 @@
 package com.example.pdv_galeteria.dto;
 
+import com.example.pdv_galeteria.model.TipoMovimentoCaixa;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class RelatorioMovimentoCaixaDTO {
 
     private Long id;
-    private LocalDateTime dataMovimento;
+    private LocalDateTime dataHora;
     private BigDecimal valor;
     private String tipo;
     private String descricao;
 
     public RelatorioMovimentoCaixaDTO(
             Long id,
-            LocalDateTime dataMovimento,
+            LocalDateTime dataHora,
             BigDecimal valor,
-            String tipo,
+            TipoMovimentoCaixa tipo,
             String descricao
     ) {
         this.id = id;
-        this.dataMovimento = dataMovimento;
+        this.dataHora = dataHora;
         this.valor = valor;
-        this.tipo = tipo;
+        this.tipo = tipo != null ? tipo.name() : null;
         this.descricao = descricao;
     }
 
@@ -30,7 +32,7 @@ public class RelatorioMovimentoCaixaDTO {
     }
 
     public LocalDateTime getDataMovimento() {
-        return dataMovimento;
+        return dataHora;
     }
 
     public BigDecimal getValor() {
