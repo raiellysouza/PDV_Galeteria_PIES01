@@ -28,6 +28,12 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     @Query("SELECT p FROM Pedido p LEFT JOIN FETCH p.formasPagamento WHERE p.id = :id")
     Optional<Pedido> findByIdWithFormasPagamento(@Param("id") Long id);
 
+    @Query("SELECT p FROM Pedido p WHERE p.numeroPedido = :numeroPedido")
+    Optional<Pedido> findByNumeroPedido(@Param("numeroPedido") String numeroPedido);
+
+    @Query("SELECT COUNT(p) > 0 FROM Pedido p WHERE p.numeroPedido = :numeroPedido AND p.entregadorAssociado IS NOT NULL")
+    boolean existsByNumeroPedidoAndHasEntregador(@Param("numeroPedido") String numeroPedido);
+
     List<Pedido> findByStatusOrderByCriadoEmDesc(StatusPedido status);
 
     List<Pedido> findAllByOrderByCriadoEmDesc();
