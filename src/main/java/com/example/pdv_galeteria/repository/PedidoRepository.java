@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,4 +39,24 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatusOrderByCriadoEmDesc(StatusPedido status);
 
     List<Pedido> findAllByOrderByCriadoEmDesc();
+
+
+    List<Pedido> findByCriadoEmBetween(LocalDateTime inicio, LocalDateTime fim);
+
+    List<Pedido> findByCriadoEmBetweenOrderByCriadoEmDesc(LocalDateTime inicio, LocalDateTime fim);
+
+    @Query("SELECT p FROM Pedido p WHERE p.criadoEm BETWEEN :inicio AND :fim AND p.status = :status")
+    List<Pedido> findByCriadoEmBetweenAndStatus(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("status") StatusPedido status);
+
+    @Query("SELECT COUNT(p) FROM Pedido p WHERE p.criadoEm BETWEEN :inicio AND :fim")
+    long countByCriadoEmBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Pedido p WHERE p.criadoEm BETWEEN :inicio AND :fim")
+    BigDecimal sumTotalByCriadoEmBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    @Query("SELECT p FROM Pedido p WHERE p.criadoEm BETWEEN :inicio AND :fim AND p.status != com.example.pdv_galeteria.model.StatusPedido.CANCELADO")
+    List<Pedido> findPedidosAtivosPorPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 }

@@ -566,4 +566,8 @@ public class Pedido {
         this.entregadorAssociado = entregadorAssociado;
         atualizarUltimaAtualizacao();
     }
+
+    public LocalDateTime getDataHora() {
+        return criadoEm;
+    }
 }
