@@ -15,6 +15,10 @@
     -fx-background-color: #F68411;
 }
 
+.button-lateral:selected {
+    -fx-background-color: #F68411;
+}
+
 .hover {
     -fx-background-color: #F68411;
     -fx-background-radius: 8;

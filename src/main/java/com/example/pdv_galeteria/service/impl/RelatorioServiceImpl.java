@@ -16,7 +16,6 @@ import com.example.pdv_galeteria.util.GeradorRelatorioPDF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Path;
@@ -67,6 +66,7 @@ public class RelatorioServiceImpl implements RelatorioService {
         }
     }
 
+    @Override
     public List<PedidoResumoDTO> getUltimasVendasPorPeriodo(LocalDate inicio, LocalDate fim, int limite) {
         try {
             LocalDateTime inicioDateTime = inicio.atStartOfDay();
@@ -147,10 +147,61 @@ public class RelatorioServiceImpl implements RelatorioService {
     @Override
     public RelatorioVendasDTO getRelatorioVendasHoje() {
         try {
+            System.out.println("=== DEBUG RELATÓRIO HOJE ===");
+
             LocalDate hoje = LocalDate.now();
-            return getRelatorioVendasPorPeriodo(hoje, hoje);
+            System.out.println("DEBUG: Data hoje = " + hoje);
+
+            LocalDateTime inicio = hoje.atStartOfDay();
+            LocalDateTime fim = hoje.atTime(LocalTime.MAX);
+            System.out.println("DEBUG: Período = " + inicio + " até " + fim);
+
+            List<Pedido> pedidos = pedidoRepository.findByCriadoEmBetween(inicio, fim);
+            System.out.println("DEBUG: Total pedidos encontrados = " + pedidos.size());
+
+            for (Pedido p : pedidos) {
+                System.out.println("DEBUG Pedido #" + p.getId() +
+                        " - Status: " + p.getStatus() +
+                        " - Total: R$ " + p.getTotal() +
+                        " - Data: " + p.getCriadoEm() +
+                        " - Cliente: " + p.getCliente());
+            }
+
+            List<Pedido> pedidosAtivos = pedidos.stream()
+                    .filter(p -> p.getStatus() != StatusPedido.CANCELADO)
+                    .collect(Collectors.toList());
+
+            System.out.println("DEBUG: Pedidos ativos (não cancelados) = " + pedidosAtivos.size());
+
+            if (pedidosAtivos.isEmpty()) {
+                System.out.println("DEBUG: Nenhum pedido ativo encontrado!");
+                return new RelatorioVendasDTO(BigDecimal.ZERO, 0, 0);
+            }
+
+            BigDecimal totalVendas = BigDecimal.ZERO;
+            int totalItens = 0;
+
+            for (Pedido pedido : pedidosAtivos) {
+                BigDecimal pedidoTotal = BigDecimal.valueOf(pedido.getTotal() != null ? pedido.getTotal() : 0.0);
+                totalVendas = totalVendas.add(pedidoTotal);
+
+                if (pedido.getItens() != null) {
+                    totalItens += pedido.getItens().size();
+                }
+            }
+
+            System.out.println("DEBUG: Total vendas = R$ " + totalVendas);
+            System.out.println("DEBUG: Total pedidos ativos = " + pedidosAtivos.size());
+            System.out.println("DEBUG: Total itens = " + totalItens);
+
+            RelatorioVendasDTO resultado = new RelatorioVendasDTO(totalVendas, pedidosAtivos.size(), totalItens);
+            System.out.println("DEBUG: Resultado final = " + resultado);
+
+            return resultado;
+
         } catch (Exception e) {
-            System.err.println("Erro ao obter relatório de hoje: " + e.getMessage());
+            System.err.println("ERRO CRÍTICO em getRelatorioVendasHoje: " + e.getMessage());
+            e.printStackTrace();
             return new RelatorioVendasDTO(BigDecimal.ZERO, 0, 0);
         }
     }
@@ -447,9 +498,6 @@ public class RelatorioServiceImpl implements RelatorioService {
         }
     }
 
-    /**
-     * Formata a forma de pagamento para um formato mais amigável
-     */
     private String formatarFormaPagamento(String formaPagamento) {
         if (formaPagamento == null || formaPagamento.trim().isEmpty()) {
             return "NÃO INFORMADO";
@@ -457,26 +505,30 @@ public class RelatorioServiceImpl implements RelatorioService {
 
         formaPagamento = formaPagamento.toUpperCase().trim();
 
-        switch (formaPagamento) {
-            case "PIX":
-                return "PIX";
-            case "CARTAO_CREDITO":
-            case "CARTAOCREDITO":
-            case "CREDITO":
-            case "CARTÃO CRÉDITO":
-            case "CARTÃO DE CRÉDITO":
-                return "CARTÃO CRÉDITO";
-            case "CARTAO_DEBITO":
-            case "CARTAODEBITO":
-            case "DEBITO":
-            case "CARTÃO DÉBITO":
-            case "CARTÃO DE DÉBITO":
-                return "CARTÃO DÉBITO";
-            case "DINHEIRO":
-                return "DINHEIRO";
-            default:
-                return formaPagamento;
+        if (formaPagamento.contains("CREDITO") || formaPagamento.contains("CRÉDITO") ||
+                formaPagamento.contains("CRED") || formaPagamento.contains("CARTAO_CREDITO") ||
+                formaPagamento.contains("CARTAOCREDITO") || formaPagamento.contains("CARTÃO CRÉDITO") ||
+                formaPagamento.contains("CARTÃO DE CRÉDITO")) {
+            return "CARTÃO CRÉDITO";
         }
+
+        if (formaPagamento.contains("DEBITO") || formaPagamento.contains("DÉBITO") ||
+                formaPagamento.contains("DEB") || formaPagamento.contains("CARTAO_DEBITO") ||
+                formaPagamento.contains("CARTAODEBITO") || formaPagamento.contains("CARTÃO DÉBITO") ||
+                formaPagamento.contains("CARTÃO DE DÉBITO")) {
+            return "CARTÃO DÉBITO";
+        }
+
+        if (formaPagamento.contains("PIX")) {
+            return "PIX";
+        }
+
+        if (formaPagamento.contains("DINHEIRO") || formaPagamento.contains("DINH") ||
+                formaPagamento.contains("DIN")) {
+            return "DINHEIRO";
+        }
+
+        return formaPagamento;
     }
 
     private Map<String, BigDecimal> criarMapaVazioDistribuicao() {
@@ -536,5 +588,34 @@ public class RelatorioServiceImpl implements RelatorioService {
             e.printStackTrace();
             return criarMapaVazioDistribuicao();
         }
+    }
+
+    @Override
+    public RelatorioVendasDTO getRelatorioVendasPeriodo(LocalDate inicio, LocalDate fim) {
+        return getRelatorioVendasPorPeriodo(inicio, fim);
+    }
+
+    @Override
+    public Map<LocalDate, RelatorioVendasDTO> getVendasPorDia(LocalDate inicio, LocalDate fim) {
+        Map<LocalDate, RelatorioVendasDTO> vendasPorDia = new LinkedHashMap<>();
+
+        try {
+            LocalDate dataAtual = inicio;
+            while (!dataAtual.isAfter(fim)) {
+                RelatorioVendasDTO relatorioDia = getRelatorioVendasPorPeriodo(dataAtual, dataAtual);
+                vendasPorDia.put(dataAtual, relatorioDia);
+                dataAtual = dataAtual.plusDays(1);
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao obter vendas por dia: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return vendasPorDia;
+    }
+
+    @Override
+    public Map<String, BigDecimal> getDistribuicaoPagamentoPeriodo(LocalDate inicio, LocalDate fim) {
+        return calcularDistribuicaoPagamentoPorPeriodo(inicio, fim);
     }
 }

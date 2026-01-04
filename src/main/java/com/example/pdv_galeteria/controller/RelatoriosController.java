@@ -13,12 +13,16 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -46,6 +50,7 @@ public class RelatoriosController {
     @FXML private Label labelProduto3Nome;
     @FXML private Label labelProduto3Quantidade;
     @FXML private Label labelProduto3Valor;
+    @FXML private Button btnDetalhesMes;
 
     @Autowired
     private UsuarioSessao usuarioSessao;
@@ -71,6 +76,10 @@ public class RelatoriosController {
                 e.printStackTrace();
             }
         });
+
+        if (btnDetalhesMes != null) {
+            btnDetalhesMes.setOnAction(event -> handleVerDetalhesMes());
+        }
     }
 
     private void carregarDadosRelatorios() {
@@ -90,6 +99,46 @@ public class RelatoriosController {
             definirValoresPadrao();
         }
     }
+
+    @FXML
+    private void handleVerDetalhesMes() {
+        try {
+            System.out.println("Abrindo relatório mensal detalhado...");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorioMensal.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Relatório de Vendas - Mês");
+
+            stage.setWidth(850);
+            stage.setHeight(750);
+            stage.setResizable(true);
+            stage.centerOnScreen();
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.show();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir relatório mensal: " + e.getMessage());
+            e.printStackTrace();
+
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setHeaderText("Não foi possível abrir o relatório mensal");
+                alert.setContentText("Erro: " + e.getMessage());
+                alert.showAndWait();
+            });
+        }
+    }
+
 
     private void carregarRelatorioHoje() {
         try {
@@ -262,26 +311,6 @@ public class RelatoriosController {
         }
     }
 
-    @FXML
-    private void handleVerDetalhesSemana() {
-        try {
-            RelatorioVendasDTO relatorio = relatorioService.getRelatorioVendasSemana();
-            mostrarDetalhesRelatorio("Relatório de Vendas - Semana", relatorio);
-        } catch (Exception e) {
-            mostrarMensagemErro("Erro ao carregar detalhes: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void handleVerDetalhesMes() {
-        try {
-            RelatorioVendasDTO relatorio = relatorioService.getRelatorioVendasMes();
-            mostrarDetalhesRelatorio("Relatório de Vendas - Mês", relatorio);
-        } catch (Exception e) {
-            mostrarMensagemErro("Erro ao carregar detalhes: " + e.getMessage());
-        }
-    }
-
     private void mostrarDetalhesRelatorio(String titulo, RelatorioVendasDTO relatorio) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
@@ -302,7 +331,6 @@ public class RelatoriosController {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
             if (usuarioSessao != null) {
-                usuarioSessao.logout();
             }
 
             FXMLLoader loader = new FXMLLoader(
@@ -472,5 +500,54 @@ public class RelatoriosController {
     @FXML
     private void handleVerDetalhesHoje() {
         abrirRelatorioHojeDetalhado();
+    }
+
+    @FXML
+    private void handleVerDetalhesSemana() {
+        abrirRelatorioSemanalDetalhado();
+    }
+
+    @FXML
+    private void abrirRelatorioSemanalDetalhado() {
+        try {
+            System.out.println("Abrindo tela de relatório semanal...");
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pdv_galeteria/Frontend/views/TelaRelatorioSemanal.fxml"));
+
+            loader.setControllerFactory(PdvGaleteriaApplication.getSpringContext()::getBean);
+
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Relatório de Vendas - Semana");
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+            stage.show();
+
+        } catch (Exception e) {
+            System.err.println("Erro ao abrir relatório semanal: " + e.getMessage());
+            e.printStackTrace();
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Não foi possível abrir o relatório semanal");
+            alert.setContentText("Erro: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String cabecalho, String conteudo, Alert.AlertType tipo) {
+        javafx.application.Platform.runLater(() -> {
+            Alert alert = new Alert(tipo);
+            alert.setTitle(titulo);
+            alert.setHeaderText(cabecalho);
+            alert.setContentText(conteudo);
+            alert.showAndWait();
+        });
     }
 }

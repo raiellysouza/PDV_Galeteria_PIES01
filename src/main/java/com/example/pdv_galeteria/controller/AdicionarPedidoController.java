@@ -10,7 +10,6 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
-
 public class AdicionarPedidoController {
 
     @FXML
@@ -33,6 +32,8 @@ public class AdicionarPedidoController {
     private Button btnCancelar;
     @FXML
     private TextField txtPrevisaoEntrega;
+    @FXML
+    private Label labelTrocoGeral;
 
     private final ObservableList<ItemPedido> itens = FXCollections.observableArrayList();
 

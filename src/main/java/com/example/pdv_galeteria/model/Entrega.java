@@ -21,6 +21,10 @@ public class Entrega {
     @Column(name = "id_ifood", length = 50)
     private String idIfood;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_id")
+    private Pedido pedido;
+
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
@@ -67,6 +71,17 @@ public class Entrega {
 
     public void setIdIfood(String idIfood) {
         this.idIfood = idIfood;
+    }
+
+    public Pedido getPedido() {
+        return pedido;
+    }
+
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
+        if (pedido != null && pedido.getNumeroPedido() != null) {
+            this.numeroPedido = pedido.getNumeroPedido();
+        }
     }
 
     public LocalDateTime getDataHora() {

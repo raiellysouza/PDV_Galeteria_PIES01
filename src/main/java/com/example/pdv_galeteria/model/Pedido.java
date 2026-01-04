@@ -133,6 +133,9 @@ public class Pedido {
     @JoinColumn(name = "entregador_id")
     private Entregador entregadorAssociado;
 
+    @Column(name = "desconto")
+    private Double desconto = 0.0;
+
     public Pedido() {
         this.status = StatusPedido.REGISTRADO;
         this.criadoEm = LocalDateTime.now();
@@ -162,24 +165,6 @@ public class Pedido {
         itens.remove(item);
         item.setPedido(null);
         recalcularTotal();
-        atualizarUltimaAtualizacao();
-    }
-
-    public void adicionarFormaPagamento(String tipo, BigDecimal valor) {
-        FormaPagamentoPedido forma = new FormaPagamentoPedido();
-        forma.setTipo(tipo);
-        forma.setValor(valor);
-        forma.setPedido(this);
-        this.formasPagamento.add(forma);
-
-        atualizarValorPago();
-        atualizarUltimaAtualizacao();
-    }
-
-    public void removerFormaPagamento(FormaPagamentoPedido formaPagamento) {
-        this.formasPagamento.remove(formaPagamento);
-        formaPagamento.setPedido(null);
-        atualizarValorPago();
         atualizarUltimaAtualizacao();
     }
 
@@ -217,11 +202,6 @@ public class Pedido {
         atualizarUltimaAtualizacao();
     }
 
-    public void aplicarTaxaEntrega(BigDecimal taxa) {
-        this.taxaEntrega = taxa != null ? taxa : BigDecimal.ZERO;
-        atualizarUltimaAtualizacao();
-    }
-
     public BigDecimal getTotalFinal() {
         BigDecimal totalBase = getTotalComDesconto() != null &&
                 getTotalComDesconto().compareTo(BigDecimal.ZERO) > 0 ?
@@ -229,26 +209,6 @@ public class Pedido {
                 BigDecimal.valueOf(getTotal() != null ? getTotal() : 0.0);
 
         return totalBase.add(getTaxaEntrega() != null ? getTaxaEntrega() : BigDecimal.ZERO);
-    }
-
-    public void cancelar(String motivo, String responsavel) {
-        this.status = StatusPedido.CANCELADO;
-        this.motivoCancelamento = motivo;
-        this.responsavelCancelamento = responsavel;
-        this.dataCancelamento = LocalDateTime.now();
-        atualizarUltimaAtualizacao();
-    }
-
-    public void marcarComoEntregue() {
-        this.statusEntrega = "ENTREGUE";
-        this.dataEntrega = LocalDateTime.now();
-        atualizarUltimaAtualizacao();
-    }
-
-    public void marcarComoRetirado() {
-        this.statusEntrega = "RETIRADO";
-        this.dataRetirada = LocalDateTime.now();
-        atualizarUltimaAtualizacao();
     }
 
     private void atualizarUltimaAtualizacao() {
@@ -281,21 +241,20 @@ public class Pedido {
         atualizarUltimaAtualizacao();
     }
 
+    public Double getDesconto() {
+        return desconto != null ? desconto : 0.0;
+    }
+
+    public void setDesconto(Double desconto) {
+        this.desconto = desconto;
+        if (this.desconto == null) {
+            this.desconto = 0.0;
+        }
+    }
+
     public String getFormaPagamento() { return formaPagamento; }
     public void setFormaPagamento(String formaPagamento) {
         this.formaPagamento = formaPagamento;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getDetalhesPagamento() { return detalhesPagamento; }
-    public void setDetalhesPagamento(String detalhesPagamento) {
-        this.detalhesPagamento = detalhesPagamento;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getCanalVenda() { return canalVenda; }
-    public void setCanalVenda(String canalVenda) {
-        this.canalVenda = canalVenda;
         atualizarUltimaAtualizacao();
     }
 
@@ -308,12 +267,6 @@ public class Pedido {
     public String getEndereco() { return endereco; }
     public void setEndereco(String endereco) {
         this.endereco = endereco;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getNumero() { return numero; }
-    public void setNumero(String numero) {
-        this.numero = numero;
         atualizarUltimaAtualizacao();
     }
 
@@ -341,12 +294,6 @@ public class Pedido {
         atualizarUltimaAtualizacao();
     }
 
-    public Integer getTempoPrevisao() { return tempoPrevisao; }
-    public void setTempoPrevisao(Integer tempoPrevisao) {
-        this.tempoPrevisao = tempoPrevisao;
-        atualizarUltimaAtualizacao();
-    }
-
     public Double getValorPago() { return valorPago; }
     public void setValorPago(Double valorPago) {
         this.valorPago = valorPago;
@@ -366,26 +313,9 @@ public class Pedido {
         atualizarUltimaAtualizacao();
     }
 
-    public BigDecimal getDescontoPercentual() { return descontoPercentual; }
-    public void setDescontoPercentual(BigDecimal descontoPercentual) {
-        this.descontoPercentual = descontoPercentual;
-        recalcularTotal();
-    }
-
-    public BigDecimal getDescontoValor() { return descontoValor; }
-    public void setDescontoValor(BigDecimal descontoValor) {
-        this.descontoValor = descontoValor;
-        recalcularTotal();
-    }
-
     public BigDecimal getTotalComDesconto() { return totalComDesconto; }
     public void setTotalComDesconto(BigDecimal totalComDesconto) {
         this.totalComDesconto = totalComDesconto;
-        atualizarUltimaAtualizacao();
-    }
-
-    public void setTaxaEntrega(BigDecimal taxaEntrega) {
-        this.taxaEntrega = taxaEntrega != null ? taxaEntrega : BigDecimal.ZERO;
         atualizarUltimaAtualizacao();
     }
 
@@ -406,36 +336,6 @@ public class Pedido {
         atualizarValorPago();
     }
 
-    public String getBairro() { return bairro; }
-    public void setBairro(String bairro) {
-        this.bairro = bairro;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getCidade() { return cidade; }
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) {
-        this.estado = estado;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getCep() { return cep; }
-    public void setCep(String cep) {
-        this.cep = cep;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getComplemento() { return complemento; }
-    public void setComplemento(String complemento) {
-        this.complemento = complemento;
-        atualizarUltimaAtualizacao();
-    }
-
     public String getNumeroPedido() { return numeroPedido; }
     public void setNumeroPedido(String numeroPedido) {
         this.numeroPedido = numeroPedido;
@@ -454,47 +354,6 @@ public class Pedido {
         atualizarUltimaAtualizacao();
     }
 
-    public LocalDateTime getDataEntrega() { return dataEntrega; }
-    public void setDataEntrega(LocalDateTime dataEntrega) {
-        this.dataEntrega = dataEntrega;
-        atualizarUltimaAtualizacao();
-    }
-
-    public LocalDateTime getDataRetirada() { return dataRetirada; }
-    public void setDataRetirada(LocalDateTime dataRetirada) {
-        this.dataRetirada = dataRetirada;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getObservacaoInterna() { return observacaoInterna; }
-    public void setObservacaoInterna(String observacaoInterna) {
-        this.observacaoInterna = observacaoInterna;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getMotivoCancelamento() { return motivoCancelamento; }
-    public void setMotivoCancelamento(String motivoCancelamento) {
-        this.motivoCancelamento = motivoCancelamento;
-        atualizarUltimaAtualizacao();
-    }
-
-    public LocalDateTime getDataCancelamento() { return dataCancelamento; }
-    public void setDataCancelamento(LocalDateTime dataCancelamento) {
-        this.dataCancelamento = dataCancelamento;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getResponsavelCancelamento() { return responsavelCancelamento; }
-    public void setResponsavelCancelamento(String responsavelCancelamento) {
-        this.responsavelCancelamento = responsavelCancelamento;
-        atualizarUltimaAtualizacao();
-    }
-
-    public LocalDateTime getUltimaAtualizacao() { return ultimaAtualizacao; }
-    public void setUltimaAtualizacao(LocalDateTime ultimaAtualizacao) {
-        this.ultimaAtualizacao = ultimaAtualizacao;
-    }
-
     public String getFormasPagamentoString() {
         if (formasPagamento.isEmpty()) {
             return formaPagamento != null ? formaPagamento : "Não informado";
@@ -510,46 +369,12 @@ public class Pedido {
         return sb.toString();
     }
 
-    public String getEnderecoCompleto() {
-        if (endereco == null || endereco.isEmpty()) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder(endereco);
-        if (numero != null && !numero.isEmpty()) {
-            sb.append(", ").append(numero);
-        }
-        if (complemento != null && !complemento.isEmpty()) {
-            sb.append(", ").append(complemento);
-        }
-        if (bairro != null && !bairro.isEmpty()) {
-            sb.append(" - ").append(bairro);
-        }
-        if (cidade != null && !cidade.isEmpty()) {
-            sb.append(", ").append(cidade);
-        }
-        if (estado != null && !estado.isEmpty()) {
-            sb.append("/").append(estado);
-        }
-        if (cep != null && !cep.isEmpty()) {
-            sb.append(" - CEP: ").append(cep);
-        }
-        if (pontoReferencia != null && !pontoReferencia.isEmpty()) {
-            sb.append(" (").append(pontoReferencia).append(")");
-        }
-        return sb.toString();
-    }
-
     public boolean isEntrega() {
         return "Entrega".equals(tipoEntrega);
     }
 
     public boolean isRetirada() {
         return "Retirada na Loja".equals(tipoEntrega);
-    }
-
-    public boolean isOnline() {
-        return "Site".equals(canalVenda) || "Ifood".equals(canalVenda) || "Outro".equals(canalVenda);
     }
 
     public boolean isLoja() {
@@ -565,9 +390,5 @@ public class Pedido {
     public void setEntregadorAssociado(Entregador entregadorAssociado) {
         this.entregadorAssociado = entregadorAssociado;
         atualizarUltimaAtualizacao();
-    }
-
-    public LocalDateTime getDataHora() {
-        return criadoEm;
     }
 }

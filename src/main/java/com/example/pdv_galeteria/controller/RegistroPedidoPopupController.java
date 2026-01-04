@@ -14,7 +14,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -28,8 +27,6 @@ public class RegistroPedidoPopupController implements Initializable {
     @Autowired private CaixaService caixaService;
     @Autowired private PedidoService pedidoService;
     @Autowired private TelaRegistroPedidoController telaRegistroController;
-
-
     @FXML private Label labelNomeCliente;
     @FXML private Label labelTipoEntrega;
     @FXML private Label labelTaxaEntrega;
@@ -38,7 +35,6 @@ public class RegistroPedidoPopupController implements Initializable {
     @FXML private Label labelTelefone;
     @FXML private Label labelPontoReferencia;
     @FXML private Label labelObservacoes;
-
     @FXML private TextArea campoNomeCliente;
     @FXML private TextArea campoEndereco;
     @FXML private TextField campoTelefone;
@@ -47,52 +43,48 @@ public class RegistroPedidoPopupController implements Initializable {
     @FXML private TextField campoTaxaEntrega;
     @FXML private TextField campoNumero;
     @FXML private TextField campoTempoPrevisao;
-
     @FXML private CheckBox checkLoja;
     @FXML private CheckBox checkSite;
     @FXML private CheckBox checkIfood;
     @FXML private CheckBox checkOutro;
     @FXML private CheckBox checkRetirada;
     @FXML private CheckBox checkEntrega;
-
     @FXML private ToggleButton btnPix;
     @FXML private ToggleButton btnDinheiro;
     @FXML private ToggleButton btnDebito;
     @FXML private ToggleButton btnCredito;
-
     @FXML private VBox containerEndereco;
     @FXML private VBox containerValoresPagamento;
     @FXML private VBox containerValorUnico;
-
     @FXML private HBox containerValorPix;
     @FXML private HBox containerValorDinheiro;
     @FXML private HBox containerValorDebito;
     @FXML private HBox containerValorCredito;
-
     @FXML private TextField campoValorPix;
     @FXML private TextField campoValorDinheiro;
     @FXML private TextField campoValorDebito;
     @FXML private TextField campoValorCredito;
     @FXML private TextField campoValorPagoUnico;
-
-    @FXML private Label labelTrocoDinheiro;
+    @FXML private Label labelTrocoGeral;
     @FXML private Label labelTrocoUnico;
     @FXML private Label labelTotalPago;
-
     @FXML private TreeView<String> treeItensPedido;
     @FXML private Label labelTotal;
     @FXML private Button btnRegistrarPedido;
     @FXML private Button btnCancelar;
+    @FXML private TextField campoDesconto;
+    @FXML private TextField campoDescontoPercentual;
+    @FXML private Button btnAplicarDesconto;
+    @FXML private Label labelTotalComDesconto;
 
+    private double descontoAplicado = 0;
+    private double totalComDesconto = 0;
     private Map<Produto, Integer> carrinho;
     private double totalPedido;
     private DecimalFormat df = new DecimalFormat("#,##0.00");
-
     private Stage popupStage;
     private ToggleGroup grupoFormaPagamento = new ToggleGroup();
-
     private static Long contadorVendas = 1L;
-
     private List<ToggleButton> botoesFormaPagamento = new ArrayList<>();
 
     @Override
@@ -113,6 +105,8 @@ public class RegistroPedidoPopupController implements Initializable {
 
         configurarListenersValores();
 
+        configurarDesconto();
+
         configurarCheckboxes();
 
         configurarBotoesAcao();
@@ -120,6 +114,120 @@ public class RegistroPedidoPopupController implements Initializable {
         inicializarEstadoPadrao();
 
         System.out.println("Controller inicializado");
+    }
+
+    private void configurarDesconto() {
+        if (btnAplicarDesconto != null) {
+            btnAplicarDesconto.setOnAction(e -> aplicarDesconto());
+        }
+
+        if (campoDesconto != null) {
+            campoDesconto.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null && !newValue.trim().isEmpty() &&
+                        campoDescontoPercentual != null) {
+                    campoDescontoPercentual.clear();
+                }
+            });
+        }
+
+        if (campoDescontoPercentual != null) {
+            campoDescontoPercentual.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null && !newValue.trim().isEmpty() &&
+                        campoDesconto != null) {
+                    campoDesconto.clear();
+                }
+            });
+        }
+    }
+
+    private void aplicarDesconto() {
+        try {
+            double descontoValor = 0;
+            double descontoPercentual = 0;
+
+            if (campoDesconto != null && !campoDesconto.getText().trim().isEmpty()) {
+                descontoValor = parseValor(campoDesconto.getText());
+
+                if (descontoValor < 0) {
+                    mostrarErro("Desconto não pode ser negativo");
+                    return;
+                }
+
+                if (descontoValor > totalPedido) {
+                    descontoValor = totalPedido;
+                    campoDesconto.setText("R$ " + df.format(descontoValor));
+                }
+            }
+
+            if (campoDescontoPercentual != null && !campoDescontoPercentual.getText().trim().isEmpty()) {
+                String percentStr = campoDescontoPercentual.getText()
+                        .replace("%", "")
+                        .replace(" ", "")
+                        .trim();
+
+                if (percentStr.isEmpty()) {
+                    return;
+                }
+
+                descontoPercentual = Double.parseDouble(percentStr);
+
+                if (descontoPercentual < 0) {
+                    mostrarErro("Percentual de desconto não pode ser negativo");
+                    return;
+                }
+
+                if (descontoPercentual > 100) {
+                    descontoPercentual = 100;
+                    campoDescontoPercentual.setText("100%");
+                }
+
+                descontoValor = totalPedido * (descontoPercentual / 100);
+            }
+
+            descontoAplicado = descontoValor;
+            totalComDesconto = totalPedido - descontoAplicado;
+
+            if (totalComDesconto < 0) {
+                totalComDesconto = 0;
+                descontoAplicado = totalPedido;
+            }
+
+            if (labelTotalComDesconto != null) {
+                labelTotalComDesconto.setText("R$ " + df.format(totalComDesconto));
+            }
+
+            if (labelTotal != null) {
+                labelTotal.setText("R$ " + df.format(totalComDesconto));
+            }
+
+            calcularTrocoMultiplo();
+            calcularTrocoUnico();
+
+            System.out.println("Desconto aplicado: R$ " + descontoAplicado);
+            System.out.println("Total com desconto: R$ " + totalComDesconto);
+
+        } catch (NumberFormatException e) {
+            mostrarErro("Valor de desconto inválido");
+        }
+    }
+
+    private void removerDesconto() {
+        descontoAplicado = 0;
+        totalComDesconto = 0;
+
+        if (labelTotal != null) {
+            labelTotal.setText("R$ " + formatarMoeda(totalPedido));
+        }
+
+        if (labelTotalComDesconto != null) {
+            labelTotalComDesconto.setText("R$ " + formatarMoeda(totalPedido));
+        }
+
+        if (campoDesconto != null) campoDesconto.clear();
+        if (campoDescontoPercentual != null) campoDescontoPercentual.clear();
+
+        calcularTrocoMultiplo();
+        calcularTrocoUnico();
     }
 
     private void configurarBotoesFormaPagamento() {
@@ -170,7 +278,8 @@ public class RegistroPedidoPopupController implements Initializable {
         if (campoTaxaEntrega != null) {
             campoTaxaEntrega.textProperty().addListener((observable, oldValue, newValue) -> {
                 atualizarTotalComTaxa();
-                resetarTrocoAoMudarPagamento();
+                calcularTrocoMultiplo();
+                calcularTrocoUnico();
             });
         }
     }
@@ -224,9 +333,8 @@ public class RegistroPedidoPopupController implements Initializable {
             labelTrocoUnico.setVisible(false);
         }
 
-        if (labelTrocoDinheiro != null) {
-            labelTrocoDinheiro.setText("R$ 0,00");
-            labelTrocoDinheiro.setVisible(false);
+        if (labelTrocoGeral != null) {
+            labelTrocoGeral.setText("R$ 0,00");
         }
 
         atualizarVisibilidadeCamposPagamento();
@@ -378,6 +486,8 @@ public class RegistroPedidoPopupController implements Initializable {
         if (quantidadeFormas == 0) {
             if (containerValoresPagamento != null) containerValoresPagamento.setVisible(false);
             if (containerValorUnico != null) containerValorUnico.setVisible(false);
+
+            if (labelTrocoGeral != null) labelTrocoGeral.setVisible(false);
         } else if (quantidadeFormas == 1) {
             if (containerValoresPagamento != null) containerValoresPagamento.setVisible(false);
             if (containerValorUnico != null) containerValorUnico.setVisible(true);
@@ -386,6 +496,8 @@ public class RegistroPedidoPopupController implements Initializable {
                 labelTrocoUnico.setVisible(true);
                 labelTrocoUnico.setText("R$ 0,00");
             }
+
+            if (labelTrocoGeral != null) labelTrocoGeral.setVisible(false);
 
             limparCamposMultiplosPagamento();
         } else {
@@ -397,12 +509,12 @@ public class RegistroPedidoPopupController implements Initializable {
             if (containerValorDebito != null) containerValorDebito.setVisible(formasSelecionadas.contains("Débito"));
             if (containerValorCredito != null) containerValorCredito.setVisible(formasSelecionadas.contains("Crédito"));
 
-            if (labelTrocoDinheiro != null) {
-                labelTrocoDinheiro.setVisible(formasSelecionadas.contains("Dinheiro"));
-                if (formasSelecionadas.contains("Dinheiro")) {
-                    labelTrocoDinheiro.setText("R$ 0,00");
-                }
+            if (labelTrocoGeral != null) {
+                labelTrocoGeral.setVisible(true);
+                labelTrocoGeral.setText("R$ 0,00");
             }
+
+            if (labelTrocoUnico != null) labelTrocoUnico.setVisible(false);
 
             if (campoValorPagoUnico != null) campoValorPagoUnico.clear();
         }
@@ -415,7 +527,7 @@ public class RegistroPedidoPopupController implements Initializable {
         if (campoValorDinheiro != null) campoValorDinheiro.clear();
         if (campoValorDebito != null) campoValorDebito.clear();
         if (campoValorCredito != null) campoValorCredito.clear();
-        if (labelTrocoDinheiro != null) labelTrocoDinheiro.setText("R$ 0,00");
+        if (labelTrocoGeral != null) labelTrocoGeral.setText("R$ 0,00");
         if (labelTotalPago != null) labelTotalPago.setText("R$ 0,00");
     }
 
@@ -469,7 +581,6 @@ public class RegistroPedidoPopupController implements Initializable {
         try {
             double totalComTaxa = getTotalComTaxa();
             double totalPago = 0;
-            double valorDinheiro = 0;
 
             List<String> formas = getFormasPagamentoSelecionadas();
 
@@ -481,8 +592,7 @@ public class RegistroPedidoPopupController implements Initializable {
                         valorForma = parseValor(campoValorPix.getText());
                         break;
                     case "Dinheiro":
-                        valorDinheiro = parseValor(campoValorDinheiro.getText());
-                        valorForma = valorDinheiro;
+                        valorForma = parseValor(campoValorDinheiro.getText());
                         break;
                     case "Débito":
                         valorForma = parseValor(campoValorDebito.getText());
@@ -495,45 +605,44 @@ public class RegistroPedidoPopupController implements Initializable {
                 totalPago += valorForma;
             }
 
-            if (formas.contains("Dinheiro")) {
-                double valorOutrasFormas = totalPago - valorDinheiro;
-                double valorDevidoComDinheiro = totalComTaxa - valorOutrasFormas;
+            double troco = 0;
+            if (totalPago > totalComTaxa) {
+                troco = totalPago - totalComTaxa;
+            }
 
-                double troco = 0;
-                if (valorDinheiro >= valorDevidoComDinheiro) {
-                    troco = valorDinheiro - valorDevidoComDinheiro;
-                }
-
-                if (labelTrocoDinheiro != null) {
-                    labelTrocoDinheiro.setText("R$ " + df.format(troco));
-                }
-            } else {
-                if (labelTrocoDinheiro != null) {
-                    labelTrocoDinheiro.setText("R$ 0,00");
-                }
+            if (labelTrocoGeral != null) {
+                labelTrocoGeral.setText("R$ " + df.format(troco));
             }
 
         } catch (NumberFormatException e) {
-            if (labelTrocoDinheiro != null) {
-                labelTrocoDinheiro.setText("R$ 0,00");
+            if (labelTrocoGeral != null) {
+                labelTrocoGeral.setText("R$ 0,00");
             }
         }
     }
 
     private void resetarTrocoAoMudarPagamento() {
         List<String> formasSelecionadas = getFormasPagamentoSelecionadas();
+        int quantidadeFormas = formasSelecionadas.size();
 
-        if (formasSelecionadas.size() == 1) {
-            String forma = formasSelecionadas.get(0);
+        if (quantidadeFormas == 1) {
             if (labelTrocoUnico != null) {
                 labelTrocoUnico.setText("R$ 0,00");
-                if (!forma.equals("Dinheiro")) {
-                }
+            }
+            if (labelTrocoGeral != null) {
+                labelTrocoGeral.setVisible(false);
+            }
+        } else if (quantidadeFormas > 1) {
+            if (labelTrocoGeral != null) {
+                labelTrocoGeral.setText("R$ 0,00");
+                labelTrocoGeral.setVisible(true);
+            }
+            if (labelTrocoUnico != null) {
+                labelTrocoUnico.setVisible(false);
             }
         } else {
-            if (labelTrocoDinheiro != null) {
-                labelTrocoDinheiro.setText("R$ 0,00");
-            }
+            if (labelTrocoGeral != null) labelTrocoGeral.setVisible(false);
+            if (labelTrocoUnico != null) labelTrocoUnico.setVisible(false);
         }
     }
 
@@ -577,9 +686,11 @@ public class RegistroPedidoPopupController implements Initializable {
     private double getTotalComTaxa() {
         try {
             double taxa = parseValor(campoTaxaEntrega.getText());
-            return totalPedido + taxa;
+            double totalBase = (totalComDesconto > 0) ? totalComDesconto : totalPedido;
+            return totalBase + taxa;
         } catch (NumberFormatException e) {
-            return totalPedido;
+            double totalBase = (totalComDesconto > 0) ? totalComDesconto : totalPedido;
+            return totalBase;
         }
     }
 
@@ -617,13 +728,10 @@ public class RegistroPedidoPopupController implements Initializable {
         }
 
         List<String> formasPagamento = getFormasPagamentoSelecionadas();
-        if (formasPagamento.isEmpty()) {
-            mostrarErro("Selecione pelo menos uma forma de pagamento");
-            return false;
-        }
-
-        if (!validarValoresPagamento(formasPagamento)) {
-            return false;
+        if (!formasPagamento.isEmpty()) {
+            if (!validarValoresPagamento(formasPagamento)) {
+                return false;
+            }
         }
 
         if (canalVenda.equals("Loja")) {
@@ -879,6 +987,7 @@ public class RegistroPedidoPopupController implements Initializable {
 
             double taxaEntrega = parseValor(campoTaxaEntrega.getText());
             double totalComTaxa = getTotalComTaxa();
+            double desconto = this.descontoAplicado;
 
             String enderecoEntrega = campoEndereco != null ? campoEndereco.getText().trim() : "";
             String numeroEndereco = campoNumero != null ? campoNumero.getText().trim() : "";
@@ -905,11 +1014,18 @@ public class RegistroPedidoPopupController implements Initializable {
                 descricaoVenda += " - " + canalVenda;
             }
 
+            if (desconto > 0) {
+                descricaoVenda += " (Desconto: R$ " + df.format(desconto) + ")";
+            }
+
             String referenciaVenda = "VENDA_" + numeroVenda;
             BigDecimal valorVenda = BigDecimal.valueOf(totalComTaxa);
 
             System.out.println("Registrando entrada no caixa: R$ " + valorVenda);
             System.out.println("Descrição: " + descricaoVenda);
+            if (desconto > 0) {
+                System.out.println("Desconto aplicado: R$ " + desconto);
+            }
 
             System.out.println("=== SALVANDO PEDIDO NO BANCO ===");
 
@@ -924,6 +1040,7 @@ public class RegistroPedidoPopupController implements Initializable {
             pedido.setValorPago(totalPago);
             pedido.setTroco(trocoTotal);
             pedido.setTempoEstimado(tempoPrevisao);
+            pedido.setDesconto(desconto);
 
             if (checkEntrega != null && checkEntrega.isSelected()) {
                 pedido.setTaxaEntrega(taxaEntrega);
@@ -949,6 +1066,7 @@ public class RegistroPedidoPopupController implements Initializable {
             pedido.recalcularTotal();
 
             System.out.println("Total do pedido: R$ " + pedido.getTotal());
+            System.out.println("Desconto: R$ " + desconto);
             System.out.println("Status: " + pedido.getStatus());
             System.out.println("Cliente: " + pedido.getCliente());
 
@@ -994,6 +1112,11 @@ public class RegistroPedidoPopupController implements Initializable {
             mensagemSucesso.append("Venda registrada com sucesso!\n\n");
             mensagemSucesso.append("Cliente: ").append(nomeCliente.isEmpty() ? "Não informado" : nomeCliente).append("\n");
             mensagemSucesso.append("Total: R$ ").append(String.format("%.2f", totalComTaxa)).append("\n");
+
+            if (desconto > 0) {
+                mensagemSucesso.append("Desconto: R$ ").append(String.format("%.2f", desconto)).append("\n");
+            }
+
             mensagemSucesso.append("Forma de Pagamento: ").append(formaPagamento).append("\n");
             mensagemSucesso.append("Canal: ").append(canalVenda).append("\n");
             mensagemSucesso.append("Tipo de Entrega: ").append(tipoEntrega).append("\n");
@@ -1046,6 +1169,8 @@ public class RegistroPedidoPopupController implements Initializable {
 
         this.carrinho = carrinho;
         this.totalPedido = totalPedido;
+        this.descontoAplicado = 0;
+        this.totalComDesconto = 0;
 
         System.out.println("Total do pedido: R$ " + totalPedido);
         System.out.println("Itens no carrinho: " + (carrinho != null ? carrinho.size() : 0));
@@ -1053,6 +1178,13 @@ public class RegistroPedidoPopupController implements Initializable {
         if (labelTotal != null) {
             labelTotal.setText("R$ " + formatarMoeda(totalPedido));
         }
+
+        if (labelTotalComDesconto != null) {
+            labelTotalComDesconto.setText("R$ " + formatarMoeda(totalPedido));
+        }
+
+        if (campoDesconto != null) campoDesconto.clear();
+        if (campoDescontoPercentual != null) campoDescontoPercentual.clear();
 
         if (treeItensPedido != null && carrinho != null && !carrinho.isEmpty()) {
             treeItensPedido.setRoot(null);
@@ -1127,6 +1259,13 @@ public class RegistroPedidoPopupController implements Initializable {
         if (campoValorCredito != null) campoValorCredito.clear();
         if (campoValorPagoUnico != null) campoValorPagoUnico.clear();
 
+        if (campoDesconto != null) campoDesconto.clear();
+        if (campoDescontoPercentual != null) campoDescontoPercentual.clear();
+        if (labelTotalComDesconto != null) labelTotalComDesconto.setText("R$ 0,00");
+
+        descontoAplicado = 0;
+        totalComDesconto = 0;
+
         if (checkLoja != null) checkLoja.setSelected(false);
         if (checkSite != null) checkSite.setSelected(false);
         if (checkIfood != null) checkIfood.setSelected(false);
@@ -1141,7 +1280,7 @@ public class RegistroPedidoPopupController implements Initializable {
 
         atualizarEstiloBotoesPagamento();
 
-        if (labelTrocoDinheiro != null) labelTrocoDinheiro.setText("R$ 0,00");
+        if (labelTrocoGeral != null) labelTrocoGeral.setText("R$ 0,00");
         if (labelTrocoUnico != null) labelTrocoUnico.setText("R$ 0,00");
         if (labelTotalPago != null) labelTotalPago.setText("R$ 0,00");
         if (labelTotal != null) labelTotal.setText("R$ 0,00");

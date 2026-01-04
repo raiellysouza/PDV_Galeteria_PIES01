@@ -1021,7 +1021,6 @@ public class DashboardController implements Initializable {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
             if (usuarioSessao != null) {
-                usuarioSessao.logout();
             }
 
             FXMLLoader loader = new FXMLLoader(
@@ -1148,7 +1147,6 @@ public class DashboardController implements Initializable {
 
     private void imprimirPedido(Long pedidoId) {
         try {
-            // Verificar se o serviço está disponível
             if (impressaoService == null) {
                 System.err.println("ERRO: ImpressaoService é nulo!");
                 if (PdvGaleteriaApplication.getSpringContext() != null) {
@@ -1160,7 +1158,6 @@ public class DashboardController implements Initializable {
                 }
             }
 
-            // Buscar pedido com todos os dados necessários
             Pedido pedido = pedidoService.buscarPedidoComItens(pedidoId);
             if (pedido == null) {
                 mostrarErro("Pedido não encontrado!");
@@ -1183,7 +1180,6 @@ public class DashboardController implements Initializable {
 
             alert.getButtonTypes().setAll(btnImprimirComanda, btnPDF, btnTXT, btnPreview, btnCancelar);
 
-            // Gerar preview da comanda
             String previewComanda = "";
             try {
                 previewComanda = impressaoService.gerarPreviewComanda(pedido);
@@ -1213,7 +1209,6 @@ public class DashboardController implements Initializable {
 
             if (result.isPresent()) {
                 if (result.get() == btnImprimirComanda) {
-                    // Imprimir comanda usando ImpressaoService
                     System.out.println("Tentando imprimir comanda...");
                     try {
                         boolean sucesso = impressaoService.imprimirComanda(pedido);
@@ -1221,7 +1216,6 @@ public class DashboardController implements Initializable {
                             mostrarSucesso("Comanda enviada para impressão com sucesso!");
                             System.out.println("Impressão realizada com sucesso!");
                         } else {
-                            // Se falhar, salva o arquivo
                             File arquivo = impressaoService.salvarArquivoImpressao(pedido);
                             mostrarSucesso("Impressão não realizada. Arquivo salvo em: " + arquivo.getAbsolutePath());
                             System.out.println("Arquivo salvo em: " + arquivo.getAbsolutePath());
@@ -1254,7 +1248,6 @@ public class DashboardController implements Initializable {
 
     private void mostrarPreviewComanda(Pedido pedido) {
         try {
-            // Verificar se o serviço está disponível
             if (impressaoService == null) {
                 System.err.println("ERRO: ImpressaoService é nulo!");
                 if (PdvGaleteriaApplication.getSpringContext() != null) {
