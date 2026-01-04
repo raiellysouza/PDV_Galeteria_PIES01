@@ -1,6 +1,5 @@
 package com.example.pdv_galeteria.controller;
 
-import com.example.pdv_galeteria.PdvGaleteriaApplication;
 import com.example.pdv_galeteria.dto.PedidoResumoDTO;
 import com.example.pdv_galeteria.dto.RelatorioVendasDTO;
 import com.example.pdv_galeteria.service.RelatorioService;
@@ -9,6 +8,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,12 +39,7 @@ public class RelatorioHojeController implements Initializable {
     @FXML private Label labelDebitoPercent;
     @FXML private Label labelDinheiroPercent;
 
-    @FXML private Label labelUltimaVendaId;
-    @FXML private Label labelUltimaVendaCliente;
-    @FXML private Label labelUltimaVendaProdutos;
-    @FXML private Label labelUltimaVendaValor;
-    @FXML private Label labelUltimaVendaPagamento;
-    @FXML private Label labelUltimaVendaHorario;
+    @FXML private VBox containerVendas;
 
     @Autowired
     private RelatorioService relatorioService;
@@ -105,49 +101,79 @@ public class RelatorioHojeController implements Initializable {
     private void carregarUltimasVendas() {
         try {
             System.out.println("Carregando últimas vendas...");
-            List<PedidoResumoDTO> ultimasVendas = relatorioService.getUltimasVendasHoje(1);
+            List<PedidoResumoDTO> ultimasVendas = relatorioService.getUltimasVendasHoje(5);
+
+            containerVendas.getChildren().clear();
 
             if (ultimasVendas != null && !ultimasVendas.isEmpty()) {
-                PedidoResumoDTO ultimaVenda = ultimasVendas.get(0);
-                System.out.println("Última venda encontrada: " + ultimaVenda);
+                System.out.println("Encontradas " + ultimasVendas.size() + " vendas recentes");
 
-                if (labelUltimaVendaId != null) {
-                    labelUltimaVendaId.setText("#" + ultimaVenda.getId());
+                for (PedidoResumoDTO venda : ultimasVendas) {
+                    adicionarLinhaVenda(venda);
                 }
 
-                if (labelUltimaVendaCliente != null) {
-                    labelUltimaVendaCliente.setText(ultimaVenda.getCliente());
-                }
-
-                if (labelUltimaVendaProdutos != null) {
-                    String produtos = ultimaVenda.getProdutos();
-                    if (produtos.length() > 30) {
-                        produtos = produtos.substring(0, 27) + "...";
-                    }
-                    labelUltimaVendaProdutos.setText(produtos);
-                }
-
-                if (labelUltimaVendaValor != null) {
-                    labelUltimaVendaValor.setText(ultimaVenda.getValorFormatado());
-                }
-
-                if (labelUltimaVendaPagamento != null) {
-                    labelUltimaVendaPagamento.setText(ultimaVenda.getFormaPagamento());
-                }
-
-                if (labelUltimaVendaHorario != null) {
-                    labelUltimaVendaHorario.setText(ultimaVenda.getHoraFormatada());
-                }
             } else {
                 System.out.println("Nenhuma venda encontrada para hoje");
-                definirUltimaVendaVazia();
+                adicionarLinhaVazia();
             }
 
         } catch (Exception e) {
             System.err.println("Erro ao carregar últimas vendas: " + e.getMessage());
             e.printStackTrace();
-            definirUltimaVendaVazia();
+            adicionarLinhaVazia();
         }
+    }
+
+    private void adicionarLinhaVenda(PedidoResumoDTO venda) {
+        HBox linha = new HBox();
+        linha.setSpacing(10.0);
+        linha.setStyle("-fx-padding: 12 10; -fx-background-color: #F9FAFB; -fx-border-color: #E5E7EB; -fx-border-width: 0 0 1 0;");
+
+        Label labelId = new Label("#" + venda.getId());
+        labelId.setPrefWidth(40);
+        labelId.setTextFill(javafx.scene.paint.Color.web("#4b5563"));
+
+        Label labelCliente = new Label(venda.getCliente());
+        labelCliente.setPrefWidth(120);
+        labelCliente.setTextFill(javafx.scene.paint.Color.web("#1f2937"));
+
+        String produtos = venda.getProdutos();
+        if (produtos.length() > 30) {
+            produtos = produtos.substring(0, 27) + "...";
+        }
+        Label labelProdutos = new Label(produtos);
+        labelProdutos.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(labelProdutos, javafx.scene.layout.Priority.ALWAYS);
+        labelProdutos.setTextFill(javafx.scene.paint.Color.web("#4b5563"));
+
+        Label labelValor = new Label(venda.getValorFormatado());
+        labelValor.setPrefWidth(100);
+        labelValor.setTextFill(javafx.scene.paint.Color.web("#16a34a"));
+        labelValor.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
+
+        Label labelPagamento = new Label(venda.getFormaPagamento());
+        labelPagamento.setPrefWidth(120);
+        labelPagamento.setTextFill(javafx.scene.paint.Color.web("#4b5563"));
+
+        Label labelHorario = new Label(venda.getHoraFormatada());
+        labelHorario.setPrefWidth(60);
+        labelHorario.setTextFill(javafx.scene.paint.Color.web("#4b5563"));
+
+        linha.getChildren().addAll(labelId, labelCliente, labelProdutos, labelValor, labelPagamento, labelHorario);
+        containerVendas.getChildren().add(linha);
+    }
+
+    private void adicionarLinhaVazia() {
+        HBox linha = new HBox();
+        linha.setSpacing(10.0);
+        linha.setStyle("-fx-padding: 12 10; -fx-background-color: #F9FAFB; -fx-border-color: #E5E7EB; -fx-border-width: 0 0 1 0;");
+
+        Label labelVazio = new Label("Nenhuma venda encontrada hoje");
+        labelVazio.setTextFill(javafx.scene.paint.Color.web("#6b7280"));
+        labelVazio.setPrefWidth(600);
+
+        linha.getChildren().add(labelVazio);
+        containerVendas.getChildren().add(linha);
     }
 
     private void carregarDistribuicaoPagamento() {
@@ -228,15 +254,6 @@ public class RelatorioHojeController implements Initializable {
         }
     }
 
-    private void definirUltimaVendaVazia() {
-        if (labelUltimaVendaId != null) labelUltimaVendaId.setText("#0");
-        if (labelUltimaVendaCliente != null) labelUltimaVendaCliente.setText("Nenhuma venda");
-        if (labelUltimaVendaProdutos != null) labelUltimaVendaProdutos.setText("-");
-        if (labelUltimaVendaValor != null) labelUltimaVendaValor.setText("R$ 0,00");
-        if (labelUltimaVendaPagamento != null) labelUltimaVendaPagamento.setText("-");
-        if (labelUltimaVendaHorario != null) labelUltimaVendaHorario.setText("--:--");
-    }
-
     private void definirDistribuicaoVazia() {
         if (labelPixPercent != null) labelPixPercent.setText("0%");
         if (labelCreditoPercent != null) labelCreditoPercent.setText("0%");
@@ -246,7 +263,7 @@ public class RelatorioHojeController implements Initializable {
 
     private void definirValoresPadrao() {
         definirValoresBasicosPadrao();
-        definirUltimaVendaVazia();
+        adicionarLinhaVazia();
         definirDistribuicaoVazia();
     }
 

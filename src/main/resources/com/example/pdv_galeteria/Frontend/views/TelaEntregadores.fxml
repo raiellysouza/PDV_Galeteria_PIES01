@@ -89,7 +89,7 @@
                     </image>
                 </ImageView>
 
-                <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
+                <Button alignment="CENTER" layoutX="12.0" layoutY="361.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" style="-fx-background-color: #f68411;" styleClass="button-lateral" text="    Entregadores" textFill="WHITE">
                     <font>
                         <Font size="27.0" />
                     </font>
@@ -150,7 +150,7 @@
                         <Image url="@/assets/imgs/sair_.png" />
                     </image>
                 </ImageView>
-                <Label fx:id="labelNomeUsuario" layoutX="23.0" layoutY="602.0" style="-fx-text-fill: white;" text="Nome do Usuário" textFill="WHITE">
+                <Label fx:id="labelNomeUsuario" layoutX="24.0" layoutY="608.0" style="-fx-text-fill: white;" text="Nome do Usuário" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="22.0" />
                     </font>

@@ -94,7 +94,6 @@ public class ConfiguracoesController {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
             if (usuarioSessao != null) {
-                usuarioSessao.logout();
             }
 
             FXMLLoader loader = new FXMLLoader(
@@ -120,6 +119,9 @@ public class ConfiguracoesController {
             popupStage.showAndWait();
 
             if (controller.isConfirmado()) {
+                if (usuarioSessao != null) {
+                    usuarioSessao.logout();
+                }
                 voltarParaTelaLogin(currentStage);
             }
         } catch (Exception e) {

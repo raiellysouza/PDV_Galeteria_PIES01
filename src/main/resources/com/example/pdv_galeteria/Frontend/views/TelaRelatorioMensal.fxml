@@ -12,9 +12,9 @@
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="655.0" prefWidth="677.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.RelatorioHojeController">
+<ScrollPane fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="602.0" prefWidth="752.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.RelatorioMensalController">
     <content>
-        <VBox prefHeight="653.0" prefWidth="675.0" spacing="25.0" style="-fx-background-color: #F3F4F6;">
+        <VBox prefHeight="700.0" prefWidth="750.0" spacing="25.0" style="-fx-background-color: #F3F4F6;">
             <padding>
                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
             </padding>
@@ -24,12 +24,12 @@
                         <SVGPath content="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#1f2937" scaleX="1.2" scaleY="1.2" />
                         <VBox spacing="2.0">
                             <children>
-                                <Label text="Relatório de Vendas - Hoje" textFill="#111827">
+                                <Label text="Relatório de Vendas - Mês" textFill="#111827">
                                     <font>
                                         <Font name="System Bold" size="20.0" />
                                     </font>
                                 </Label>
-                                <Label text="Vendas realizadas no dia atual" textFill="#6b7280">
+                                <Label text="Vendas do mês atual" textFill="#6b7280">
                                     <font>
                                         <Font size="12.0" />
                                     </font>
@@ -48,7 +48,7 @@
                             </padding>
                             <children>
                                 <SVGPath content="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L6.04 7.5 12 10.85l5.96-3.35L12 4.15zM5 15.91l6 3.38v-6.71L5 9.21v6.7z" fill="#3b82f6" scaleX="1.5" scaleY="1.5" />
-                                <Label fx:id="labelPedidosHoje" text="0" textFill="#111827">
+                                <Label fx:id="labelPedidosMes" text="1.287" textFill="#111827">
                                     <font>
                                         <Font name="System Bold" size="24.0" />
                                     </font>
@@ -63,7 +63,7 @@
                             </padding>
                             <children>
                                 <SVGPath content="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="#22c55e" scaleX="1.5" scaleY="1.5" />
-                                <Label fx:id="labelTotalHoje" text="R$ 00,00" textFill="#111827">
+                                <Label fx:id="labelTotalMes" text="R$ 32.450,00" textFill="#111827">
                                     <font>
                                         <Font name="System Bold" size="24.0" />
                                     </font>
@@ -78,7 +78,7 @@
                             </padding>
                             <children>
                                 <SVGPath content="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" fill="#22c55e" scaleX="1.5" scaleY="1.5" />
-                                <Label fx:id="labelTicketMedio" text="R$ 00,00" textFill="#111827">
+                                <Label fx:id="labelTicketMedioMes" text="R$ 25,21" textFill="#111827">
                                     <font>
                                         <Font name="System Bold" size="24.0" />
                                     </font>
@@ -93,7 +93,7 @@
                             </padding>
                             <children>
                                 <SVGPath content="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="#f97316" scaleX="1.5" scaleY="1.5" />
-                                <Label fx:id="labelPeriodo" text="Hoje" textFill="#111827">
+                                <Label fx:id="labelPeriodoMes" text="Este Mês" textFill="#111827">
                                     <font>
                                         <Font name="System Bold" size="24.0" />
                                     </font>
@@ -104,7 +104,7 @@
                     </children>
                 </HBox>
 
-                <Label text="Últimas Vendas do Período" textFill="#111827">
+                <Label text="Faturamento por Semana do Mês" textFill="#111827">
                     <font>
                         <Font size="18.0" />
                     </font>
@@ -117,25 +117,25 @@
                                 <Label prefWidth="40.0" text="ID" textFill="#374151">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
-                                <Label prefWidth="120.0" text="Cliente" textFill="#374151">
+                                <Label prefWidth="150.0" text="Período" textFill="#374151">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
-                                <Label maxWidth="1.7976931348623157E308" text="Produtos" textFill="#374151" HBox.hgrow="ALWAYS">
+                                <Label prefWidth="200.0" text="Resumo" textFill="#374151">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
-                                <Label prefWidth="100.0" text="Valor" textFill="#374151">
+                                <Label prefWidth="120.0" text="Faturamento" textFill="#374151">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
-                                <Label prefWidth="120.0" text="Pagamento" textFill="#374151">
+                                <Label prefWidth="100.0" text="Pagamento" textFill="#374151">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
-                                <Label prefWidth="60.0" text="Horário" textFill="#374151">
+                                <Label prefWidth="120.0" text="Status" textFill="#374151">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
                             </children>
                         </HBox>
 
-                        <VBox fx:id="containerVendas" style="-fx-background-color: white;" />
+                        <VBox fx:id="containerSemanas" style="-fx-background-color: white;" />
                     </children>
                 </VBox>
 
@@ -160,7 +160,7 @@
                                         </Label>
                                     </children>
                                 </HBox>
-                                <Label fx:id="labelPixPercent" text="0%" textFill="#111827">
+                                <Label fx:id="labelPixPercentMes" text="0%" textFill="#111827">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
                             </children>
@@ -179,7 +179,7 @@
                                         </Label>
                                     </children>
                                 </HBox>
-                                <Label fx:id="labelCreditoPercent" text="0%" textFill="#111827">
+                                <Label fx:id="labelCreditoPercentMes" text="0%" textFill="#111827">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
                             </children>
@@ -198,7 +198,7 @@
                                         </Label>
                                     </children>
                                 </HBox>
-                                <Label fx:id="labelDebitoPercent" text="0%" textFill="#111827">
+                                <Label fx:id="labelDebitoPercentMes" text="0%" textFill="#111827">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
                             </children>
@@ -217,7 +217,7 @@
                                         </Label>
                                     </children>
                                 </HBox>
-                                <Label fx:id="labelDinheiroPercent" text="0%" textFill="#111827">
+                                <Label fx:id="labelDinheiroPercentMes" text="0%" textFill="#111827">
                                     <font><Font name="System Bold" size="14.0" /></font>
                                 </Label>
                             </children>
@@ -227,7 +227,7 @@
 
                 <HBox alignment="CENTER_RIGHT" spacing="20.0">
                     <children>
-                        <Button fx:id="btnExportar" onAction="#handleExportarRelatorio" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Exportar Relatório">
+                        <Button fx:id="btnExportar" onAction="#handleExportarRelatorioMensal" style="-fx-background-color: #F97316; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Exportar Relatório">
                             <padding>
                                 <Insets bottom="12.0" left="25.0" right="25.0" top="12.0" />
                             </padding>

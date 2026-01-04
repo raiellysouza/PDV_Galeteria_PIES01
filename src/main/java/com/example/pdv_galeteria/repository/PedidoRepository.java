@@ -59,4 +59,19 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query("SELECT p FROM Pedido p WHERE p.criadoEm BETWEEN :inicio AND :fim AND p.status != com.example.pdv_galeteria.model.StatusPedido.CANCELADO")
     List<Pedido> findPedidosAtivosPorPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    @Query("SELECT p FROM Pedido p WHERE p.criadoEm BETWEEN :inicio AND :fim ORDER BY p.criadoEm DESC")
+    List<Pedido> findTopNByCriadoEmBetweenOrderByCriadoEmDesc(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("quantidade") int quantidade);
+
+    @Query(value = "SELECT * FROM pedidos WHERE DATE(criado_em) = CURRENT_DATE AND status != 'CANCELADO'", nativeQuery = true)
+    List<Pedido> findPedidosHojeAtivos();
+
+    @Query(value = "SELECT COUNT(*) FROM pedidos WHERE DATE(criado_em) = CURRENT_DATE AND status != 'CANCELADO'", nativeQuery = true)
+    Long countPedidosHojeAtivos();
+
+    @Query(value = "SELECT COALESCE(SUM(total), 0) FROM pedidos WHERE DATE(criado_em) = CURRENT_DATE AND status != 'CANCELADO'", nativeQuery = true)
+    Double sumTotalVendasHoje();
 }

@@ -104,7 +104,7 @@
                     </image>
                 </ImageView>
 
-                <Button alignment="CENTER" layoutX="12.0" layoutY="421.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" styleClass="button-lateral" text="Relatórios  " textFill="WHITE">
+                <Button alignment="CENTER" layoutX="12.0" layoutY="421.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="260.0" style="-fx-background-color: #f68411;" styleClass="button-lateral" text="Relatórios  " textFill="WHITE">
                     <font>
                         <Font size="27.0" />
                     </font>
@@ -237,7 +237,7 @@
                                                         </Label>
                                                     </children>
                                                 </HBox>
-                                                <Button fx:id="btnDetalhesHoje" onAction="#handleVerDetalhesHoje" maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
+                                                <Button fx:id="btnDetalhesHoje" maxWidth="1.7976931348623157E308" onAction="#handleVerDetalhesHoje" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
                                                     <font>
                                                         <Font name="System Bold" size="12.0" />
                                                     </font>
@@ -293,7 +293,7 @@
                                                         </Label>
                                                     </children>
                                                 </HBox>
-                                                <Button fx:id="btnDetalhesSemana" onAction="#handleVerDetalhesSemana" maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
+                                                <Button fx:id="btnDetalhesSemana" maxWidth="1.7976931348623157E308" onAction="#handleVerDetalhesSemana" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
                                                     <font>
                                                         <Font name="System Bold" size="12.0" />
                                                     </font>
@@ -349,7 +349,7 @@
                                                         </Label>
                                                     </children>
                                                 </HBox>
-                                                <Button fx:id="btnDetalhesMes" onAction="#handleVerDetalhesMes" maxWidth="1.7976931348623157E308" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
+                                                <Button fx:id="btnDetalhesMes" maxWidth="1.7976931348623157E308" onAction="#handleVerDetalhesMes" style="-fx-background-color: #d1d5db; -fx-background-radius: 6;" text="Ver Detalhes" textFill="#1f2937">
                                                     <font>
                                                         <Font name="System Bold" size="12.0" />
                                                     </font>

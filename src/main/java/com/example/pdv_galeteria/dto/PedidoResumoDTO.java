@@ -23,6 +23,9 @@ public class PedidoResumoDTO {
         this.horario = horario;
     }
 
+    public PedidoResumoDTO(Long id, String cliente, String produtos, BigDecimal bigDecimal, String valorFormatado, String formaPagamento, String horaFormatada, LocalDateTime criadoEm) {
+    }
+
     public Long getId() {
         return id;
     }

@@ -47,4 +47,7 @@ public interface MovimentoCaixaRepository extends JpaRepository<MovimentoCaixa, 
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim
     );
+
+    List<MovimentoCaixa> findByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
+
 }

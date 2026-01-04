@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -146,21 +147,56 @@ public class EntregadorController {
         entregasBox.getChildren().add(tituloEntregas);
 
         GridPane tabela = new GridPane();
-        tabela.setHgap(20);
+        tabela.setHgap(15);
         tabela.setVgap(8);
         tabela.setPadding(new Insets(5, 0, 0, 0));
 
-        tabela.add(criarHeaderLabel("Pedido"), 0, 0);
-        tabela.add(criarHeaderLabel("ID iFood"), 1, 0);
-        tabela.add(criarHeaderLabel("Horário"), 2, 0);
+        tabela.add(criarHeaderLabel("ID Pedido"), 0, 0);
+        tabela.add(criarHeaderLabel("Nº Pedido"), 1, 0);
+        tabela.add(criarHeaderLabel("Cliente"), 2, 0);
+        tabela.add(criarHeaderLabel("Valor"), 3, 0);
+        tabela.add(criarHeaderLabel("Horário"), 4, 0);
 
         int row = 1;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         for (Entrega entrega : entregas.stream().limit(5).collect(Collectors.toList())) {
-            tabela.add(criarDetalheLabel(entrega.getNumeroPedido()), 0, row);
-            tabela.add(criarDetalheLabel(entrega.getIdIfood() != null && !entrega.getIdIfood().isEmpty() ? entrega.getIdIfood() : "-"), 1, row);
-            tabela.add(criarDetalheLabel(entrega.getDataHora().format(formatter)), 2, row);
+            Pedido pedido = entrega.getPedido();
+
+            String idPedidoTexto = pedido != null ? "#" + pedido.getId() : "N/A";
+            Label lblId = criarDetalheLabel(idPedidoTexto);
+            if (pedido != null) {
+                lblId.setStyle("-fx-font-weight: bold; -fx-text-fill: #3B82F6;");
+            }
+
+            Label lblNumero = criarDetalheLabel(entrega.getNumeroPedido());
+
+            String cliente = pedido != null && pedido.getCliente() != null ?
+                    pedido.getCliente() : "Cliente não informado";
+            Label lblCliente = criarDetalheLabel(cliente);
+
+            String valorTexto;
+            if (pedido != null) {
+                BigDecimal valorFinal = pedido.getTotalFinal();
+                if (valorFinal != null) {
+                    valorTexto = String.format("R$ %.2f", valorFinal.doubleValue());
+                } else {
+                    valorTexto = String.format("R$ %.2f", pedido.getTotal());
+                }
+            } else {
+                valorTexto = "R$ 0,00";
+            }
+            Label lblValor = criarDetalheLabel(valorTexto);
+            lblValor.setStyle("-fx-font-weight: bold; -fx-text-fill: #059669;");
+
+            Label lblHorario = criarDetalheLabel(entrega.getDataHora().format(formatter));
+
+            tabela.add(lblId, 0, row);
+            tabela.add(lblNumero, 1, row);
+            tabela.add(lblCliente, 2, row);
+            tabela.add(lblValor, 3, row);
+            tabela.add(lblHorario, 4, row);
+
             row++;
         }
 
@@ -330,6 +366,7 @@ public class EntregadorController {
                     novaEntrega.setNumeroPedido(numeroPedido);
                     novaEntrega.setIdIfood(idIfood.isEmpty() ? null : idIfood);
                     novaEntrega.setDataHora(LocalDateTime.now());
+                    novaEntrega.setPedido(pedido);
 
                     return novaEntrega;
                 }
@@ -794,7 +831,7 @@ public class EntregadorController {
                 return;
             }
 
-            Entrega novaEntrega = criarNovaEntrega(pedido, idIfood);
+            Entrega novaEntrega = criarNovaEntregaComPedido(pedido, idIfood);
             entregaRepository.save(novaEntrega);
 
             atualizarPedido(pedido);
@@ -816,6 +853,16 @@ public class EntregadorController {
             e.printStackTrace();
             mostrarErro("Erro", "Não foi possível salvar a entrega: " + e.getMessage());
         }
+    }
+
+    private Entrega criarNovaEntregaComPedido(Pedido pedido, String idIfood) {
+        Entrega novaEntrega = new Entrega();
+        novaEntrega.setEntregador(entregadorAtual);
+        novaEntrega.setNumeroPedido(pedido.getNumeroPedido());
+        novaEntrega.setIdIfood(idIfood.isEmpty() ? null : idIfood);
+        novaEntrega.setDataHora(LocalDateTime.now());
+        novaEntrega.setPedido(pedido);
+        return novaEntrega;
     }
 
     private Optional<Pedido> buscarPedido(String numeroPedidoOuId) {
@@ -856,6 +903,7 @@ public class EntregadorController {
         novaEntrega.setNumeroPedido(pedido.getNumeroPedido());
         novaEntrega.setIdIfood(idIfood.isEmpty() ? null : idIfood);
         novaEntrega.setDataHora(LocalDateTime.now());
+        novaEntrega.setPedido(pedido);
         return novaEntrega;
     }
 
@@ -1151,22 +1199,27 @@ public class EntregadorController {
     private List<Entrega> buscarEntregasHoje(Entregador entregador) {
         try {
             LocalDate hoje = LocalDate.now();
-            return entregaRepository.findEntregasHojeByEntregadorAlt(entregador, hoje.atStartOfDay(), hoje.atTime(LocalTime.MAX));
+            LocalDateTime inicioDoDia = hoje.atStartOfDay();
+            LocalDateTime fimDoDia = hoje.atTime(23, 59, 59);
+
+            return entregaRepository.findEntregasHojeByEntregadorAlt(
+                    entregador, inicioDoDia, fimDoDia);
+
         } catch (Exception e) {
+            System.err.println("Erro na query findEntregasHojeByEntregadorAlt: " + e.getMessage());
+            e.printStackTrace();
+
             try {
-                return entregaRepository.findEntregasHojeByEntregador(entregador);
-            } catch (Exception ex) {
-                List<Entrega> todasEntregas = entregaRepository.findByEntregadorOrderByDataHoraDesc(entregador);
+                List<Entrega> todasEntregas = entregaRepository.findByEntregadorWithPedido(entregador);
                 LocalDate hoje = LocalDate.now();
-                List<Entrega> entregasHoje = new ArrayList<>();
 
-                for (Entrega entrega : todasEntregas) {
-                    if (entrega.getDataHora().toLocalDate().equals(hoje)) {
-                        entregasHoje.add(entrega);
-                    }
-                }
-
-                return entregasHoje;
+                return todasEntregas.stream()
+                        .filter(entrega -> entrega.getDataHora().toLocalDate().equals(hoje))
+                        .collect(Collectors.toList());
+            } catch (Exception ex) {
+                System.err.println("Erro no fallback: " + ex.getMessage());
+                ex.printStackTrace();
+                return new ArrayList<>();
             }
         }
     }

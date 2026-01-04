@@ -671,7 +671,6 @@ public class TelaRegistroPedidoController implements Initializable {
             System.out.println("Abrindo pop-up de confirmação de saída...");
 
             if (usuarioSessao != null) {
-                usuarioSessao.logout();
             }
 
             FXMLLoader loader = new FXMLLoader(
