@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxWidth="1450.0" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.UsuarioController">
+   <children>
+
+      <ImageView fitHeight="160.0" fitWidth="160.0" layoutX="595.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@/assets/imgs/logo-pdv.jpg" />
+         </image>
+      </ImageView>
+
+      <AnchorPane layoutX="475.0" layoutY="220.0" prefHeight="320.0" prefWidth="400.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);">
+         <children>
+            
+            <VBox alignment="CENTER" layoutX="35.0" layoutY="25.0" prefWidth="330.0" spacing="15.0">
+               <children>
+                  
+                  <Label text="Recupere seu acesso">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </Label>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Nova senha">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <PasswordField fx:id="txtNovaSenha" prefHeight="40.0" promptText="Digite sua nova senha" style="-fx-background-radius: 5; -fx-border-color: #ccc; -fx-border-radius: 5;">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </PasswordField>
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Confirmar senha">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <PasswordField fx:id="txtConfirmarSenha" prefHeight="40.0" promptText="Confirme sua nova senha" style="-fx-background-radius: 5; -fx-border-color: #ccc; -fx-border-radius: 5;">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </PasswordField>
+                     </children>
+                  </VBox>
+
+                  <Button fx:id="btnCadastrar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#voltarParaLogin" prefHeight="45.0" style="-fx-background-color: #f68411; -fx-background-radius: 8px;" styleClass="hover" text="Cadastrar" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </Button>
+
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
