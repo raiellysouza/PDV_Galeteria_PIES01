@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="800.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.EditarPedidoController">
+   <children>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="800.0" prefWidth="600.0" style="-fx-background-color: transparent; -fx-background: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <content>
+            <VBox spacing="15.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               <children>
+                  
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <VBox>
+                           <children>
+                              <Label text="Editar Pedido">
+                                 <font>
+                                    <Font name="System Bold" size="22.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Modifique as informações do pedido" textFill="#888888">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" style="-fx-background-color: transparent;" text="X" textFill="#666666">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </HBox>
+
+                  <Separator prefWidth="200.0" />
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Nome do Cliente">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <TextField promptText="Nome do cliente" style="-fx-border-color: #dddddd; -fx-background-radius: 4; -fx-border-radius: 4;" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="10.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="Itens do Pedido">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Button mnemonicParsing="false" style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 4;" text="+ Adicionar Item">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                           </children>
+                        </HBox>
+
+                        <VBox spacing="10.0" style="-fx-background-color: #f9f9f9; -fx-padding: 10; -fx-background-radius: 5;">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <TextField prefWidth="200.0" promptText="Item" style="-fx-border-color: #cccccc; -fx-background-radius: 3;" HBox.hgrow="ALWAYS" />
+                                    <TextField alignment="CENTER" prefWidth="60.0" text="0" style="-fx-border-color: #cccccc; -fx-background-radius: 3;" />
+                                    <TextField alignment="CENTER_RIGHT" prefWidth="100.0" text="0.00" style="-fx-border-color: #cccccc; -fx-background-radius: 3;" />
+                                    
+                                    <Button mnemonicParsing="false" style="-fx-background-color: transparent;">
+                                       <graphic>
+                                          <SVGPath content="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#ff4d4d" scaleX="0.8" scaleY="0.8" />
+                                       </graphic>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                              <Label text="Subtotal: R$ 0.00" textFill="#888888">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="10.0" style="-fx-background-color: #f9f9f9; -fx-padding: 10; -fx-background-radius: 5;">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <TextField prefWidth="200.0" promptText="Item" style="-fx-border-color: #cccccc; -fx-background-radius: 3;" HBox.hgrow="ALWAYS" />
+                                    <TextField alignment="CENTER" prefWidth="60.0" text="0" style="-fx-border-color: #cccccc; -fx-background-radius: 3;" />
+                                    <TextField alignment="CENTER_RIGHT" prefWidth="100.0" text="0.00" style="-fx-border-color: #cccccc; -fx-background-radius: 3;" />
+                                    
+                                    <Button mnemonicParsing="false" style="-fx-background-color: transparent;">
+                                       <graphic>
+                                          <SVGPath content="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#ff4d4d" scaleX="0.8" scaleY="0.8" />
+                                       </graphic>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                              <Label text="Subtotal: R$ 0.00" textFill="#888888">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Total: R$ 0.00">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+
+                  <Separator prefWidth="200.0" />
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Observação">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <TextArea prefHeight="80.0" promptText="Observações do pedido..." style="-fx-border-color: #dddddd; -fx-background-radius: 4; -fx-border-radius: 4;" wrapText="true" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Tempo de Previsão">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <TextField text="0 minutos" style="-fx-border-color: #dddddd; -fx-background-radius: 4; -fx-border-radius: 4;" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Forma de Pagamento">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <ComboBox maxWidth="1.7976931348623157E308" promptText="Não Pago" style="-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 4;">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="Não Pago" />
+                                 <String fx:value="Dinheiro" />
+                                 <String fx:value="PIX" />
+                                 <String fx:value="Crédito" />
+                                 <String fx:value="Débito" />
+                              </FXCollections>
+                           </items>
+                        </ComboBox>
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Valor pago">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <TextField text="0.00" style="-fx-border-color: #dddddd; -fx-background-radius: 4; -fx-border-radius: 4;" />
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Status">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <ComboBox maxWidth="1.7976931348623157E308" promptText="Registrado" style="-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-radius: 4;">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="Registrado" />
+                                 <String fx:value="Em Andamento" />
+                                 <String fx:value="Pronto" />
+                                 <String fx:value="Finalizado" />
+                              </FXCollections>
+                           </items>
+                        </ComboBox>
+                     </children>
+                  </VBox>
+
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                     <children>
+                        <Button mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 5;" text="Cancelar">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <Button mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #f68411; -fx-background-radius: 5;" text="Salvar Alterações" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                  </HBox>
+
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</AnchorPane>

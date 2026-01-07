@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -9,80 +10,105 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="1450.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
+<AnchorPane maxHeight="1450.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1350.0" style="-fx-background-color: #7C0000;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.Frontend.Controllers.LoginController">
 
     <children>
-        <VBox alignment="CENTER" prefHeight="700.0" prefWidth="1350.0" spacing="40" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
-
+        <VBox alignment="CENTER" spacing="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <ImageView fitHeight="180.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true">
+                
+                <ImageView fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@/assets/imgs/logo-pdv.jpg" />
                     </image>
                 </ImageView>
 
-                <VBox alignment="CENTER" maxWidth="500.0" prefWidth="500.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 40;">
-
+                <VBox alignment="CENTER" maxWidth="450.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);">
+                    <padding>
+                        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                    </padding>
                     <children>
-                        <Label style="-fx-text-fill: black;" text="Login">
+                        
+                        <Label text="Login" textFill="BLACK">
                             <font>
                                 <Font name="System Bold" size="32.0" />
                             </font>
+                            <VBox.margin>
+                                <Insets bottom="30.0" />
+                            </VBox.margin>
                         </Label>
 
-                        <VBox maxWidth="400.0" prefWidth="400.0" spacing="25">
+                        <VBox alignment="CENTER_LEFT" spacing="5.0">
                             <children>
-                                <VBox spacing="8">
-                                    <children>
-                                        <Label style="-fx-text-fill: black;" text="Usuário">
-                                            <font>
-                                                <Font name="System Bold" size="18.0" />
-                                            </font>
-                                        </Label>
-                                        <TextField fx:id="campoUsuario" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Digite seu usuário" style="-fx-background-color: white;" styleClass="text-field">
-                                            <font>
-                                                <Font size="16.0" />
-                                            </font>
-                                        </TextField>
-                                    </children>
-                                </VBox>
-
-                                <VBox spacing="8">
-                                    <children>
-                                        <Label style="-fx-text-fill: black;" text="Senha">
-                                            <font>
-                                                <Font name="System Bold" size="18.0" />
-                                            </font>
-                                        </Label>
-                                        <PasswordField fx:id="campoSenha" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Digite sua senha" style="-fx-background-color: white;" styleClass="text-field">
-                                            <font>
-                                                <Font size="16.0" />
-                                            </font>
-                                        </PasswordField>
-                                    </children>
-                                </VBox>
+                                <Label text="Usuário" textFill="BLACK">
+                                    <font>
+                                        <Font name="System Bold" size="18.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="campoUsuario" prefHeight="45.0" promptText="Digite seu usuário" style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 5; -fx-background-radius: 5;" styleClass="text-field">
+                                    <font>
+                                        <Font size="16.0" />
+                                    </font>
+                                </TextField>
                             </children>
+                            <VBox.margin>
+                                <Insets bottom="20.0" />
+                            </VBox.margin>
                         </VBox>
 
-                        <Button maxWidth="400.0" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="50.0" prefWidth="400.0" style="-fx-background-color: #f68411; -fx-background-radius: 8px;" styleClass="hover" text="Entrar" textFill="WHITE">
-                            <cursor>
-                                <Cursor fx:constant="HAND" />
-                            </cursor>
+                        <VBox alignment="CENTER_LEFT" spacing="5.0">
+                            <children>
+                                <Label text="Senha" textFill="BLACK">
+                                    <font>
+                                        <Font name="System Bold" size="18.0" />
+                                    </font>
+                                </Label>
+                                <PasswordField fx:id="campoSenha" prefHeight="45.0" promptText="Digite sua senha" style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-radius: 5; -fx-background-radius: 5;" styleClass="text-field">
+                                    <font>
+                                        <Font size="16.0" />
+                                    </font>
+                                </PasswordField>
+                                
+                                <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Esqueci minha senha" textFill="#666666">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <VBox.margin>
+                                        <Insets top="2.0" />
+                                    </VBox.margin>
+                                </Label>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="30.0" />
+                            </VBox.margin>
+                        </VBox>
+
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#entrarNoSistema" prefHeight="50.0" style="-fx-background-color: #f68411; -fx-background-radius: 8;" styleClass="hover" text="Entrar" textFill="WHITE">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                            <VBox.margin>
+                                <Insets bottom="15.0" />
+                            </VBox.margin>
                         </Button>
-                        <HBox alignment="CENTER" spacing="5">
+
+                        <HBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <Label opacity="0.5" text="Ainda não tem login?">
+                                <Label text="Ainda não tem login?" textFill="#666666">
                                     <font>
                                         <Font name="System Bold" size="12.0" />
                                     </font>
                                 </Label>
-                                <Button mnemonicParsing="false" onAction="#abrirTelaCadastro" style="-fx-background-color: transparent; -fx-padding: 0;" text="Cadastre-se">
+                                <Button mnemonicParsing="false" onAction="#abrirTelaCadastro" style="-fx-background-color: transparent; -fx-padding: 0;" text="Cadastre-se" textFill="BLACK">
                                     <font>
                                         <Font name="System Bold" size="13.0" />
                                     </font>
@@ -108,11 +134,12 @@
                         </Label>
                     </children>
                 </VBox>
+
             </children>
         </VBox>
 
-        <VBox alignment="CENTER" managed="false" spacing="30" visible="false" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
 
+        <VBox alignment="CENTER" managed="false" spacing="30" visible="false" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
             <children>
                 <ImageView fitHeight="120.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
                     <image>
@@ -121,7 +148,6 @@
                 </ImageView>
 
                 <VBox alignment="CENTER" spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 30;">
-
                     <children>
                         <Label style="-fx-text-fill: black;" text="Login">
                             <font>
@@ -157,5 +183,6 @@
                 </VBox>
             </children>
         </VBox>
+
     </children>
 </AnchorPane>

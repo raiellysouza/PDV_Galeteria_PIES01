@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="700.0" prefWidth="500.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pdv_galeteria.controller.DetalhesPedidoController">
+   <children>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="700.0" prefWidth="500.0" style="-fx-background-color: white; -fx-background: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <content>
+            <VBox spacing="20.0">
+               <padding>
+                  <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+               </padding>
+               <children>
+
+                  <HBox alignment="TOP_CENTER">
+                     <children>
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Detalhes do Pedido">
+                                 <font>
+                                    <Font name="System Bold" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Informações completas do pedido" textFill="#888888">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#fecharModal" style="-fx-background-color: transparent;" text="X">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </HBox>
+
+                  <VBox spacing="15.0">
+                     <children>
+                        
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Cliente">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Francisco Soares" textFill="#333333">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Data e Hora">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label text="01/12/2025, 17:39:10" textFill="#333333">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Itens do Pedido">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <VBox spacing="2.0">
+                                 <children>
+                                    <Label text="0x Galeto Inteiro - R$ 0.00" textFill="#333333">
+                                       <font><Font size="15.0" /></font>
+                                    </Label>
+                                    <Label text="0x Batata Frita - R$ 0.00" textFill="#333333">
+                                       <font><Font size="15.0" /></font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Tipo de Entrega">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label text="27 de setembro, 1852" textFill="#333333">
+                                 <font><Font size="15.0" /></font>
+                              </Label>
+                              <Label text="Tel: 1111111111" textFill="#333333">
+                                 <font><Font size="15.0" /></font>
+                              </Label>
+                              <Label text="Ref: próximo a sobral" textFill="#333333">
+                                 <font><Font size="15.0" /></font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Observação">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Frango bem assado" textFill="#333333">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Forma de Pagamento">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Dinheiro" textFill="#333333">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Tempo de Previsão">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label text="45 minutos" textFill="#333333">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                           <children>
+                              <Label text="Desconto">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font>
+                              </Label>
+                              <Label text="R$ 0.00" textFill="#333333">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                     </children>
+                  </VBox>
+
+                  <Separator prefWidth="200.0" />
+
+                  <HBox alignment="BOTTOM_LEFT" spacing="10.0">
+                     <children>
+                        <VBox>
+                           <children>
+                              <Label text="Total">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Troco" textFill="#888888">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                        
+                        <Region HBox.hgrow="ALWAYS" />
+                        
+                        <VBox alignment="BOTTOM_RIGHT">
+                           <children>
+                              <Label text="R$ 0.00">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label text="R$ 0.00" textFill="#888888">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+
+                  <HBox alignment="CENTER_RIGHT">
+                      <Button mnemonicParsing="false" onAction="#fecharModal" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: #f68411; -fx-background-radius: 8;" text="Fechar" textFill="WHITE">
+                         <font>
+                            <Font name="System Bold" size="14.0" />
+                         </font>
+                         <cursor>
+                            <Cursor fx:constant="HAND" />
+                         </cursor>
+                      </Button>
+                  </HBox>
+
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</AnchorPane>
