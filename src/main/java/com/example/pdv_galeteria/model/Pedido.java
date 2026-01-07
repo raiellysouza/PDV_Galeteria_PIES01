@@ -30,9 +30,6 @@ public class Pedido {
     @Column(name = "forma_pagamento", length = 100)
     private String formaPagamento;
 
-    @Column(name = "detalhes_pagamento", length = 500)
-    private String detalhesPagamento;
-
     @Column(name = "canal_venda", length = 20)
     private String canalVenda = "loja";
 
@@ -41,9 +38,6 @@ public class Pedido {
 
     @Column(length = 200)
     private String endereco;
-
-    @Column(length = 20)
-    private String numero;
 
     @Column(length = 20)
     private String telefone;
@@ -56,9 +50,6 @@ public class Pedido {
 
     @Column(name = "tempo_estimado", length = 50)
     private String tempoEstimado;
-
-    @Column(name = "tempo_previsao")
-    private Integer tempoPrevisao;
 
     @Column(name = "valor_pago")
     private Double valorPago = 0.0;
@@ -84,47 +75,11 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FormaPagamentoPedido> formasPagamento = new ArrayList<>();
 
-    @Column(name = "bairro", length = 100)
-    private String bairro;
-
-    @Column(name = "cidade", length = 100)
-    private String cidade;
-
-    @Column(name = "estado", length = 2)
-    private String estado;
-
-    @Column(name = "cep", length = 10)
-    private String cep;
-
-    @Column(name = "complemento", length = 200)
-    private String complemento;
-
     @Column(name = "numero_pedido", unique = true)
     private String numeroPedido;
 
-    @Column(name = "entregador", length = 100)
-    private String entregador;
-
     @Column(name = "status_entrega", length = 20)
     private String statusEntrega;
-
-    @Column(name = "data_entrega")
-    private LocalDateTime dataEntrega;
-
-    @Column(name = "data_retirada")
-    private LocalDateTime dataRetirada;
-
-    @Column(name = "observacao_interna", length = 500)
-    private String observacaoInterna;
-
-    @Column(name = "motivo_cancelamento", length = 500)
-    private String motivoCancelamento;
-
-    @Column(name = "data_cancelamento")
-    private LocalDateTime dataCancelamento;
-
-    @Column(name = "responsavel_cancelamento", length = 100)
-    private String responsavelCancelamento;
 
     @Column(name = "ultima_atualizacao")
     private LocalDateTime ultimaAtualizacao = LocalDateTime.now();
@@ -339,12 +294,6 @@ public class Pedido {
     public String getNumeroPedido() { return numeroPedido; }
     public void setNumeroPedido(String numeroPedido) {
         this.numeroPedido = numeroPedido;
-        atualizarUltimaAtualizacao();
-    }
-
-    public String getEntregador() { return entregador; }
-    public void setEntregador(String entregador) {
-        this.entregador = entregador;
         atualizarUltimaAtualizacao();
     }
 
